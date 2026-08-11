@@ -5,15 +5,11 @@ import { AvatarCompositor, defaultAvatarConfig } from './avatar';
 import { MenuBarComponent } from './components/menu-bar';
 import { PanelHost } from './components/panels/PanelHost';
 
+import { ElectronAPI } from './types/ipc';
+
 // Type checking definitions for exposed window API
 interface Window {
-  electronAPI?: {
-    setIgnoreMouseEvents: (ignore: boolean, options?: { forward: boolean }) => void;
-    dragWindow: (dx: number, dy: number) => void;
-    setDragging: (dragging: boolean) => void;
-    setMenuOpen?: (open: boolean) => void;
-    setInteractiveRects?: (rects: any) => void;
-  };
+  electronAPI?: ElectronAPI;
 }
 
 const bubble = document.getElementById('bubble') as HTMLDivElement | null;
@@ -25,6 +21,7 @@ const featurePanelContainer = document.getElementById('feature-panel') as HTMLDi
 const compositor = new AvatarCompositor(canvas, defaultAvatarConfig);
 
 let panelRoot: Root | null = null;
+
 if (featurePanelContainer) {
   panelRoot = createRoot(featurePanelContainer);
 }
@@ -69,22 +66,25 @@ function renderFeaturePanel() {
 
   if (activeOptionId) {
     featurePanelContainer.classList.add('visible');
+    panelRoot.render(
+      React.createElement(PanelHost, {
+        activeOptionId,
+        onClose: () => {
+          activeOptionId = null;
+          menuBar.setActiveOption(null);
+          renderFeaturePanel();
+        },
+      })
+    );
   } else {
     featurePanelContainer.classList.remove('visible');
   }
 
-  panelRoot.render(
-    React.createElement(PanelHost, {
-      activeOptionId,
-      onClose: () => {
-        activeOptionId = null;
-        menuBar.setActiveOption(null);
-        renderFeaturePanel();
-      },
-    })
-  );
-
+  // Update immediately and schedule a re-measurement after React commits DOM layout & paint
   updateInteractiveRects();
+  requestAnimationFrame(() => {
+    requestAnimationFrame(updateInteractiveRects);
+  });
 }
 
 // Initialize MenuBar Component
@@ -138,7 +138,10 @@ avatar.addEventListener('mouseenter', () => {
 });
 
 avatar.addEventListener('mouseleave', () => {
-  if (!isDragging && !menuBarContainer.matches(':hover') && (!featurePanelContainer || !featurePanelContainer.matches(':hover')) && (!bubble || !bubble.matches(':hover'))) {
+  if (!isDragging && !menuBarContainer.matches(':hover')
+    && (!featurePanelContainer ||
+      !featurePanelContainer.matches(':hover')) &&
+    (!bubble || !bubble.matches(':hover'))) {
     setInteractive(false);
   }
 });
@@ -148,7 +151,8 @@ menuBarContainer.addEventListener('mouseenter', () => {
 });
 
 menuBarContainer.addEventListener('mouseleave', () => {
-  if (!isDragging && !avatar.matches(':hover') && (!featurePanelContainer || !featurePanelContainer.matches(':hover'))) {
+  if (!isDragging && !avatar.matches(':hover') &&
+    (!featurePanelContainer || !featurePanelContainer.matches(':hover'))) {
     setInteractive(false);
   }
 });

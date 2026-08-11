@@ -1,7 +1,10 @@
 import { contextBridge, ipcRenderer } from 'electron';
+import { InteractiveRects, IgnoreMouseEventsOptions } from './types/ipc';
+
+export type { ComponentRect, InteractiveRects, IgnoreMouseEventsOptions, ElectronAPI } from './types/ipc';
 
 contextBridge.exposeInMainWorld('electronAPI', {
-    setIgnoreMouseEvents: (ignore: boolean, options?: { forward: boolean }) => {
+    setIgnoreMouseEvents: (ignore: boolean, options?: IgnoreMouseEventsOptions) => {
         ipcRenderer.send('set-ignore-mouse-events', ignore, options);
     },
     dragWindow: (dx: number, dy: number) => {
@@ -13,7 +16,7 @@ contextBridge.exposeInMainWorld('electronAPI', {
     setMenuOpen: (open: boolean) => {
         ipcRenderer.send('set-menu-open', open);
     },
-    setInteractiveRects: (rects: any) => {
+    setInteractiveRects: (rects: InteractiveRects) => {
         ipcRenderer.send('set-interactive-rects', rects);
     },
     saveMemoryFile: (filename: string, content: string) => ipcRenderer.invoke('save-memory-file', filename, content),

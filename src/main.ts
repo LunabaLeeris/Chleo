@@ -2,6 +2,7 @@ import { app, BrowserWindow, ipcMain, screen } from 'electron';
 import path from 'node:path';
 import fs from 'node:fs';
 import started from 'electron-squirrel-startup';
+import { InteractiveRects, IgnoreMouseEventsOptions } from './types/ipc';
 
 // Handle creating/removing shortcuts on Windows when installing/uninstalling.
 if (started) {
@@ -50,18 +51,10 @@ let isUserDragging = false;
 let isCurrentlyIgnoring = false;
 let isMenuOpen = false;
 
-interface ComponentRect {
-  x: number;
-  y: number;
-  width: number;
-  height: number;
-  visible?: boolean;
-}
-
-let interactiveRects: { avatar?: ComponentRect; menu?: ComponentRect; panel?: ComponentRect } = {};
+let interactiveRects: InteractiveRects = {};
 
 // IPC listener so the frontend can toggle click-through toggle when hovering over the avatar
-ipcMain.on('set-ignore-mouse-events', (event: Electron.IpcMainEvent, ignore: boolean, options?: { forward?: boolean }) => {
+ipcMain.on('set-ignore-mouse-events', (event: Electron.IpcMainEvent, ignore: boolean, options?: IgnoreMouseEventsOptions) => {
   const win = BrowserWindow.fromWebContents(event.sender);
   if (win) {
     if (options && typeof options === 'object' && options !== null && typeof options.forward === 'boolean') {
@@ -79,7 +72,7 @@ ipcMain.on('set-menu-open', (_event: Electron.IpcMainEvent, open: boolean) => {
 });
 
 // IPC listener to receive dynamic element bounding boxes from renderer
-ipcMain.on('set-interactive-rects', (_event: Electron.IpcMainEvent, rects) => {
+ipcMain.on('set-interactive-rects', (_event: Electron.IpcMainEvent, rects: InteractiveRects) => {
   if (rects && typeof rects === 'object') {
     interactiveRects = rects;
   }
