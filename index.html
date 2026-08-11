@@ -7,16 +7,27 @@
   <!-- Pixel Art & Retro Google Fonts -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Pixelify+Sans:wght@400;500;600;700&family=Press+Start+2P&family=Silkscreen:wght@400;700&family=Outfit:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link
+    href="https://fonts.googleapis.com/css2?family=Pixelify+Sans:wght@400;500;600;700&family=Press+Start+2P&family=Silkscreen:wght@400;700&family=Outfit:wght@400;500;600;700&display=swap"
+    rel="stylesheet">
 </head>
 
 <body>
   <div class="container">
-    <!-- Pixel Avatar (composable sprite canvas) -->
-    <div id="avatar" class="avatar-container">
-      <!-- Speech Bubble (Anchored directly above CLEO's head) -->
-      <div id="bubble" class="speech-bubble"></div>
-      <canvas id="avatar-canvas"></canvas>
+    <div class="companion-wrapper">
+      <!-- Feature Panel (Anchored to the left of Menu Bar) -->
+      <div id="feature-panel" class="feature-panel"></div>
+
+      <!-- Menu Bar (Middle) -->
+      <div id="menu-bar" class="menu-bar"></div>
+
+      <!-- Pixel Avatar (composable sprite canvas) -->
+      <div id="avatar" class="avatar-container">
+        <!-- Speech Bubble (Anchored directly above CLEO's head) -->
+        <div id="bubble" class="speech-bubble"></div>
+        <canvas id="avatar-canvas"></canvas>
+      </div>
+
     </div>
   </div>
   <script type="module" src="/src/renderer.ts"></script>

@@ -2,7 +2,6 @@ import { app, BrowserWindow, ipcMain, screen } from 'electron';
 import path from 'node:path';
 import fs from 'node:fs';
 import started from 'electron-squirrel-startup';
-import { startWebSocketServer } from './web-socket-server';
 
 // Handle creating/removing shortcuts on Windows when installing/uninstalling.
 if (started) {
@@ -12,8 +11,8 @@ if (started) {
 const createWindow = () => {
   const primaryDisplay = screen.getPrimaryDisplay();
   const { width: screenWidth, height: screenHeight } = primaryDisplay.workAreaSize;
-  const windowWidth = 320;
-  const windowHeight = 350;
+  const windowWidth = 750;
+  const windowHeight = 420;
 
   // Create the browser window.
   const mainWindow = new BrowserWindow({
@@ -49,17 +48,40 @@ const createWindow = () => {
 
 let isUserDragging = false;
 let isCurrentlyIgnoring = false;
+let isMenuOpen = false;
+
+interface ComponentRect {
+  x: number;
+  y: number;
+  width: number;
+  height: number;
+  visible?: boolean;
+}
+
+let interactiveRects: { avatar?: ComponentRect; menu?: ComponentRect; panel?: ComponentRect } = {};
 
 // IPC listener so the frontend can toggle click-through toggle when hovering over the avatar
-ipcMain.on('set-ignore-mouse-events', (event: Electron.IpcMainEvent, ignore: boolean, options) => {
+ipcMain.on('set-ignore-mouse-events', (event: Electron.IpcMainEvent, ignore: boolean, options?: { forward?: boolean }) => {
   const win = BrowserWindow.fromWebContents(event.sender);
   if (win) {
-    if (options && typeof options === 'object') {
-      win.setIgnoreMouseEvents(ignore, options);
+    if (options && typeof options === 'object' && options !== null && typeof options.forward === 'boolean') {
+      win.setIgnoreMouseEvents(ignore, { forward: options.forward });
     } else {
       win.setIgnoreMouseEvents(ignore);
     }
     isCurrentlyIgnoring = ignore;
+  }
+});
+
+// IPC listener to track menu open state
+ipcMain.on('set-menu-open', (_event: Electron.IpcMainEvent, open: boolean) => {
+  isMenuOpen = open;
+});
+
+// IPC listener to receive dynamic element bounding boxes from renderer
+ipcMain.on('set-interactive-rects', (_event: Electron.IpcMainEvent, rects) => {
+  if (rects && typeof rects === 'object') {
+    interactiveRects = rects;
   }
 });
 
@@ -111,7 +133,6 @@ ipcMain.handle('read-memory-file', (_event, filename: string) => {
 // initialization and is ready to create browser windows.
 app.on('ready', () => {
   const mainWindow = createWindow();
-  startWebSocketServer(mainWindow);
 
   // OS-level cursor tracking loop to ensure companion is always clickable when hovered
   setInterval(() => {
@@ -132,10 +153,27 @@ app.on('ready', () => {
       return;
     }
 
-    // Avatar/Bubble region inside the 320x350 window
-    const isOverAvatarRegion = relX >= 40 && relX <= 280 && relY >= 50 && relY <= 345;
+    // Dynamic hit-testing based on actual element rects from renderer
+    const avatar = interactiveRects.avatar;
+    const menu = interactiveRects.menu;
+    const panel = interactiveRects.panel;
 
-    if (isOverAvatarRegion) {
+    const isOverAvatar = avatar ? (
+      relX >= avatar.x && relX <= avatar.x + avatar.width &&
+      relY >= avatar.y && relY <= avatar.y + avatar.height
+    ) : (relX >= 0 && relX <= bounds.width && relY >= 0 && relY <= bounds.height);
+
+    const isOverMenu = (menu && menu.visible) ? (
+      relX >= menu.x && relX <= menu.x + menu.width &&
+      relY >= menu.y && relY <= menu.y + menu.height
+    ) : false;
+
+    const isOverPanel = (panel && panel.visible) ? (
+      relX >= panel.x && relX <= panel.x + panel.width &&
+      relY >= panel.y && relY <= panel.y + panel.height
+    ) : false;
+
+    if (isOverAvatar || isOverMenu || isOverPanel) {
       if (isCurrentlyIgnoring) {
         mainWindow.setIgnoreMouseEvents(false);
         isCurrentlyIgnoring = false;
