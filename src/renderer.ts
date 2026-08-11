@@ -1,7 +1,7 @@
 import './index.css';
 import React from 'react';
 import { createRoot, Root } from 'react-dom/client';
-import { AvatarCompositor, defaultAvatarConfig } from './avatar';
+import { AvatarCompositor, defaultAvatarConfig, defaultSpeechOrchestrator } from './avatar';
 import { MenuBarComponent } from './components/menu-bar';
 import { PanelHost } from './components/panels/PanelHost';
 
@@ -19,11 +19,27 @@ const menuBarContainer = document.getElementById('menu-bar') as HTMLDivElement;
 const featurePanelContainer = document.getElementById('feature-panel') as HTMLDivElement;
 
 const compositor = new AvatarCompositor(canvas, defaultAvatarConfig);
+const speechOrchestrator = defaultSpeechOrchestrator;
 
 let panelRoot: Root | null = null;
 
 if (featurePanelContainer) {
   panelRoot = createRoot(featurePanelContainer);
+
+  // Automatically update interactive rects whenever panel size or DOM children change
+  const resizeObserver = new ResizeObserver(() => {
+    updateInteractiveRects();
+  });
+  resizeObserver.observe(featurePanelContainer);
+
+  const mutationObserver = new MutationObserver(() => {
+    requestAnimationFrame(updateInteractiveRects);
+  });
+  mutationObserver.observe(featurePanelContainer, {
+    childList: true,
+    subtree: true,
+    attributes: true,
+  });
 }
 
 let activeOptionId: string | null = null;
@@ -66,6 +82,9 @@ function renderFeaturePanel() {
 
   if (activeOptionId) {
     featurePanelContainer.classList.add('visible');
+    // Ensure mouse events are enabled on opening panel
+    (window as any).electronAPI?.setIgnoreMouseEvents(false);
+
     panelRoot.render(
       React.createElement(PanelHost, {
         activeOptionId,
@@ -80,11 +99,11 @@ function renderFeaturePanel() {
     featurePanelContainer.classList.remove('visible');
   }
 
-  // Update immediately and schedule a re-measurement after React commits DOM layout & paint
+  // Update rects synchronously, on next frame, and after React DOM layout finishes
   updateInteractiveRects();
-  requestAnimationFrame(() => {
-    requestAnimationFrame(updateInteractiveRects);
-  });
+  requestAnimationFrame(() => updateInteractiveRects());
+  setTimeout(updateInteractiveRects, 50);
+  setTimeout(updateInteractiveRects, 150);
 }
 
 // Initialize MenuBar Component
@@ -109,11 +128,11 @@ const menuBar = new MenuBarComponent(menuBarContainer, {
   },
 });
 
-// Avatar compose
+// Avatar & Speech Compositor initialization
 (async () => {
   await compositor.init();
   compositor.start();
-  console.log('[Renderer] AvatarCompositor started.');
+  console.log('[Renderer] AvatarCompositor and SpeechOrchestrator successfully initialized.');
   updateInteractiveRects();
 })();
 

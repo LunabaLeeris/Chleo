@@ -20,6 +20,20 @@ contextBridge.exposeInMainWorld('electronAPI', {
         ipcRenderer.send('set-interactive-rects', rects);
     },
     saveMemoryFile: (filename: string, content: string) => ipcRenderer.invoke('save-memory-file', filename, content),
-    readMemoryFile: (filename: string) => ipcRenderer.invoke('read-memory-file', filename)
+    readMemoryFile: (filename: string) => ipcRenderer.invoke('read-memory-file', filename),
+
+    // Emotion & Brain APIs
+    getOverallEmotion: () => ipcRenderer.invoke('get-overall-emotion'),
+    getEmotionState: () => ipcRenderer.invoke('get-emotion-state'),
+    processMonitoringEvent: (event: any) => ipcRenderer.invoke('process-monitoring-event', event),
+    setActiveDomain: (url: string) => ipcRenderer.invoke('set-active-domain', url),
+    getActiveDomain: () => ipcRenderer.invoke('get-active-domain'),
+
+    // Rules & Memory APIs
+    getSiteRules: () => ipcRenderer.invoke('get-site-rules'),
+    getBehavioralRules: () => ipcRenderer.invoke('get-behavioral-rules'),
+    getShortTermMemoryEvents: () => ipcRenderer.invoke('get-short-term-events'),
+    getLongTermMemoryData: () => ipcRenderer.invoke('get-long-term-memory'),
 });
+
 

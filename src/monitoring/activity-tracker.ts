@@ -15,8 +15,8 @@ export class ActivityTracker {
   private shortTermMemory: ShortTermMemory;
   private listeners: ActivityTrackerListeners;
 
-  private tickerInterval: number | null = null;
-  private activeDomain: string = 'localhost';
+  private tickerInterval: ReturnType<typeof setInterval> | null = null;
+  private activeDomain = 'localhost';
   private lastCheckedDate: string = new Date().toDateString();
 
   constructor(
@@ -37,7 +37,7 @@ export class ActivityTracker {
   startTicker(): void {
     if (this.tickerInterval !== null) return;
 
-    this.tickerInterval = window.setInterval(() => {
+    this.tickerInterval = setInterval(() => {
       this.onTick();
     }, 1000);
   }
@@ -58,7 +58,9 @@ export class ActivityTracker {
       if (url.startsWith('http://') || url.startsWith('https://')) {
         domain = new URL(url).hostname;
       }
-    } catch (_) { }
+    } catch (_err) {
+      /* ignore invalid URL parsing */
+    }
 
     this.activeDomain = domain;
     this.shortTermMemory.setActiveDomain(domain);

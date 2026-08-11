@@ -1,6 +1,5 @@
-import type { ShortTermMemoryEvent, ActiveWarningState, MemoryConsolidationReason } from './memory-types';
+import type { ShortTermMemoryEvent, ActiveWarningState, MemoryConsolidationReason, StorageAdapter } from './memory-types';
 import { LongTermMemory } from './long-term-memory';
-import type { PrimaryEmotion } from '../avatar/emotions/emotion-types';
 
 export const MAX_EVENT_HISTORY = 50;
 export const MAX_RECENT_SPEECH_PHRASES = 10;
@@ -18,6 +17,7 @@ export class ShortTermMemory {
   private maxEventHistory: number = MAX_EVENT_HISTORY;
   private maxRecentSpeechPhrases: number = MAX_RECENT_SPEECH_PHRASES;
   private storageKey: string = 'chleo_short_term_memory_v1';
+  private storageAdapter?: StorageAdapter;
 
   // Easy-to-modify event template string for LLM feeding
   private eventTemplate: string = '[{time}] [{type}] {domain} - {details}';
@@ -36,8 +36,9 @@ export class ShortTermMemory {
 
   private longTermMemory: LongTermMemory;
 
-  constructor(longTermMemory: LongTermMemory) {
+  constructor(longTermMemory: LongTermMemory, storageAdapter?: StorageAdapter) {
     this.longTermMemory = longTermMemory;
+    this.storageAdapter = storageAdapter;
     this.load();
   }
 
@@ -72,6 +73,10 @@ export class ShortTermMemory {
     return this.maxEventHistory;
   }
 
+  getEvents(): ShortTermMemoryEvent[] {
+    return this.events;
+  }
+
   /**
    * Save short-term memory state to storage (Desktop file I/O or browser localStorage).
    */
@@ -87,9 +92,14 @@ export class ShortTermMemory {
       };
       const jsonStr = JSON.stringify(payload, null, 2);
 
-      // Desktop Native (Electron IPC) save check
+      // Direct Node.js / Custom StorageAdapter (Electron Main process)
+      if (this.storageAdapter) {
+        this.storageAdapter.saveMemoryFile('short-term-memory.json', jsonStr);
+      }
+
+      // Desktop Native (Electron Renderer IPC) save check
       if (typeof window !== 'undefined' && (window as any).electronAPI?.saveMemoryFile) {
-        (window as any).electronAPI.saveMemoryFile('short_term_memory.json', jsonStr);
+        (window as any).electronAPI.saveMemoryFile('short-term-memory.json', jsonStr);
       }
 
       // Browser localStorage backup/fallback
@@ -118,9 +128,20 @@ export class ShortTermMemory {
         if (Array.isArray(parsed.memorableEventTypes)) this.memorableEventTypes = parsed.memorableEventTypes;
       };
 
-      // Desktop Native (Electron IPC) check
+      // Direct Node.js / Custom StorageAdapter (Electron Main process)
+      if (this.storageAdapter) {
+        const res = this.storageAdapter.readMemoryFile('short-term-memory.json');
+        if (res instanceof Promise) {
+          res.then((raw) => { if (raw) applyData(raw); });
+        } else if (res) {
+          applyData(res);
+        }
+        return;
+      }
+
+      // Desktop Native (Electron Renderer IPC) check
       if (typeof window !== 'undefined' && (window as any).electronAPI?.readMemoryFile) {
-        (window as any).electronAPI.readMemoryFile('short_term_memory.json').then((raw: string | null) => {
+        (window as any).electronAPI.readMemoryFile('short-term-memory.json').then((raw: string | null) => {
           if (raw) {
             applyData(raw);
           } else if (window.localStorage) {

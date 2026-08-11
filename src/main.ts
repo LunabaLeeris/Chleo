@@ -4,10 +4,71 @@ import fs from 'node:fs';
 import started from 'electron-squirrel-startup';
 import { InteractiveRects, IgnoreMouseEventsOptions } from './types/ipc';
 
+import { LongTermMemory } from './memory/long-term-memory';
+import { ShortTermMemory } from './memory/short-term-memory';
+import { LLMService } from './monitoring/llm-service';
+import { ResponseGenerator } from './monitoring/response-generator';
+import { EmotionsOrchestrator } from './avatar/emotions/emotions-orchestrator';
+import { BehavioralEngine } from './monitoring/behavioral-engine';
+import { RuleStore } from './monitoring/rule-store';
+import { ActivityTracker } from './monitoring/activity-tracker';
+import type { StorageAdapter } from './memory/memory-types';
+import type { MonitoringEventPayload } from './monitoring';
+
 // Handle creating/removing shortcuts on Windows when installing/uninstalling.
 if (started) {
   app.quit();
 }
+
+const getUserDataDir = (): string => {
+  const dirPath = path.join(app.getAppPath(), 'src', 'user-data');
+  if (!fs.existsSync(dirPath)) {
+    fs.mkdirSync(dirPath, { recursive: true });
+  }
+  return dirPath;
+};
+
+// Custom file storage adapter for Desktop Native Electron main process
+const mainStorageAdapter: StorageAdapter = {
+  readMemoryFile: (filename: string) => {
+    try {
+      const filePath = path.join(getUserDataDir(), filename);
+      if (fs.existsSync(filePath)) {
+        return fs.readFileSync(filePath, 'utf-8');
+      }
+      // if can't read any throw an error
+
+      return null;
+    } catch (err) {
+      console.error(`[MainStorageAdapter] Failed to read memory file ${filename}:`, err);
+      return null;
+    }
+  },
+  saveMemoryFile: (filename: string, content: string) => {
+    try {
+      const filePath = path.join(getUserDataDir(), filename);
+      fs.writeFileSync(filePath, content, 'utf-8');
+      return true;
+    } catch (err) {
+      console.error(`[MainStorageAdapter] Failed to save memory file ${filename}:`, err);
+      return false;
+    }
+  },
+};
+
+// Initialize CHLEO Core Modules in Main Process (Brain & Memory)
+const longTermMemory = new LongTermMemory(mainStorageAdapter);
+const shortTermMemory = new ShortTermMemory(longTermMemory, mainStorageAdapter);
+const llmService = new LLMService();
+const responseGenerator = new ResponseGenerator(shortTermMemory, llmService);
+const initialEmotionState = longTermMemory.getData().lastEmotionState;
+const emotionsOrchestrator = new EmotionsOrchestrator(initialEmotionState);
+const behavioralEngine = new BehavioralEngine(emotionsOrchestrator, responseGenerator);
+const ruleStore = new RuleStore(behavioralEngine);
+const activityTracker = new ActivityTracker(ruleStore, shortTermMemory);
+
+console.log('[Main] CHLEO Brain & Memory modules successfully initialized.');
+console.log(`[Main] Memory files located at: ${getUserDataDir()}`);
 
 const createWindow = () => {
   const primaryDisplay = screen.getPrimaryDisplay();
@@ -99,28 +160,50 @@ ipcMain.on('drag-window', (event: Electron.IpcMainEvent, dx: number, dy: number)
 
 // IPC handlers for Desktop Native memory file storage
 ipcMain.handle('save-memory-file', (_event, filename: string, content: string) => {
-  try {
-    const filePath = path.join(app.getPath('userData'), filename);
-    fs.writeFileSync(filePath, content, 'utf-8');
-    return true;
-  } catch (err) {
-    console.error(`[Main] Failed to save memory file ${filename}:`, err);
-    return false;
-  }
+  return mainStorageAdapter.saveMemoryFile(filename, content);
 });
 
 ipcMain.handle('read-memory-file', (_event, filename: string) => {
-  try {
-    const filePath = path.join(app.getPath('userData'), filename);
-    if (fs.existsSync(filePath)) {
-      return fs.readFileSync(filePath, 'utf-8');
-    }
-    return null;
-  } catch (err) {
-    console.error(`[Main] Failed to read memory file ${filename}:`, err);
-    return null;
-  }
+  return mainStorageAdapter.readMemoryFile(filename);
 });
+
+// CHLEO Brain & Emotion IPC routes
+ipcMain.handle('get-overall-emotion', () => {
+  return emotionsOrchestrator.getOverallEmotion();
+});
+
+ipcMain.handle('get-emotion-state', () => {
+  return emotionsOrchestrator.getState();
+});
+
+ipcMain.handle('process-monitoring-event', async (_event, payload: MonitoringEventPayload) => {
+  return await behavioralEngine.processEvent(payload);
+});
+
+ipcMain.handle('set-active-domain', (_event, url: string) => {
+  return activityTracker.setActiveDomain(url);
+});
+
+ipcMain.handle('get-active-domain', () => {
+  return activityTracker.getActiveDomain();
+});
+
+ipcMain.handle('get-site-rules', () => {
+  return ruleStore.getSiteRules();
+});
+
+ipcMain.handle('get-behavioral-rules', () => {
+  return behavioralEngine.getBehavioralRules();
+});
+
+ipcMain.handle('get-short-term-events', () => {
+  return shortTermMemory.getEvents();
+});
+
+ipcMain.handle('get-long-term-memory', () => {
+  return longTermMemory.getData();
+});
+
 
 // This method will be called when Electron has finished
 // initialization and is ready to create browser windows.

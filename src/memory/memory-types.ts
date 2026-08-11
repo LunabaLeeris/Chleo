@@ -18,6 +18,11 @@ export interface ActiveWarningState {
   percentSpent: number;
 }
 
+export interface StorageAdapter {
+  readMemoryFile: (filename: string) => string | null | Promise<string | null>;
+  saveMemoryFile: (filename: string, content: string) => boolean | Promise<boolean>;
+}
+
 export interface LongTermMemoryData {
   daysKnown: number;
   firstSeenTimestamp: number;
@@ -34,4 +39,5 @@ export interface LongTermMemoryData {
     waketime?: string;
   };
 }
+
 

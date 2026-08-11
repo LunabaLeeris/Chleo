@@ -1,0 +1,14 @@
+{
+  "events": [],
+  "recentSpeechPhrases": [],
+  "activeWarnings": [],
+  "currentActiveDomain": "",
+  "eventTemplate": "default",
+  "memorableEventTypes": [
+    "long_idle_duration",
+    "frequent_context_switching",
+    "site_marked_unproductive",
+    "site_marked_productive",
+    "site_unmarked_productive"
+  ]
+}

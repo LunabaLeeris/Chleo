@@ -1,4 +1,4 @@
-import type { LongTermMemoryData } from './memory-types';
+import type { LongTermMemoryData, StorageAdapter } from './memory-types';
 import type { EmotionalState } from '../avatar/emotions/emotion-types';
 
 export const VIOLATION_CAP = 20;
@@ -11,11 +11,13 @@ export const MS_PER_DAY = 1000 * 60 * 60 * 24;
  */
 export class LongTermMemory {
   private data: LongTermMemoryData;
-  private storageKey: string = 'chleo_long_term_memory';
+  private storageKey = 'chleo_long_term_memory';
   private violationCap: number = VIOLATION_CAP;
   private rewardCap: number = REWARD_CAP;
+  private storageAdapter?: StorageAdapter;
 
-  constructor() {
+  constructor(storageAdapter?: StorageAdapter) {
+    this.storageAdapter = storageAdapter;
     this.data = this.getDefaultData();
     this.load();
   }
@@ -67,13 +69,26 @@ export class LongTermMemory {
         const parsed = JSON.parse(raw);
         if (parsed && typeof parsed === 'object') {
           this.data = { ...this.getDefaultData(), ...parsed };
-          this.updateDaysKnown();
+          if (typeof parsed.daysKnown !== 'number') {
+            this.updateDaysKnown();
+          }
         }
       };
 
-      // Desktop Native (Electron IPC) load check
+      // Direct Node.js / Custom StorageAdapter (Electron Main process)
+      if (this.storageAdapter) {
+        const res = this.storageAdapter.readMemoryFile('long-term-memory.json');
+        if (res instanceof Promise) {
+          res.then((raw) => { if (raw) applyData(raw); });
+        } else if (res) {
+          applyData(res);
+        }
+        return;
+      }
+
+      // Desktop Native (Electron Renderer IPC) load check
       if (typeof window !== 'undefined' && (window as any).electronAPI?.readMemoryFile) {
-        (window as any).electronAPI.readMemoryFile('long_term_memory.json').then((raw: string | null) => {
+        (window as any).electronAPI.readMemoryFile('long-term-memory.json').then((raw: string | null) => {
           if (raw) {
             applyData(raw);
           } else if (window.localStorage) {
@@ -99,9 +114,14 @@ export class LongTermMemory {
       this.data.lastSeenTimestamp = Date.now();
       const jsonStr = JSON.stringify(this.data, null, 2);
 
-      // Desktop Native (Electron IPC) save check
+      // Direct Node.js / Custom StorageAdapter (Electron Main process)
+      if (this.storageAdapter) {
+        this.storageAdapter.saveMemoryFile('long-term-memory.json', jsonStr);
+      }
+
+      // Desktop Native (Electron Renderer IPC) save check
       if (typeof window !== 'undefined' && (window as any).electronAPI?.saveMemoryFile) {
-        (window as any).electronAPI.saveMemoryFile('long_term_memory.json', jsonStr);
+        (window as any).electronAPI.saveMemoryFile('long-term-memory.json', jsonStr);
       }
 
       // Browser localStorage fallback
@@ -181,7 +201,9 @@ export class LongTermMemory {
       const parsed = JSON.parse(jsonString);
       if (parsed && typeof parsed === 'object') {
         this.data = { ...this.getDefaultData(), ...parsed };
-        this.updateDaysKnown();
+        if (typeof parsed.daysKnown !== 'number') {
+          this.updateDaysKnown();
+        }
         this.save();
         return true;
       }
@@ -195,7 +217,7 @@ export class LongTermMemory {
   /**
    * Trigger browser file download of long-term memory state.
    */
-  downloadJSON(filename: string = 'long_term_memory.json'): void {
+  downloadJSON(filename = 'long_term_memory.json'): void {
     if (typeof window === 'undefined') return;
     const jsonStr = this.exportJSON();
     const blob = new Blob([jsonStr], { type: 'application/json' });

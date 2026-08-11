@@ -33,7 +33,7 @@ export class ResponseGenerator {
   ): Promise<ResponseResult> {
     // Try LLM first
     // COMPOSE memory context and place it in memory context 
-    const memoryContext: string = "";
+    const memoryContext = "";
     const llmResult = await this.llmService.generate(event, rule.llmDirective, memoryContext);
 
     let speechText: string;
@@ -67,7 +67,7 @@ export class ResponseGenerator {
 
     // Pick template randomly to prevent repetitive phrasing
     const idx = Math.floor(Math.random() * templates.length);
-    let template = templates[idx];
+    const template = templates[idx];
 
     const timeSpentFormatted =
       event.timeSpentSeconds >= 60
