@@ -6,7 +6,8 @@ import { MenuBarComponent } from './components/menu-bar';
 import { PanelHost } from './components/panels/PanelHost';
 import { logger } from './logger';
 
-import { ElectronAPI } from './types/ipc';
+import { ElectronAPI, ChleoResponsePayload } from './types/ipc';
+import { PlutchikEmotion, ResponseType } from './avatar';
 
 // Expose logger on window for dev console access
 (window as any).__CLEO_LOGGER__ = logger;
@@ -145,6 +146,48 @@ const menuBar = new MenuBarComponent(menuBarContainer, {
   }
   updateInteractiveRects();
 })();
+
+let bubbleTimer: ReturnType<typeof setTimeout> | null = null;
+
+// Listen for companion speech broadcast from Main process
+(window as any).electronAPI?.onCompanionSpeak?.(async (data: ChleoResponsePayload) => {
+  logger.info('companion-speech', `Cleo dialogue: "${data.speechText}"`, {
+    overallEmotion: data.overallEmotion,
+    responseType: data.responseType,
+  });
+
+  if (bubble) {
+    bubble.textContent = data.speechText;
+    bubble.classList.add('visible');
+    updateInteractiveRects();
+  }
+
+  try {
+    const packet = await compositor.speakWithEmotion(
+      data.speechText,
+      data.overallEmotion,
+      (data.responseType as ResponseType) || 'declarative',
+      {
+        onComplete: () => {
+          compositor.resetAll();
+        },
+      }
+    );
+
+    const bubbleDuration = Math.max(1500, (packet?.totalDurationMs || 2500) + 1200);
+    if (bubbleTimer) {
+      clearTimeout(bubbleTimer);
+    }
+    bubbleTimer = setTimeout(() => {
+      if (bubble) {
+        bubble.classList.remove('visible');
+        updateInteractiveRects();
+      }
+    }, bubbleDuration);
+  } catch (err: any) {
+    logger.error('companion-speech', `Speech synthesis/animation error: ${err?.message || err}`);
+  }
+});
 
 // Send initial rects & track resize
 window.addEventListener('resize', updateInteractiveRects);

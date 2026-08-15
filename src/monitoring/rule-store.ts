@@ -1,11 +1,11 @@
 import type { SiteRule, MonitoringConfig, MonitoringEventPayload, TickResult } from './monitoring-types';
-import { BehavioralEngine } from './behavioral-engine';
+import { BehavioralEngine, type BehavioralReactionResult } from './behavioral-engine';
 import type { StorageAdapter } from '../memory/memory-types';
 import defaultActivityRules from './config/activity-rules.json';
 import { parseMonitoringCommand, ParsedCommand } from './command-parser';
 
 export interface RuleStoreListeners {
-  onEventTriggered?: (payload: MonitoringEventPayload, speechText: string) => void;
+  onEventTriggered?: (payload: MonitoringEventPayload, speechText: string, reaction?: BehavioralReactionResult) => void;
   onRuleChanged?: () => void;
 }
 
@@ -87,7 +87,7 @@ export class RuleStore {
     };
 
     try {
-      // 1. Direct Node.js / Custom StorageAdapter (Electron Main process)
+      // Direct Node.js / Custom StorageAdapter (Electron Main process)
       if (this.storageAdapter) {
         const res = this.storageAdapter.readMemoryFile('activity-rules.json');
         if (typeof res === 'string') {
@@ -106,7 +106,7 @@ export class RuleStore {
         }
       }
 
-      // 2. Desktop Native (Electron Renderer IPC) check
+      // Desktop Native (Electron Renderer IPC) check
       if (typeof window !== 'undefined' && (window as any).electronAPI?.readMemoryFile) {
         (window as any).electronAPI.readMemoryFile('activity-rules.json').then((raw: string | null) => {
           if (raw) {
@@ -128,7 +128,7 @@ export class RuleStore {
         });
       }
 
-      // 3. Browser localStorage fallback
+      // Browser localStorage fallback
       if (typeof window !== 'undefined' && window.localStorage) {
         const raw = window.localStorage.getItem(this.storageKeyActivity);
         if (raw) {
@@ -213,7 +213,7 @@ export class RuleStore {
       };
       const result = await this.behavioralEngine.processEvent(payload);
       if (result && this.listeners?.onEventTriggered) {
-        this.listeners.onEventTriggered(payload, result.speechText);
+        this.listeners.onEventTriggered(payload, result.speechText, result);
       }
       if (this.listeners?.onRuleChanged) {
         this.listeners.onRuleChanged();
@@ -253,7 +253,7 @@ export class RuleStore {
       };
       const result = await this.behavioralEngine.processEvent(payload);
       if (result && this.listeners?.onEventTriggered) {
-        this.listeners.onEventTriggered(payload, result.speechText);
+        this.listeners.onEventTriggered(payload, result.speechText, result);
       }
       if (this.listeners?.onRuleChanged) {
         this.listeners.onRuleChanged();
@@ -317,7 +317,7 @@ export class RuleStore {
       };
       const result = await this.behavioralEngine.processEvent(payload);
       if (result && this.listeners?.onEventTriggered) {
-        this.listeners.onEventTriggered(payload, result.speechText);
+        this.listeners.onEventTriggered(payload, result.speechText, result);
       }
       if (this.listeners?.onRuleChanged) {
         this.listeners.onRuleChanged();
@@ -405,7 +405,7 @@ export class RuleStore {
 
         const result = await this.behavioralEngine.processEvent(payload);
         if (result && this.listeners?.onEventTriggered) {
-          this.listeners.onEventTriggered(payload, result.speechText);
+          this.listeners.onEventTriggered(payload, result.speechText, result);
         }
         if (this.listeners?.onRuleChanged) {
           this.listeners.onRuleChanged();
@@ -435,7 +435,7 @@ export class RuleStore {
 
         const result = await this.behavioralEngine.processEvent(payload);
         if (result && this.listeners?.onEventTriggered) {
-          this.listeners.onEventTriggered(payload, result.speechText);
+          this.listeners.onEventTriggered(payload, result.speechText, result);
         }
         return {
           domain,
@@ -466,7 +466,7 @@ export class RuleStore {
 
         const result = await this.behavioralEngine.processEvent(payload);
         if (result && this.listeners?.onEventTriggered) {
-          this.listeners.onEventTriggered(payload, result.speechText);
+          this.listeners.onEventTriggered(payload, result.speechText, result);
         }
         return {
           domain,
@@ -492,6 +492,7 @@ export class RuleStore {
   async evaluateVisit(domain: string): Promise<TickResult> {
     const rule = this.findRuleForDomain(domain);
 
+    // [add other rules for avoid and productive]
     if (rule && rule.type === 'blocked') {
       const payload: MonitoringEventPayload = {
         eventId: 'SITE_BLOCKED_VISIT',
@@ -505,7 +506,7 @@ export class RuleStore {
 
       const result = await this.behavioralEngine.processEvent(payload);
       if (result && this.listeners?.onEventTriggered) {
-        this.listeners.onEventTriggered(payload, result.speechText);
+        this.listeners.onEventTriggered(payload, result.speechText, result);
       }
       return {
         domain,
@@ -537,7 +538,7 @@ export class RuleStore {
 
     const result = await this.behavioralEngine.processEvent(payload);
     if (result && this.listeners?.onEventTriggered) {
-      this.listeners.onEventTriggered(payload, result.speechText);
+      this.listeners.onEventTriggered(payload, result.speechText, result);
     }
     if (this.listeners?.onRuleChanged) {
       this.listeners.onRuleChanged();

@@ -23,6 +23,10 @@ export class ResponseGenerator {
     this.llmService = llmService;
   }
 
+  getShortTermMemory(): ShortTermMemory {
+    return this.shortTermMemory;
+  }
+
   /**
    * Generate a speech response for the given event and behavioral rule.
    * Records the event and speech into ShortTermMemory.

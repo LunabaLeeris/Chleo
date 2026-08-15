@@ -1,4 +1,5 @@
 import type { ShortTermMemoryEvent, ActiveWarningState, MemoryConsolidationReason, StorageAdapter } from './memory-types';
+import type { EmotionalState } from '../avatar/emotions/emotion-types';
 import { LongTermMemory } from './long-term-memory';
 
 export const MAX_EVENT_HISTORY = 50;
@@ -75,6 +76,14 @@ export class ShortTermMemory {
 
   getEvents(): ShortTermMemoryEvent[] {
     return this.events;
+  }
+
+  getLongTermMemory(): LongTermMemory {
+    return this.longTermMemory;
+  }
+
+  updateLastEmotion(state: EmotionalState): void {
+    this.longTermMemory.updateLastEmotion(state);
   }
 
   /**

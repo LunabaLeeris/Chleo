@@ -64,5 +64,9 @@ export interface ElectronAPI {
   // Main -> Renderer Logging Stream
   onMainLog?: (callback: (payload: MainLogPayload) => void) => () => void;
   getBufferedMainLogs?: () => Promise<MainLogPayload[]>;
+
+  // Companion Broadcast Events
+  onCompanionSpeak?: (callback: (payload: ChleoResponsePayload) => void) => () => void;
+  onRulesChanged?: (callback: () => void) => () => void;
 }
 

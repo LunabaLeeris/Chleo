@@ -46,6 +46,22 @@ contextBridge.exposeInMainWorld('electronAPI', {
         };
     },
     getBufferedMainLogs: () => ipcRenderer.invoke('get-buffered-main-logs'),
+
+    // Companion Broadcast Events
+    onCompanionSpeak: (callback: (payload: any) => void) => {
+        const listener = (_event: Electron.IpcRendererEvent, data: any) => callback(data);
+        ipcRenderer.on('companion-speak', listener);
+        return () => {
+            ipcRenderer.removeListener('companion-speak', listener);
+        };
+    },
+    onRulesChanged: (callback: () => void) => {
+        const listener = () => callback();
+        ipcRenderer.on('rules-changed', listener);
+        return () => {
+            ipcRenderer.removeListener('rules-changed', listener);
+        };
+    },
 });
 
 

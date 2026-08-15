@@ -55,13 +55,14 @@ export const MonitoringSimulator: React.FC<MonitoringSimulatorProps> = ({
     const stm = new ShortTermMemory(ltm);
     const llm = new LLMService();
     const rg = new ResponseGenerator(stm, llm);
-    const be = new BehavioralEngine(emotionEngine, rg);
+    const be = new BehavioralEngine(emotionEngine, rg, stm);
     const rs = new RuleStore(be, {
       onEventTriggered: (payload, speechText) => {
         onRefreshEmotionState();
         onSpeakText(speechText);
         setMemoryEvents([...stm.getRecentEvents(10)]);
       },
+      // [CHANGE] this will no longer work?
       onRuleChanged: () => {
         setSiteRules([...rs.getSiteRules()]);
         setTickCounter((prev) => prev + 1);

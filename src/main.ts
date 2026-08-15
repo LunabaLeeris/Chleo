@@ -1,8 +1,11 @@
-import { app, BrowserWindow, ipcMain, screen } from 'electron';
+import { app, BrowserWindow, screen } from 'electron';
 import path from 'node:path';
-import fs from 'node:fs';
 import started from 'electron-squirrel-startup';
-import { InteractiveRects, IgnoreMouseEventsOptions } from './types/ipc';
+import type { InteractiveRects, ChleoResponsePayload } from './types/ipc';
+
+import { mainStorageAdapter, getUserDataDir, getConfigDir } from './main/storage';
+import { registerIpcHandlers } from './main/ipc';
+import { BrowserWebSocketServer } from './monitoring/browser-websocket-server';
 
 import { LongTermMemory } from './memory/long-term-memory';
 import { ShortTermMemory } from './memory/short-term-memory';
@@ -12,60 +15,11 @@ import { EmotionsOrchestrator } from './avatar/emotions/emotions-orchestrator';
 import { BehavioralEngine } from './monitoring/behavioral-engine';
 import { RuleStore } from './monitoring/rule-store';
 import { ActivityTracker } from './monitoring/activity-tracker';
-import type { StorageAdapter } from './memory/memory-types';
-import type { MonitoringEventPayload } from './monitoring';
 
 // Handle creating/removing shortcuts on Windows when installing/uninstalling.
 if (started) {
   app.quit();
 }
-
-const getUserDataDir = (): string => {
-  const dirPath = path.join(app.getAppPath(), 'user-data');
-  if (!fs.existsSync(dirPath)) {
-    fs.mkdirSync(dirPath, { recursive: true });
-  }
-  return dirPath;
-};
-
-const getConfigDir = (): string => {
-  return path.join(app.getAppPath(), 'src', 'monitoring', 'config');
-};
-
-// Custom file storage adapter for Desktop Native Electron main process
-const mainStorageAdapter: StorageAdapter = {
-  readMemoryFile: (filename: string) => {
-    try {
-      // Check root user-data first (persisted runtime state)
-      const userFilePath = path.join(getUserDataDir(), filename);
-      if (fs.existsSync(userFilePath)) {
-        return fs.readFileSync(userFilePath, 'utf-8');
-      }
-
-      // Check config template as initial fallback (read-only default)
-      const configFilePath = path.join(getConfigDir(), filename);
-      if (fs.existsSync(configFilePath)) {
-        return fs.readFileSync(configFilePath, 'utf-8');
-      }
-
-      return null;
-    } catch (err) {
-      console.error(`[MainStorageAdapter] Failed to read file ${filename}:`, err);
-      return null;
-    }
-  },
-  saveMemoryFile: (filename: string, content: string) => {
-    try {
-      // Always write to user-data (outside src to prevent Vite reload loops)
-      const userFilePath = path.join(getUserDataDir(), filename);
-      fs.writeFileSync(userFilePath, content, 'utf-8');
-      return true;
-    } catch (err) {
-      console.error(`[MainStorageAdapter] Failed to save file ${filename}:`, err);
-      return false;
-    }
-  },
-};
 
 // Central logging endpoint from Main process to Frontend DebugLogger
 export type MainLogLevel = 'info' | 'warn' | 'error' | 'success' | 'debug';
@@ -130,21 +84,109 @@ sendMainLog('success', 'emotions', 'EmotionsOrchestrator initialized with persis
   overallEmotion: emotionsOrchestrator.getOverallEmotion(),
 });
 
-const behavioralEngine = new BehavioralEngine(emotionsOrchestrator, responseGenerator, mainStorageAdapter);
-sendMainLog('success', 'behavioral-engine', 'BehavioralEngine initialized with emotion orchestrator');
+const behavioralEngine = new BehavioralEngine(emotionsOrchestrator, responseGenerator, shortTermMemory, mainStorageAdapter);
+sendMainLog('success', 'behavioral-engine', 'BehavioralEngine initialized with emotion orchestrator and memory');
 
 const ruleStore = new RuleStore(behavioralEngine, mainStorageAdapter);
 sendMainLog('success', 'rule-store', 'RuleStore loaded site and behavioral rules', {
   siteRulesCount: ruleStore.getSiteRules()?.length ?? 0,
 });
 
+// Configure RuleStore listeners to broadcast companion speech & rules changes to renderer
+ruleStore.setListeners({
+  onEventTriggered: (payload, speechText, reaction) => {
+    sendMainLog('info', 'behavior', `Behavior triggered for ${payload.domain}: "${speechText}"`, {
+      eventId: payload.eventId,
+      domain: payload.domain,
+      overallEmotion: emotionsOrchestrator.getOverallEmotion(),
+      responseType: reaction?.responseType || 'declarative',
+    });
+
+    if (mainWindowInstance && !mainWindowInstance.isDestroyed()) {
+      const responsePayload: ChleoResponsePayload = {
+        speechText,
+        responseType: reaction?.responseType || 'declarative',
+        overallEmotion: emotionsOrchestrator.getOverallEmotion(),
+        emotionState: emotionsOrchestrator.getState(),
+      };
+      try {
+        mainWindowInstance.webContents.send('companion-speak', responsePayload);
+      } catch (err: any) {
+        sendMainLog('error', 'main', `Failed to send companion-speak IPC: ${err?.message || err}`);
+      }
+    }
+  },
+  onRuleChanged: () => {
+    sendMainLog('debug', 'rule-store', 'Site rules modified, broadcasting rules-changed IPC');
+    if (mainWindowInstance && !mainWindowInstance.isDestroyed()) {
+      try {
+        mainWindowInstance.webContents.send('rules-changed');
+      } catch (_) {
+        /* ignore */
+      }
+    }
+  },
+});
+
 const activityTracker = new ActivityTracker(ruleStore, shortTermMemory);
 sendMainLog('success', 'activity-tracker', 'ActivityTracker connected to RuleStore and ShortTermMemory');
+
+// Initialize Browser WebSocket Server
+const browserWsServer = new BrowserWebSocketServer({
+  port: 8080,
+  activityTracker,
+  ruleStore,
+  onLog: sendMainLog,
+});
+browserWsServer.start();
 
 console.log('[Main] CHLEO Brain & Memory modules successfully initialized.');
 console.log(`[Main] Memory files located at: ${getUserDataDir()}`);
 console.log(`[Main] Config files located at: ${getConfigDir()}`);
 sendMainLog('success', 'main', 'All CHLEO Brain & Memory modules initialized successfully');
+
+// State tracking for window dragging & dynamic click-through
+let isUserDragging = false;
+let isCurrentlyIgnoring = false;
+let isMenuOpen = false;
+let interactiveRects: InteractiveRects = {};
+
+const flushAllMemoryAndRules = () => {
+  try {
+    sendMainLog('info', 'main', 'Flushing active rules and memory logs to user-data...');
+    browserWsServer.stop();
+    activityTracker.stopTicker();
+    ruleStore.flush();
+    longTermMemory.updateLastEmotion(emotionsOrchestrator.getState());
+    longTermMemory.save();
+    shortTermMemory.save();
+    sendMainLog('success', 'main', 'Memory and rules successfully flushed to user-data');
+  } catch (err: any) {
+    console.error('[Main] Failed to flush data on exit:', err);
+  }
+};
+
+// Register all modular IPC handlers
+registerIpcHandlers({
+  mainStorageAdapter,
+  longTermMemory,
+  shortTermMemory,
+  emotionsOrchestrator,
+  behavioralEngine,
+  ruleStore,
+  activityTracker,
+  getInteractiveRects: () => interactiveRects,
+  setInteractiveRects: (rects) => { interactiveRects = rects; },
+  getIsUserDragging: () => isUserDragging,
+  setIsUserDragging: (dragging) => { isUserDragging = dragging; },
+  getIsMenuOpen: () => isMenuOpen,
+  setIsMenuOpen: (open) => { isMenuOpen = open; },
+  getIsCurrentlyIgnoring: () => isCurrentlyIgnoring,
+  setIsCurrentlyIgnoring: (ignoring) => { isCurrentlyIgnoring = ignoring; },
+  getLogBuffer: () => mainLogBuffer,
+  flushAllMemoryAndRules,
+  sendMainLog,
+});
 
 const createWindow = () => {
   const primaryDisplay = screen.getPrimaryDisplay();
@@ -182,7 +224,7 @@ const createWindow = () => {
     }
   });
 
-  // and load the index.html of the app.
+  // Load the index.html of the app.
   if (MAIN_WINDOW_VITE_DEV_SERVER_URL) {
     mainWindow.loadURL(MAIN_WINDOW_VITE_DEV_SERVER_URL);
   } else {
@@ -191,143 +233,8 @@ const createWindow = () => {
     );
   }
 
-  // Open the DevTools.
-  // mainWindow.webContents.openDevTools();
-
   return mainWindow;
 };
-
-let isUserDragging = false;
-let isCurrentlyIgnoring = false;
-let isMenuOpen = false;
-
-let interactiveRects: InteractiveRects = {};
-
-// IPC listener so the frontend can toggle click-through toggle when hovering over the avatar
-ipcMain.on('set-ignore-mouse-events', (event: Electron.IpcMainEvent, ignore: boolean, options?: IgnoreMouseEventsOptions) => {
-  const win = BrowserWindow.fromWebContents(event.sender);
-  if (win) {
-    if (options && typeof options === 'object' && options !== null && typeof options.forward === 'boolean') {
-      win.setIgnoreMouseEvents(ignore, { forward: options.forward });
-    } else {
-      win.setIgnoreMouseEvents(ignore);
-    }
-    isCurrentlyIgnoring = ignore;
-  }
-});
-
-// IPC listener to track menu open state
-ipcMain.on('set-menu-open', (_event: Electron.IpcMainEvent, open: boolean) => {
-  isMenuOpen = open;
-});
-
-// IPC listener to receive dynamic element bounding boxes from renderer
-ipcMain.on('set-interactive-rects', (_event: Electron.IpcMainEvent, rects: InteractiveRects) => {
-  if (rects && typeof rects === 'object') {
-    interactiveRects = rects;
-  }
-});
-
-// IPC listener to notify main process of drag state
-ipcMain.on('set-dragging', (event: Electron.IpcMainEvent, dragging: boolean) => {
-  // If previously dragging then it must have been dragged
-  if (isUserDragging) {
-    const win = BrowserWindow.fromWebContents(event.sender);
-    const [x, y] = win.getPosition();
-    sendMainLog('info', 'main', `window moved`, {
-      x_position: x,
-      y_position: y
-    });
-  }
-
-  isUserDragging = dragging;
-  const win = BrowserWindow.fromWebContents(event.sender);
-  if (win && dragging) {
-    win.setIgnoreMouseEvents(false);
-    isCurrentlyIgnoring = false;
-  }
-});
-
-// IPC listener to allow dragging frameless window
-ipcMain.on('drag-window', (event: Electron.IpcMainEvent, dx: number, dy: number) => {
-  const win = BrowserWindow.fromWebContents(event.sender);
-  if (win && typeof dx === 'number' && typeof dy === 'number') {
-    const [x, y] = win.getPosition();
-    win.setPosition(Math.round(x + dx), Math.round(y + dy));
-  }
-});
-
-// IPC handlers for Desktop Native memory file storage
-ipcMain.handle('save-memory-file', (_event, filename: string, content: string) => {
-  return mainStorageAdapter.saveMemoryFile(filename, content);
-});
-
-ipcMain.handle('read-memory-file', (_event, filename: string) => {
-  return mainStorageAdapter.readMemoryFile(filename);
-});
-
-// CHLEO Brain & Emotion IPC routes
-ipcMain.handle('get-overall-emotion', () => {
-  return emotionsOrchestrator.getOverallEmotion();
-});
-
-ipcMain.handle('get-emotion-state', () => {
-  return emotionsOrchestrator.getState();
-});
-
-ipcMain.handle('process-monitoring-event', async (_event, payload: MonitoringEventPayload) => {
-  return await behavioralEngine.processEvent(payload);
-});
-
-ipcMain.handle('set-active-domain', (_event, url: string) => {
-  return activityTracker.setActiveDomain(url);
-});
-
-ipcMain.handle('get-active-domain', () => {
-  return activityTracker.getActiveDomain();
-});
-
-ipcMain.handle('get-site-rules', () => {
-  return ruleStore.getSiteRules();
-});
-
-ipcMain.handle('get-behavioral-rules', () => {
-  return behavioralEngine.getBehavioralRules();
-});
-
-ipcMain.handle('get-short-term-events', () => {
-  return shortTermMemory.getEvents();
-});
-
-ipcMain.handle('get-long-term-memory', () => {
-  return longTermMemory.getData();
-});
-
-ipcMain.handle('get-buffered-main-logs', () => {
-  return mainLogBuffer;
-});
-
-const flushAllMemoryAndRules = () => {
-  try {
-    sendMainLog('info', 'main', 'Flushing active rules and memory logs to user-data...');
-    ruleStore.saveActivityConfig();
-    longTermMemory.save();
-    shortTermMemory.save();
-    sendMainLog('success', 'main', 'Memory and rules successfully flushed to user-data');
-  } catch (err: any) {
-    console.error('[Main] Failed to flush data on exit:', err);
-  }
-};
-
-ipcMain.handle('flush-memory', () => {
-  flushAllMemoryAndRules();
-  return true;
-});
-
-ipcMain.handle('save-site-rules', () => {
-  ruleStore.saveActivityConfig();
-  return true;
-});
 
 app.on('before-quit', () => {
   flushAllMemoryAndRules();
@@ -337,8 +244,7 @@ app.on('will-quit', () => {
   flushAllMemoryAndRules();
 });
 
-// This method will be called when Electron has finished
-// initialization and is ready to create browser windows.
+// This method will be called when Electron has finished initialization
 app.on('ready', () => {
   const mainWindow = createWindow();
 
@@ -395,9 +301,6 @@ app.on('ready', () => {
   }, 50);
 });
 
-// Quit when all windows are closed, except on macOS. There, it's common
-// for applications and their menu bar to stay active until the user quits
-// explicitly with Cmd + Q.
 app.on('window-all-closed', () => {
   if (process.platform !== 'darwin') {
     app.quit();
@@ -405,12 +308,7 @@ app.on('window-all-closed', () => {
 });
 
 app.on('activate', () => {
-  // On OS X it's common to re-create a window in the app when the
-  // dock icon is clicked and there are no other windows open.
   if (BrowserWindow.getAllWindows().length === 0) {
     createWindow();
   }
 });
-
-// In this file you can include the rest of your app's specific main process
-// code. You can also put them in separate files and import them here.

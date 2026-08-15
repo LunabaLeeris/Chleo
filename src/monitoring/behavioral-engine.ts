@@ -4,6 +4,7 @@ import type { ResponseResult } from './response-generator';
 import type { PrimaryEmotion } from '../avatar/emotions/emotion-types';
 import type { MonitoringEventPayload } from './monitoring-types';
 import type { StorageAdapter } from '../memory/memory-types';
+import type { ShortTermMemory } from '../memory/short-term-memory';
 import defaultBehavioralRules from './config/behavioral-rules.json';
 
 // Behavioral types co-located with the engine that owns them
@@ -38,11 +39,11 @@ export interface BehavioralReactionResult {
 /**
  * BehavioralEngine owns the behavioral rules config, matches events to rules,
  * resolves emotion deltas, and delegates speech/memory to ResponseGenerator.
- * Does NOT directly access ShortTermMemory or LongTermMemory.
  */
 export class BehavioralEngine {
   private emotionOrchestrator: EmotionsOrchestrator;
   private responseGenerator: ResponseGenerator;
+  private shortTermMemory: ShortTermMemory;
   private behavioralConfig: BehavioralConfig;
   private storageKeyBehavioral = 'chleo_behavioral_rules_v1';
   private storageAdapter?: StorageAdapter;
@@ -50,10 +51,12 @@ export class BehavioralEngine {
   constructor(
     emotionOrchestrator: EmotionsOrchestrator,
     responseGenerator: ResponseGenerator,
+    shortTermMemory: ShortTermMemory,
     storageAdapter?: StorageAdapter
   ) {
     this.emotionOrchestrator = emotionOrchestrator;
     this.responseGenerator = responseGenerator;
+    this.shortTermMemory = shortTermMemory;
     this.storageAdapter = storageAdapter;
     this.behavioralConfig = this.loadBehavioralConfig();
   }
@@ -193,8 +196,9 @@ export class BehavioralEngine {
       return null;
     }
 
-    // Apply emotion deltas to EmotionsOrchestrator
+    // Apply emotion deltas to EmotionsOrchestrator & persist to LongTermMemory via ShortTermMemory
     this.emotionOrchestrator.applyBehavioralData(matchingRule.emotionDeltas);
+    this.shortTermMemory.updateLastEmotion(this.emotionOrchestrator.getState());
 
     // Delegate speech generation + memory recording to ResponseGenerator
     const response: ResponseResult = await this.responseGenerator.generateResponse(event, matchingRule);

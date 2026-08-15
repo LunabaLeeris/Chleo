@@ -45,11 +45,8 @@ export const MonitoringPanel: React.FC<PanelProps> = ({ onClose }) => {
         const api = (window as unknown as CustomWindow).electronAPI;
         if (api?.getSiteRules) {
           const liveRules = await api.getSiteRules();
-          if (Array.isArray(liveRules) && liveRules.length > 0) {
+          if (Array.isArray(liveRules)) {
             setRules(liveRules);
-            logger.info('monitoring-panel', `Loaded ${liveRules.length} site monitoring rules via IPC`, {
-              count: liveRules.length,
-            });
             return;
           }
         }
@@ -57,15 +54,25 @@ export const MonitoringPanel: React.FC<PanelProps> = ({ onClose }) => {
         // Fallback to imported JSON config
         const fallbackRules = (defaultActivityRules as any).rules || [];
         setRules(fallbackRules);
-        logger.info('monitoring-panel', `Loaded ${fallbackRules.length} site monitoring rules from config`, {
-          count: fallbackRules.length,
-        });
       } catch (err: any) {
         logger.error('monitoring-panel', `Error loading monitoring rules: ${err?.message || err}`, err);
       }
     };
 
     fetchRules();
+
+    // Refresh live time spent every 1 second while panel is open
+    const interval = setInterval(fetchRules, 1000);
+
+    // Subscribe to immediate rules change events from main process
+    const api = (window as unknown as CustomWindow).electronAPI;
+    const unsubscribe = api?.onRulesChanged ? api.onRulesChanged(() => fetchRules()) : undefined;
+
+    return () => {
+      clearInterval(interval);
+      if (unsubscribe) unsubscribe();
+      logger.debug('monitoring-panel', 'MonitoringPanel unmounted');
+    };
   }, []);
 
   const counts = useMemo(() => {
