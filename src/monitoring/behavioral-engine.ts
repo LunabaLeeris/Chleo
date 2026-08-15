@@ -3,6 +3,7 @@ import { ResponseGenerator } from './response-generator';
 import type { ResponseResult } from './response-generator';
 import type { PrimaryEmotion } from '../avatar/emotions/emotion-types';
 import type { MonitoringEventPayload } from './monitoring-types';
+import type { StorageAdapter } from '../memory/memory-types';
 import defaultBehavioralRules from './config/behavioral-rules.json';
 
 // Behavioral types co-located with the engine that owns them
@@ -44,45 +45,107 @@ export class BehavioralEngine {
   private responseGenerator: ResponseGenerator;
   private behavioralConfig: BehavioralConfig;
   private storageKeyBehavioral = 'chleo_behavioral_rules_v1';
+  private storageAdapter?: StorageAdapter;
 
   constructor(
     emotionOrchestrator: EmotionsOrchestrator,
-    responseGenerator: ResponseGenerator
+    responseGenerator: ResponseGenerator,
+    storageAdapter?: StorageAdapter
   ) {
     this.emotionOrchestrator = emotionOrchestrator;
     this.responseGenerator = responseGenerator;
+    this.storageAdapter = storageAdapter;
     this.behavioralConfig = this.loadBehavioralConfig();
   }
 
   private loadBehavioralConfig(): BehavioralConfig {
     const defaults = JSON.parse(JSON.stringify(defaultBehavioralRules)) as BehavioralConfig;
-    try {
-      if (typeof window !== 'undefined' && window.localStorage) {
-        const raw = window.localStorage.getItem(this.storageKeyBehavioral);
-        if (raw) {
-          const parsed = JSON.parse(raw) as BehavioralConfig;
+
+    const applyData = (raw: string): BehavioralConfig | null => {
+      try {
+        const parsed = JSON.parse(raw) as BehavioralConfig;
+        if (parsed && Array.isArray(parsed.rules)) {
           defaults.rules.forEach((defRule) => {
             const storedRule = parsed.rules.find((r) => r.id === defRule.id);
-            if (storedRule) {
-              storedRule.emotionDeltas = defRule.emotionDeltas;
-              storedRule.conditions = defRule.conditions;
-            } else {
+            if (!storedRule) {
               parsed.rules.push(defRule);
             }
           });
           return parsed;
         }
+      } catch (e) {
+        console.warn('[BehavioralEngine] Failed to parse behavioral rules:', e);
+      }
+      return null;
+    };
+
+    try {
+      // 1. Direct Node.js / Custom StorageAdapter (Electron Main process)
+      if (this.storageAdapter) {
+        const res = this.storageAdapter.readMemoryFile('behavioral-rules.json');
+        if (typeof res === 'string') {
+          const parsed = applyData(res);
+          if (parsed) return parsed;
+        } else if (res instanceof Promise) {
+          res.then((raw) => {
+            if (raw) {
+              const parsed = applyData(raw);
+              if (parsed) {
+                this.behavioralConfig = parsed;
+              }
+            }
+          });
+        }
+      }
+
+      // 2. Desktop Native (Electron Renderer IPC) check
+      if (typeof window !== 'undefined' && (window as any).electronAPI?.readMemoryFile) {
+        (window as any).electronAPI.readMemoryFile('behavioral-rules.json').then((raw: string | null) => {
+          if (raw) {
+            const parsed = applyData(raw);
+            if (parsed) this.behavioralConfig = parsed;
+          } else if (window.localStorage) {
+            const localRaw = window.localStorage.getItem(this.storageKeyBehavioral);
+            if (localRaw) {
+              const localParsed = applyData(localRaw);
+              if (localParsed) this.behavioralConfig = localParsed;
+            }
+          }
+        });
+      }
+
+      // 3. Browser localStorage fallback
+      if (typeof window !== 'undefined' && window.localStorage) {
+        const raw = window.localStorage.getItem(this.storageKeyBehavioral);
+        if (raw) {
+          const parsed = applyData(raw);
+          if (parsed) return parsed;
+        }
       }
     } catch (e) {
       console.warn('[BehavioralEngine] Failed to load behavioral rules from storage:', e);
     }
+
     return defaults;
   }
 
   saveBehavioralConfig(): void {
     try {
+      const jsonStr = JSON.stringify(this.behavioralConfig, null, 2);
+
+      // Direct Node.js / Custom StorageAdapter (Electron Main process)
+      if (this.storageAdapter) {
+        this.storageAdapter.saveMemoryFile('behavioral-rules.json', jsonStr);
+      }
+
+      // Desktop Native (Electron Renderer IPC) save check
+      if (typeof window !== 'undefined' && (window as any).electronAPI?.saveMemoryFile) {
+        (window as any).electronAPI.saveMemoryFile('behavioral-rules.json', jsonStr);
+      }
+
+      // Browser localStorage fallback
       if (typeof window !== 'undefined' && window.localStorage) {
-        window.localStorage.setItem(this.storageKeyBehavioral, JSON.stringify(this.behavioralConfig));
+        window.localStorage.setItem(this.storageKeyBehavioral, jsonStr);
       }
     } catch (e) {
       console.warn('[BehavioralEngine] Failed to save behavioral rules:', e);

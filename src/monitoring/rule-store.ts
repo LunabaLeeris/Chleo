@@ -1,5 +1,6 @@
-import type { SiteRule, SiteType, MonitoringConfig, MonitoringEventPayload, TickResult } from './monitoring-types';
+import type { SiteRule, MonitoringConfig, MonitoringEventPayload, TickResult } from './monitoring-types';
 import { BehavioralEngine } from './behavioral-engine';
+import type { StorageAdapter } from '../memory/memory-types';
 import defaultActivityRules from './config/activity-rules.json';
 import { parseMonitoringCommand, ParsedCommand } from './command-parser';
 
@@ -12,18 +13,27 @@ export interface RuleStoreListeners {
  * RuleStore manages site rules only: reading, writing, and updating domain rules
  * at runtime. Delegates behavioral reactions to BehavioralEngine.
  */
-//[ADD] rules should be saved and loaded for persistence
 export class RuleStore {
   private activityConfig: MonitoringConfig;
   private behavioralEngine: BehavioralEngine;
   private storageKeyActivity = 'chleo_activity_rules_v1';
   private cumulativeProductiveSeconds: number = 0;
   private listeners?: RuleStoreListeners;
+  private storageAdapter?: StorageAdapter;
 
-  constructor(behavioralEngine: BehavioralEngine, listeners?: RuleStoreListeners) {
+  constructor(
+    behavioralEngine: BehavioralEngine,
+    storageAdapterOrListeners?: StorageAdapter | RuleStoreListeners,
+    listeners?: RuleStoreListeners
+  ) {
     this.behavioralEngine = behavioralEngine;
+    if (storageAdapterOrListeners && 'readMemoryFile' in storageAdapterOrListeners) {
+      this.storageAdapter = storageAdapterOrListeners as StorageAdapter;
+      this.listeners = listeners;
+    } else if (storageAdapterOrListeners) {
+      this.listeners = storageAdapterOrListeners as RuleStoreListeners;
+    }
     this.activityConfig = this.loadActivityConfig();
-    this.listeners = listeners;
   }
 
   setListeners(listeners?: RuleStoreListeners): void {
@@ -31,21 +41,94 @@ export class RuleStore {
   }
 
   private loadActivityConfig(): MonitoringConfig {
+    const defaults = JSON.parse(JSON.stringify(defaultActivityRules)) as MonitoringConfig;
+
+    const applyData = (raw: string): MonitoringConfig | null => {
+      try {
+        const parsed = JSON.parse(raw);
+        if (parsed && Array.isArray(parsed.rules)) {
+          return parsed as MonitoringConfig;
+        }
+      } catch (e) {
+        console.warn('[RuleStore] Failed to parse activity rules:', e);
+      }
+      return null;
+    };
+
     try {
+      // 1. Direct Node.js / Custom StorageAdapter (Electron Main process)
+      if (this.storageAdapter) {
+        const res = this.storageAdapter.readMemoryFile('activity-rules.json');
+        if (typeof res === 'string') {
+          const parsed = applyData(res);
+          if (parsed) return parsed;
+        } else if (res instanceof Promise) {
+          res.then((raw) => {
+            if (raw) {
+              const parsed = applyData(raw);
+              if (parsed) {
+                this.activityConfig = parsed;
+                if (this.listeners?.onRuleChanged) this.listeners.onRuleChanged();
+              }
+            }
+          });
+        }
+      }
+
+      // 2. Desktop Native (Electron Renderer IPC) check
+      if (typeof window !== 'undefined' && (window as any).electronAPI?.readMemoryFile) {
+        (window as any).electronAPI.readMemoryFile('activity-rules.json').then((raw: string | null) => {
+          if (raw) {
+            const parsed = applyData(raw);
+            if (parsed) {
+              this.activityConfig = parsed;
+              if (this.listeners?.onRuleChanged) this.listeners.onRuleChanged();
+            }
+          } else if (window.localStorage) {
+            const localRaw = window.localStorage.getItem(this.storageKeyActivity);
+            if (localRaw) {
+              const localParsed = applyData(localRaw);
+              if (localParsed) {
+                this.activityConfig = localParsed;
+                if (this.listeners?.onRuleChanged) this.listeners.onRuleChanged();
+              }
+            }
+          }
+        });
+      }
+
+      // 3. Browser localStorage fallback
       if (typeof window !== 'undefined' && window.localStorage) {
         const raw = window.localStorage.getItem(this.storageKeyActivity);
-        if (raw) return JSON.parse(raw);
+        if (raw) {
+          const parsed = applyData(raw);
+          if (parsed) return parsed;
+        }
       }
     } catch (e) {
       console.warn('[RuleStore] Failed to load activity rules from storage:', e);
     }
-    return JSON.parse(JSON.stringify(defaultActivityRules)) as MonitoringConfig;
+
+    return defaults;
   }
 
   saveActivityConfig(): void {
     try {
+      const jsonStr = JSON.stringify(this.activityConfig, null, 2);
+
+      // Direct Node.js / Custom StorageAdapter (Electron Main process)
+      if (this.storageAdapter) {
+        this.storageAdapter.saveMemoryFile('activity-rules.json', jsonStr);
+      }
+
+      // Desktop Native (Electron Renderer IPC) save check
+      if (typeof window !== 'undefined' && (window as any).electronAPI?.saveMemoryFile) {
+        (window as any).electronAPI.saveMemoryFile('activity-rules.json', jsonStr);
+      }
+
+      // Browser localStorage fallback
       if (typeof window !== 'undefined' && window.localStorage) {
-        window.localStorage.setItem(this.storageKeyActivity, JSON.stringify(this.activityConfig));
+        window.localStorage.setItem(this.storageKeyActivity, jsonStr);
       }
     } catch (e) {
       console.warn('[RuleStore] Failed to save activity rules:', e);

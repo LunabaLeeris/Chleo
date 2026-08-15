@@ -28,6 +28,15 @@ export interface ChleoResponsePayload {
   emotionState: EmotionalState;
 }
 
+export type MainLogLevel = 'info' | 'warn' | 'error' | 'success' | 'debug';
+
+export interface MainLogPayload {
+  type: MainLogLevel;
+  source: string;
+  description: string;
+  details?: unknown;
+}
+
 export interface ElectronAPI {
   setIgnoreMouseEvents: (ignore: boolean, options?: IgnoreMouseEventsOptions) => void;
   dragWindow: (dx: number, dy: number) => void;
@@ -49,5 +58,9 @@ export interface ElectronAPI {
   getBehavioralRules: () => Promise<BehavioralRule[]>;
   getShortTermMemoryEvents: () => Promise<ShortTermMemoryEvent[]>;
   getLongTermMemoryData: () => Promise<LongTermMemoryData>;
+
+  // Main -> Renderer Logging Stream
+  onMainLog?: (callback: (payload: MainLogPayload) => void) => () => void;
+  getBufferedMainLogs?: () => Promise<MainLogPayload[]>;
 }
 

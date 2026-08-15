@@ -6,6 +6,7 @@ import { ClosetPanel } from './ClosetPanel';
 import { StatusPanel } from './StatusPanel';
 import { MarketplacePanel } from './MarketplacePanel';
 import { ConfigPanel } from './ConfigPanel';
+import { DebugPanel } from './DebugPanel';
 
 export interface PanelHostProps {
   activeOptionId: string | null;
@@ -30,6 +31,8 @@ export const PanelHost: React.FC<PanelHostProps> = ({ activeOptionId, onClose })
       return <MarketplacePanel onClose={onClose} />;
     case 'config':
       return <ConfigPanel onClose={onClose} />;
+    case 'debug':
+      return <DebugPanel onClose={onClose} />;
     default:
       return null;
   }

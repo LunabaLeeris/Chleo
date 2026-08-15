@@ -28,47 +28,134 @@ const getUserDataDir = (): string => {
   return dirPath;
 };
 
+const getConfigDir = (): string => {
+  const dirPath = path.join(app.getAppPath(), 'src', 'monitoring', 'config');
+  if (!fs.existsSync(dirPath)) {
+    fs.mkdirSync(dirPath, { recursive: true });
+  }
+  return dirPath;
+};
+
+const resolveFilePath = (filename: string): string => {
+  const configPath = path.join(getConfigDir(), filename);
+  if (fs.existsSync(configPath)) {
+    return configPath;
+  }
+  const userDataPath = path.join(getUserDataDir(), filename);
+  if (fs.existsSync(userDataPath)) {
+    return userDataPath;
+  }
+  // Default to config directory if it's a rule/config file, otherwise user data directory
+  if (filename.includes('rules') || filename.includes('config')) {
+    return configPath;
+  }
+  return userDataPath;
+};
+
 // Custom file storage adapter for Desktop Native Electron main process
 const mainStorageAdapter: StorageAdapter = {
   readMemoryFile: (filename: string) => {
     try {
-      const filePath = path.join(getUserDataDir(), filename);
+      const filePath = resolveFilePath(filename);
       if (fs.existsSync(filePath)) {
         return fs.readFileSync(filePath, 'utf-8');
       }
-      // if can't read any throw an error
-
       return null;
     } catch (err) {
-      console.error(`[MainStorageAdapter] Failed to read memory file ${filename}:`, err);
+      console.error(`[MainStorageAdapter] Failed to read file ${filename}:`, err);
       return null;
     }
   },
   saveMemoryFile: (filename: string, content: string) => {
     try {
-      const filePath = path.join(getUserDataDir(), filename);
+      const filePath = resolveFilePath(filename);
       fs.writeFileSync(filePath, content, 'utf-8');
       return true;
     } catch (err) {
-      console.error(`[MainStorageAdapter] Failed to save memory file ${filename}:`, err);
+      console.error(`[MainStorageAdapter] Failed to save file ${filename}:`, err);
       return false;
     }
   },
 };
 
+// Central logging endpoint from Main process to Frontend DebugLogger
+export type MainLogLevel = 'info' | 'warn' | 'error' | 'success' | 'debug';
+
+export interface MainLogPayload {
+  type: MainLogLevel;
+  source: string;
+  description: string;
+  details?: unknown;
+}
+
+const mainLogBuffer: MainLogPayload[] = [];
+let mainWindowInstance: BrowserWindow | null = null;
+
+export const sendMainLog = (
+  type: MainLogLevel,
+  source: string,
+  description: string,
+  details?: unknown
+): void => {
+  const payload: MainLogPayload = { type, source, description, details };
+  mainLogBuffer.push(payload);
+  if (mainLogBuffer.length > 200) {
+    mainLogBuffer.shift();
+  }
+
+  // Also print to console
+  console.log(`[MainLog:${type.toUpperCase()}][${source}] ${description}`);
+
+  // Broadcast to renderer if window exists and is ready
+  if (mainWindowInstance && !mainWindowInstance.isDestroyed()) {
+    try {
+      mainWindowInstance.webContents.send('main-log', payload);
+    } catch (_) {
+      /* ignore */
+    }
+  }
+};
+
 // Initialize CHLEO Core Modules in Main Process (Brain & Memory)
+sendMainLog('info', 'main', 'Starting CHLEO core modules initialization in Main process...');
 const longTermMemory = new LongTermMemory(mainStorageAdapter);
+
+sendMainLog('success', 'long-term-memory', 'LongTermMemory initialized with native storage adapter', {
+  firstSeenTimestamp: longTermMemory.getData()?.firstSeenTimestamp,
+  daysKnown: longTermMemory.getData()?.daysKnown,
+});
 const shortTermMemory = new ShortTermMemory(longTermMemory, mainStorageAdapter);
+
+sendMainLog('success', 'short-term-memory', 'ShortTermMemory initialized with working buffer', {
+  eventsCount: shortTermMemory.getEvents()?.length ?? 0,
+});
 const llmService = new LLMService();
+sendMainLog('info', 'llm-service', 'LLMService instance created and ready');
+
 const responseGenerator = new ResponseGenerator(shortTermMemory, llmService);
+sendMainLog('info', 'response-generator', 'ResponseGenerator connected to ShortTermMemory and LLMService');
+
 const initialEmotionState = longTermMemory.getData().lastEmotionState;
 const emotionsOrchestrator = new EmotionsOrchestrator(initialEmotionState);
-const behavioralEngine = new BehavioralEngine(emotionsOrchestrator, responseGenerator);
-const ruleStore = new RuleStore(behavioralEngine);
+sendMainLog('success', 'emotions', 'EmotionsOrchestrator initialized with persisted emotion baseline', {
+  overallEmotion: emotionsOrchestrator.getOverallEmotion(),
+});
+
+const behavioralEngine = new BehavioralEngine(emotionsOrchestrator, responseGenerator, mainStorageAdapter);
+sendMainLog('success', 'behavioral-engine', 'BehavioralEngine initialized with emotion orchestrator');
+
+const ruleStore = new RuleStore(behavioralEngine, mainStorageAdapter);
+sendMainLog('success', 'rule-store', 'RuleStore loaded site and behavioral rules', {
+  siteRulesCount: ruleStore.getSiteRules()?.length ?? 0,
+});
+
 const activityTracker = new ActivityTracker(ruleStore, shortTermMemory);
+sendMainLog('success', 'activity-tracker', 'ActivityTracker connected to RuleStore and ShortTermMemory');
 
 console.log('[Main] CHLEO Brain & Memory modules successfully initialized.');
 console.log(`[Main] Memory files located at: ${getUserDataDir()}`);
+console.log(`[Main] Config files located at: ${getConfigDir()}`);
+sendMainLog('success', 'main', 'All CHLEO Brain & Memory modules initialized successfully');
 
 const createWindow = () => {
   const primaryDisplay = screen.getPrimaryDisplay();
@@ -91,6 +178,19 @@ const createWindow = () => {
     webPreferences: {
       preload: path.join(__dirname, 'preload.js'),
     },
+  });
+
+  mainWindowInstance = mainWindow;
+
+  // When webContents finishes loading, flush any initial buffered logs to frontend
+  mainWindow.webContents.on('did-finish-load', () => {
+    for (const logItem of mainLogBuffer) {
+      try {
+        mainWindow.webContents.send('main-log', logItem);
+      } catch (_) {
+        /* ignore */
+      }
+    }
   });
 
   // and load the index.html of the app.
@@ -141,6 +241,16 @@ ipcMain.on('set-interactive-rects', (_event: Electron.IpcMainEvent, rects: Inter
 
 // IPC listener to notify main process of drag state
 ipcMain.on('set-dragging', (event: Electron.IpcMainEvent, dragging: boolean) => {
+  // If previously dragging then it must have been dragged
+  if (isUserDragging) {
+    const win = BrowserWindow.fromWebContents(event.sender);
+    const [x, y] = win.getPosition();
+    sendMainLog('info', 'main', `window moved`, {
+      x_position: x,
+      y_position: y
+    });
+  }
+
   isUserDragging = dragging;
   const win = BrowserWindow.fromWebContents(event.sender);
   if (win && dragging) {
@@ -202,6 +312,10 @@ ipcMain.handle('get-short-term-events', () => {
 
 ipcMain.handle('get-long-term-memory', () => {
   return longTermMemory.getData();
+});
+
+ipcMain.handle('get-buffered-main-logs', () => {
+  return mainLogBuffer;
 });
 
 

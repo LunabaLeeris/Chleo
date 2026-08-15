@@ -31,6 +31,14 @@
       "spentTodaySeconds": 0,
       "warningThresholdPercent": 80,
       "requiresPuzzleToUnblock": false
+    },
+    {
+      "domain": "localhost",
+      "type": "neutral",
+      "dailyLimitSeconds": 0,
+      "spentTodaySeconds": 611,
+      "warningThresholdPercent": 80,
+      "requiresPuzzleToUnblock": false
     }
   ],
   "productiveRewardIntervalSeconds": 60,

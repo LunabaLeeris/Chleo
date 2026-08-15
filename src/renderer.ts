@@ -4,8 +4,12 @@ import { createRoot, Root } from 'react-dom/client';
 import { AvatarCompositor, defaultAvatarConfig, defaultSpeechOrchestrator } from './avatar';
 import { MenuBarComponent } from './components/menu-bar';
 import { PanelHost } from './components/panels/PanelHost';
+import { logger } from './logger';
 
 import { ElectronAPI } from './types/ipc';
+
+// Expose logger on window for dev console access
+(window as any).__CLEO_LOGGER__ = logger;
 
 // Type checking definitions for exposed window API
 interface Window {
@@ -109,7 +113,7 @@ function renderFeaturePanel() {
 // Initialize MenuBar Component
 const menuBar = new MenuBarComponent(menuBarContainer, {
   onItemClick: (id: string) => {
-    console.log(`[Renderer] Selected menu item: ${id}`);
+    logger.info('menu-bar', `Selected menu item: "${id}"`);
     if (activeOptionId === id) {
       activeOptionId = null;
     } else {
@@ -119,6 +123,7 @@ const menuBar = new MenuBarComponent(menuBarContainer, {
     renderFeaturePanel();
   },
   onStateChange: (isOpen: boolean) => {
+    logger.debug('menu-bar', `Menu bar ${isOpen ? 'opened' : 'closed'}`);
     (window as any).electronAPI?.setMenuOpen?.(isOpen);
     if (!isOpen) {
       activeOptionId = null;
@@ -130,9 +135,14 @@ const menuBar = new MenuBarComponent(menuBarContainer, {
 
 // Avatar & Speech Compositor initialization
 (async () => {
-  await compositor.init();
-  compositor.start();
-  console.log('[Renderer] AvatarCompositor and SpeechOrchestrator successfully initialized.');
+  try {
+    await compositor.init();
+    compositor.start();
+    logger.success('avatar', 'AvatarCompositor successfully initialized and started');
+    logger.info('speech-orchestrator', 'SpeechOrchestrator ready');
+  } catch (err: any) {
+    logger.error('avatar', `Avatar initialization failed: ${err?.message || err}`, err);
+  }
   updateInteractiveRects();
 })();
 

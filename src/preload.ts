@@ -34,6 +34,16 @@ contextBridge.exposeInMainWorld('electronAPI', {
     getBehavioralRules: () => ipcRenderer.invoke('get-behavioral-rules'),
     getShortTermMemoryEvents: () => ipcRenderer.invoke('get-short-term-events'),
     getLongTermMemoryData: () => ipcRenderer.invoke('get-long-term-memory'),
+
+    // Main -> Renderer Logging Stream
+    onMainLog: (callback: (payload: any) => void) => {
+        const listener = (_event: Electron.IpcRendererEvent, log: any) => callback(log);
+        ipcRenderer.on('main-log', listener);
+        return () => {
+            ipcRenderer.removeListener('main-log', listener);
+        };
+    },
+    getBufferedMainLogs: () => ipcRenderer.invoke('get-buffered-main-logs'),
 });
 
 
