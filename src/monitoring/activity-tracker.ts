@@ -46,6 +46,7 @@ export class ActivityTracker {
     if (this.tickerInterval !== null) {
       clearInterval(this.tickerInterval);
       this.tickerInterval = null;
+      this.ruleStore.flush();
     }
   }
 

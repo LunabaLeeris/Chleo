@@ -58,6 +58,8 @@ export interface ElectronAPI {
   getBehavioralRules: () => Promise<BehavioralRule[]>;
   getShortTermMemoryEvents: () => Promise<ShortTermMemoryEvent[]>;
   getLongTermMemoryData: () => Promise<LongTermMemoryData>;
+  saveSiteRules?: () => Promise<boolean>;
+  flushMemory?: () => Promise<boolean>;
 
   // Main -> Renderer Logging Stream
   onMainLog?: (callback: (payload: MainLogPayload) => void) => () => void;

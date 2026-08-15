@@ -20,6 +20,8 @@ export class RuleStore {
   private cumulativeProductiveSeconds: number = 0;
   private listeners?: RuleStoreListeners;
   private storageAdapter?: StorageAdapter;
+  private isDirty = false;
+  private autoSaveTimer: ReturnType<typeof setInterval> | null = null;
 
   constructor(
     behavioralEngine: BehavioralEngine,
@@ -34,10 +36,39 @@ export class RuleStore {
       this.listeners = storageAdapterOrListeners as RuleStoreListeners;
     }
     this.activityConfig = this.loadActivityConfig();
+
+    if (typeof window !== 'undefined') {
+      window.addEventListener('beforeunload', () => {
+        this.flush();
+      });
+    }
+
+    // Periodic auto-save every 60 seconds if dirty
+    this.startAutoSave(60000);
   }
 
   setListeners(listeners?: RuleStoreListeners): void {
     this.listeners = listeners;
+  }
+
+  public startAutoSave(intervalMs = 60000): void {
+    if (this.autoSaveTimer) return;
+    this.autoSaveTimer = setInterval(() => {
+      if (this.isDirty) {
+        this.saveActivityConfig();
+      }
+    }, intervalMs);
+  }
+
+  public stopAutoSave(): void {
+    if (this.autoSaveTimer) {
+      clearInterval(this.autoSaveTimer);
+      this.autoSaveTimer = null;
+    }
+  }
+
+  public flush(): void {
+    this.saveActivityConfig(true);
   }
 
   private loadActivityConfig(): MonitoringConfig {
@@ -112,7 +143,8 @@ export class RuleStore {
     return defaults;
   }
 
-  saveActivityConfig(): void {
+  saveActivityConfig(force = false): void {
+    if (!force && !this.isDirty) return;
     try {
       const jsonStr = JSON.stringify(this.activityConfig, null, 2);
 
@@ -130,6 +162,8 @@ export class RuleStore {
       if (typeof window !== 'undefined' && window.localStorage) {
         window.localStorage.setItem(this.storageKeyActivity, jsonStr);
       }
+
+      this.isDirty = false;
     } catch (e) {
       console.warn('[RuleStore] Failed to save activity rules:', e);
     }
@@ -309,7 +343,7 @@ export class RuleStore {
       rule.spentTodaySeconds += deltaSeconds;
     }
 
-    this.saveActivityConfig();
+    this.isDirty = true;
     return rule;
   }
 
@@ -319,7 +353,7 @@ export class RuleStore {
 
   setProductiveRewardIntervalSeconds(seconds: number): void {
     this.activityConfig.productiveRewardIntervalSeconds = seconds;
-    this.saveActivityConfig();
+    this.saveActivityConfig(true);
   }
 
   // --- Tick Evaluation (moved from ActivityTracker.onTick) ---

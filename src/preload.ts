@@ -34,6 +34,8 @@ contextBridge.exposeInMainWorld('electronAPI', {
     getBehavioralRules: () => ipcRenderer.invoke('get-behavioral-rules'),
     getShortTermMemoryEvents: () => ipcRenderer.invoke('get-short-term-events'),
     getLongTermMemoryData: () => ipcRenderer.invoke('get-long-term-memory'),
+    saveSiteRules: () => ipcRenderer.invoke('save-site-rules'),
+    flushMemory: () => ipcRenderer.invoke('flush-memory'),
 
     // Main -> Renderer Logging Stream
     onMainLog: (callback: (payload: any) => void) => {

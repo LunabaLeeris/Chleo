@@ -21,7 +21,7 @@ if (started) {
 }
 
 const getUserDataDir = (): string => {
-  const dirPath = path.join(app.getAppPath(), 'src', 'user-data');
+  const dirPath = path.join(app.getAppPath(), 'user-data');
   if (!fs.existsSync(dirPath)) {
     fs.mkdirSync(dirPath, { recursive: true });
   }
@@ -29,37 +29,25 @@ const getUserDataDir = (): string => {
 };
 
 const getConfigDir = (): string => {
-  const dirPath = path.join(app.getAppPath(), 'src', 'monitoring', 'config');
-  if (!fs.existsSync(dirPath)) {
-    fs.mkdirSync(dirPath, { recursive: true });
-  }
-  return dirPath;
-};
-
-const resolveFilePath = (filename: string): string => {
-  const configPath = path.join(getConfigDir(), filename);
-  if (fs.existsSync(configPath)) {
-    return configPath;
-  }
-  const userDataPath = path.join(getUserDataDir(), filename);
-  if (fs.existsSync(userDataPath)) {
-    return userDataPath;
-  }
-  // Default to config directory if it's a rule/config file, otherwise user data directory
-  if (filename.includes('rules') || filename.includes('config')) {
-    return configPath;
-  }
-  return userDataPath;
+  return path.join(app.getAppPath(), 'src', 'monitoring', 'config');
 };
 
 // Custom file storage adapter for Desktop Native Electron main process
 const mainStorageAdapter: StorageAdapter = {
   readMemoryFile: (filename: string) => {
     try {
-      const filePath = resolveFilePath(filename);
-      if (fs.existsSync(filePath)) {
-        return fs.readFileSync(filePath, 'utf-8');
+      // Check root user-data first (persisted runtime state)
+      const userFilePath = path.join(getUserDataDir(), filename);
+      if (fs.existsSync(userFilePath)) {
+        return fs.readFileSync(userFilePath, 'utf-8');
       }
+
+      // Check config template as initial fallback (read-only default)
+      const configFilePath = path.join(getConfigDir(), filename);
+      if (fs.existsSync(configFilePath)) {
+        return fs.readFileSync(configFilePath, 'utf-8');
+      }
+
       return null;
     } catch (err) {
       console.error(`[MainStorageAdapter] Failed to read file ${filename}:`, err);
@@ -68,8 +56,9 @@ const mainStorageAdapter: StorageAdapter = {
   },
   saveMemoryFile: (filename: string, content: string) => {
     try {
-      const filePath = resolveFilePath(filename);
-      fs.writeFileSync(filePath, content, 'utf-8');
+      // Always write to user-data (outside src to prevent Vite reload loops)
+      const userFilePath = path.join(getUserDataDir(), filename);
+      fs.writeFileSync(userFilePath, content, 'utf-8');
       return true;
     } catch (err) {
       console.error(`[MainStorageAdapter] Failed to save file ${filename}:`, err);
@@ -318,6 +307,35 @@ ipcMain.handle('get-buffered-main-logs', () => {
   return mainLogBuffer;
 });
 
+const flushAllMemoryAndRules = () => {
+  try {
+    sendMainLog('info', 'main', 'Flushing active rules and memory logs to user-data...');
+    ruleStore.saveActivityConfig();
+    longTermMemory.save();
+    shortTermMemory.save();
+    sendMainLog('success', 'main', 'Memory and rules successfully flushed to user-data');
+  } catch (err: any) {
+    console.error('[Main] Failed to flush data on exit:', err);
+  }
+};
+
+ipcMain.handle('flush-memory', () => {
+  flushAllMemoryAndRules();
+  return true;
+});
+
+ipcMain.handle('save-site-rules', () => {
+  ruleStore.saveActivityConfig();
+  return true;
+});
+
+app.on('before-quit', () => {
+  flushAllMemoryAndRules();
+});
+
+app.on('will-quit', () => {
+  flushAllMemoryAndRules();
+});
 
 // This method will be called when Electron has finished
 // initialization and is ready to create browser windows.

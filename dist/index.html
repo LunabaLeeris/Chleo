@@ -1,30 +1,37 @@
 <!doctype html>
-<html lang="en">
+<html>
 
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
-  <title>CHLEO — Interactive Companion</title>
-  <meta name="description"
-    content="CHLEO is an interactive desktop and browser companion designed to keep you on track, monitor digital activity, and add life to your workspace." />
-
+  <title>Cleo</title>
   <!-- Pixel Art & Retro Google Fonts -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link
     href="https://fonts.googleapis.com/css2?family=Pixelify+Sans:wght@400;500;600;700&family=Press+Start+2P&family=Silkscreen:wght@400;700&family=Outfit:wght@400;500;600;700&display=swap"
     rel="stylesheet">
-
-  <link rel="icon" type="image/png" href="/logo.png" />
-  <script type="module" crossorigin src="/assets/main-D2RhR83y.js"></script>
-  <link rel="modulepreload" crossorigin href="/assets/Footer-iB9vL_0y.js">
-  <link rel="modulepreload" crossorigin href="/assets/avatar-DZcdGRbf.js">
-  <link rel="modulepreload" crossorigin href="/assets/heart-747vS28V.js">
-  <link rel="stylesheet" crossorigin href="/assets/Footer-D-7r9wGR.css">
+  <script type="module" crossorigin src="/assets/index-CXEVcZG8.js"></script>
+  <link rel="stylesheet" crossorigin href="/assets/index-Mp-KlbX-.css">
 </head>
 
-<body class="theme-light-pixel">
-  <div id="root"></div>
+<body>
+  <div class="container">
+    <div class="companion-wrapper">
+      <!-- Feature Panel (Anchored to the left of Menu Bar) -->
+      <div id="feature-panel" class="feature-panel"></div>
+
+      <!-- Menu Bar (Middle) -->
+      <div id="menu-bar" class="menu-bar"></div>
+
+      <!-- Pixel Avatar (composable sprite canvas) -->
+      <div id="avatar" class="avatar-container">
+        <!-- Speech Bubble (Anchored directly above CLEO's head) -->
+        <div id="bubble" class="speech-bubble"></div>
+        <canvas id="avatar-canvas"></canvas>
+      </div>
+
+    </div>
+  </div>
 </body>
 
 </html>
