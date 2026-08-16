@@ -130,7 +130,14 @@ export class ShortTermMemory {
         if (Array.isArray(parsed.events)) this.events = parsed.events;
         if (Array.isArray(parsed.recentSpeechPhrases)) this.recentSpeechPhrases = parsed.recentSpeechPhrases;
         if (Array.isArray(parsed.activeWarnings)) {
-          this.activeWarnings = new Map(parsed.activeWarnings);
+          this.activeWarnings = new Map();
+          for (const [key, val] of parsed.activeWarnings) {
+            const cleanKey = this.normalizeDomain(key);
+            this.activeWarnings.set(cleanKey, {
+              ...val,
+              domain: cleanKey,
+            });
+          }
         }
         if (parsed.currentActiveDomain) this.currentActiveDomain = parsed.currentActiveDomain;
         if (parsed.eventTemplate) this.eventTemplate = parsed.eventTemplate;
@@ -237,8 +244,11 @@ export class ShortTermMemory {
 
     console.log(`[ShortTermMemory] Consolidated ${summaries.length} events to LongTermMemory (Reason: ${reason})`);
 
-    // Reset/clear active event log after consolidation to prevent duplication
+    // Reset/clear active event log and active warnings after consolidation to prevent duplication / stale state
     this.events = [];
+    if (reason === 'day_change') {
+      this.activeWarnings.clear();
+    }
     this.save();
   }
 
@@ -269,7 +279,14 @@ export class ShortTermMemory {
       if (Array.isArray(parsed.events)) this.events = parsed.events;
       if (Array.isArray(parsed.recentSpeechPhrases)) this.recentSpeechPhrases = parsed.recentSpeechPhrases;
       if (Array.isArray(parsed.activeWarnings)) {
-        this.activeWarnings = new Map(parsed.activeWarnings);
+        this.activeWarnings = new Map();
+        for (const [key, val] of parsed.activeWarnings) {
+          const cleanKey = this.normalizeDomain(key);
+          this.activeWarnings.set(cleanKey, {
+            ...val,
+            domain: cleanKey,
+          });
+        }
       }
       if (parsed.currentActiveDomain) this.currentActiveDomain = parsed.currentActiveDomain;
       if (parsed.eventTemplate) this.eventTemplate = parsed.eventTemplate;
@@ -314,6 +331,18 @@ export class ShortTermMemory {
   }
 
   /**
+   * Helper to clean / normalize domains for consistent map keys.
+   */
+  private normalizeDomain(domain: string): string {
+    if (!domain) return '';
+    return domain
+      .toLowerCase()
+      .trim()
+      .replace(/^(https?:\/\/)?(www\.)?/, '')
+      .split('/')[0];
+  }
+
+  /**
    * Update active domain and return time spent on previous domain in ms.
    */
   setActiveDomain(domain: string): { previousDomain: string | null; timeSpentMs: number } {
@@ -335,8 +364,9 @@ export class ShortTermMemory {
    * Warning states tracking.
    */
   setWarning(domain: string, percentSpent: number): void {
-    this.activeWarnings.set(domain, {
-      domain,
+    const cleanKey = this.normalizeDomain(domain);
+    this.activeWarnings.set(cleanKey, {
+      domain: cleanKey,
       warnedAt: Date.now(),
       percentSpent,
     });
@@ -344,12 +374,15 @@ export class ShortTermMemory {
   }
 
   clearWarning(domain: string): void {
+    const cleanKey = this.normalizeDomain(domain);
+    this.activeWarnings.delete(cleanKey);
     this.activeWarnings.delete(domain);
     this.save();
   }
 
   isWarningActive(domain: string): boolean {
-    return this.activeWarnings.has(domain);
+    const cleanKey = this.normalizeDomain(domain);
+    return this.activeWarnings.has(cleanKey) || this.activeWarnings.has(domain);
   }
 
   /**

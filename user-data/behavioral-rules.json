@@ -12,6 +12,31 @@
         "joy": -0.25,
         "trust": -0.23
       },
+      "actions": {
+        "close-tab": true,
+        "prompt-puzzle": {
+          "text": "Do you want to solve a puzzle to unlock access?",
+          "options": [
+            "yes",
+            "no"
+          ],
+          "on-success": {
+            "status": "unblock",
+            "duration": 30
+          },
+          "draggable": false,
+          "close-all-tabs": true,
+          "orientation": "center"
+        },
+        "open-puzzle": [
+          "snake",
+          "chess",
+          "sudoku"
+        ],
+        "orientation": "center",
+        "avatar-position": "bottom-right",
+        "interactable": false
+      },
       "heuristicTemplates": [
         "Hey! {domain} is completely blocked. You cannot visit it unless you complete my puzzle!",
         "Stop trying to open {domain}! Access is restricted until you pass my challenge."
@@ -47,6 +72,31 @@
         "sadness": 0.30,
         "joy": -0.1,
         "trust": -0.1
+      },
+      "actions": {
+        "close-tab": true,
+        "prompt-puzzle": {
+          "text": "Daily limit reached! Solve a puzzle to earn extra time?",
+          "options": [
+            "yes",
+            "no"
+          ],
+          "on-success": {
+            "status": "avoid",
+            "duration": 30
+          },
+          "draggable": false,
+          "close-all-tabs": true,
+          "orientation": "center"
+        },
+        "open-puzzle": [
+          "snake",
+          "chess",
+          "sudoku"
+        ],
+        "orientation": "center",
+        "avatar-position": "bottom-right",
+        "interactable": false
       },
       "heuristicTemplates": [
         "Time's up! You exceeded your daily limit on {domain}. It is now blocked!",

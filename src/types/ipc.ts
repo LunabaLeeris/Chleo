@@ -1,6 +1,6 @@
 import type { PlutchikEmotion, EmotionalState } from '../avatar/emotions/emotion-types';
 import type { MonitoringEventPayload, SiteRule } from '../monitoring/monitoring-types';
-import type { BehavioralRule, BehavioralReactionResult } from '../monitoring/behavioral-engine';
+import type { BehavioralRule, BehavioralReactionResult, BehavioralActions, PuzzleSuccessConfig } from '../monitoring/behavioral-engine';
 import type { ShortTermMemoryEvent, LongTermMemoryData } from '../memory/memory-types';
 
 export interface ComponentRect {
@@ -15,6 +15,9 @@ export interface InteractiveRects {
   avatar?: ComponentRect;
   menu?: ComponentRect;
   panel?: ComponentRect;
+  prompt?: ComponentRect;
+  puzzle?: ComponentRect;
+  backdrop?: ComponentRect;
 }
 
 export interface IgnoreMouseEventsOptions {
@@ -26,6 +29,9 @@ export interface ChleoResponsePayload {
   responseType: string;
   overallEmotion: PlutchikEmotion;
   emotionState: EmotionalState;
+  domain?: string;
+  eventId?: string;
+  actions?: BehavioralActions;
 }
 
 export type MainLogLevel = 'info' | 'warn' | 'error' | 'success' | 'debug';
@@ -60,6 +66,10 @@ export interface ElectronAPI {
   getLongTermMemoryData: () => Promise<LongTermMemoryData>;
   saveSiteRules?: () => Promise<boolean>;
   flushMemory?: () => Promise<boolean>;
+
+  // Actions & Puzzle APIs
+  closeActiveTab: (domain?: string) => Promise<boolean>;
+  unblockDomainSuccess: (domain: string, onSuccess?: PuzzleSuccessConfig) => Promise<boolean>;
 
   // Main -> Renderer Logging Stream
   onMainLog?: (callback: (payload: MainLogPayload) => void) => () => void;

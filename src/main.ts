@@ -92,6 +92,18 @@ sendMainLog('success', 'rule-store', 'RuleStore loaded site and behavioral rules
   siteRulesCount: ruleStore.getSiteRules()?.length ?? 0,
 });
 
+const activityTracker = new ActivityTracker(ruleStore, shortTermMemory);
+sendMainLog('success', 'activity-tracker', 'ActivityTracker connected to RuleStore and ShortTermMemory');
+
+// Initialize Browser WebSocket Server
+const browserWsServer = new BrowserWebSocketServer({
+  port: 8080,
+  activityTracker,
+  ruleStore,
+  onLog: sendMainLog,
+});
+browserWsServer.start();
+
 // Configure RuleStore listeners to broadcast companion speech & rules changes to renderer
 ruleStore.setListeners({
   onEventTriggered: (payload, speechText, reaction) => {
@@ -100,7 +112,21 @@ ruleStore.setListeners({
       domain: payload.domain,
       overallEmotion: emotionsOrchestrator.getOverallEmotion(),
       responseType: reaction?.responseType || 'declarative',
+      actions: reaction?.actions,
     });
+
+    const closeTabAction = reaction?.actions?.closeTab ?? (reaction?.rule as any)?.actions?.['close-tab'];
+    if (closeTabAction) {
+      browserWsServer.closeActiveTab(payload.domain);
+      sendMainLog('info', 'behavior', `Executed closeActiveTab action for domain: ${payload.domain}`);
+    }
+
+    const redirectAction = reaction?.actions?.redirect ?? (reaction?.rule as any)?.actions?.['redirect'];
+    if (redirectAction) {
+      const redirectUrl = typeof redirectAction === 'string' ? redirectAction : 'about:blank';
+      browserWsServer.broadcastCommand({ action: 'redirect_tab', url: redirectUrl, domain: payload.domain });
+      sendMainLog('info', 'behavior', `Executed redirect_tab action to "${redirectUrl}" for domain: ${payload.domain}`);
+    }
 
     if (mainWindowInstance && !mainWindowInstance.isDestroyed()) {
       const responsePayload: ChleoResponsePayload = {
@@ -108,6 +134,9 @@ ruleStore.setListeners({
         responseType: reaction?.responseType || 'declarative',
         overallEmotion: emotionsOrchestrator.getOverallEmotion(),
         emotionState: emotionsOrchestrator.getState(),
+        domain: payload.domain,
+        eventId: payload.eventId,
+        actions: reaction?.actions,
       };
       try {
         mainWindowInstance.webContents.send('companion-speak', responsePayload);
@@ -127,18 +156,6 @@ ruleStore.setListeners({
     }
   },
 });
-
-const activityTracker = new ActivityTracker(ruleStore, shortTermMemory);
-sendMainLog('success', 'activity-tracker', 'ActivityTracker connected to RuleStore and ShortTermMemory');
-
-// Initialize Browser WebSocket Server
-const browserWsServer = new BrowserWebSocketServer({
-  port: 8080,
-  activityTracker,
-  ruleStore,
-  onLog: sendMainLog,
-});
-browserWsServer.start();
 
 console.log('[Main] CHLEO Brain & Memory modules successfully initialized.');
 console.log(`[Main] Memory files located at: ${getUserDataDir()}`);
@@ -175,6 +192,7 @@ registerIpcHandlers({
   behavioralEngine,
   ruleStore,
   activityTracker,
+  browserWsServer,
   getInteractiveRects: () => interactiveRects,
   setInteractiveRects: (rects) => { interactiveRects = rects; },
   getIsUserDragging: () => isUserDragging,
@@ -191,15 +209,13 @@ registerIpcHandlers({
 const createWindow = () => {
   const primaryDisplay = screen.getPrimaryDisplay();
   const { width: screenWidth, height: screenHeight } = primaryDisplay.workAreaSize;
-  const windowWidth = 750;
-  const windowHeight = 420;
 
-  // Create the browser window.
+  // Create the fullscreen transparent companion overlay window
   const mainWindow = new BrowserWindow({
-    width: windowWidth,
-    height: windowHeight,
-    x: screenWidth - windowWidth - 20,
-    y: screenHeight - windowHeight - 20,
+    width: screenWidth,
+    height: screenHeight,
+    x: 0,
+    y: 0,
     frame: false,
     transparent: true,
     alwaysOnTop: true,
@@ -271,11 +287,16 @@ app.on('ready', () => {
     const avatar = interactiveRects.avatar;
     const menu = interactiveRects.menu;
     const panel = interactiveRects.panel;
+    const prompt = interactiveRects.prompt;
+    const puzzle = interactiveRects.puzzle;
+    const backdrop = interactiveRects.backdrop;
+
+    const isBackdropActive = Boolean(backdrop && backdrop.visible);
 
     const isOverAvatar = avatar ? (
       relX >= avatar.x && relX <= avatar.x + avatar.width &&
       relY >= avatar.y && relY <= avatar.y + avatar.height
-    ) : (relX >= 0 && relX <= bounds.width && relY >= 0 && relY <= bounds.height);
+    ) : false;
 
     const isOverMenu = (menu && menu.visible) ? (
       relX >= menu.x && relX <= menu.x + menu.width &&
@@ -287,7 +308,17 @@ app.on('ready', () => {
       relY >= panel.y && relY <= panel.y + panel.height
     ) : false;
 
-    if (isOverAvatar || isOverMenu || isOverPanel) {
+    const isOverPrompt = (prompt && prompt.visible) ? (
+      relX >= prompt.x && relX <= prompt.x + prompt.width &&
+      relY >= prompt.y && relY <= prompt.y + prompt.height
+    ) : false;
+
+    const isOverPuzzle = (puzzle && puzzle.visible) ? (
+      relX >= puzzle.x && relX <= puzzle.x + puzzle.width &&
+      relY >= puzzle.y && relY <= puzzle.y + puzzle.height
+    ) : false;
+
+    if (isBackdropActive || isOverAvatar || isOverMenu || isOverPanel || isOverPrompt || isOverPuzzle) {
       if (isCurrentlyIgnoring) {
         mainWindow.setIgnoreMouseEvents(false);
         isCurrentlyIgnoring = false;

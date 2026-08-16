@@ -9,6 +9,8 @@ import type { ActivityTracker } from '../monitoring/activity-tracker';
 import { InteractiveRects, IgnoreMouseEventsOptions } from '../types/ipc';
 import { MonitoringEventPayload } from 'src/monitoring';
 
+import type { BrowserWebSocketServer } from '../monitoring/browser-websocket-server';
+
 export interface IpcHandlerContext {
   mainStorageAdapter: StorageAdapter;
   longTermMemory: LongTermMemory;
@@ -17,6 +19,7 @@ export interface IpcHandlerContext {
   behavioralEngine: BehavioralEngine;
   ruleStore: RuleStore;
   activityTracker: ActivityTracker;
+  browserWsServer: BrowserWebSocketServer;
   getInteractiveRects: () => InteractiveRects;
   setInteractiveRects: (rects: InteractiveRects) => void;
   getIsUserDragging: () => boolean;
@@ -141,6 +144,23 @@ export function registerIpcHandlers(ctx: IpcHandlerContext): void {
 
   ipcMain.handle('save-site-rules', () => {
     ctx.ruleStore.saveActivityConfig();
+    return true;
+  });
+
+  // Action IPC handlers
+  ipcMain.handle('close-active-tab', (_event, domain?: string) => {
+    ctx.browserWsServer.closeActiveTab(domain);
+    return true;
+  });
+
+  ipcMain.handle('unblock-domain-success', async (_event, domain: string, onSuccess?: { status: 'unblock' | 'avoid'; duration?: number }) => {
+    if (!domain) return false;
+    ctx.sendMainLog('info', 'behavior', `Unblocking domain via puzzle success: ${domain}`, { onSuccess });
+    if (onSuccess?.status === 'avoid') {
+      ctx.ruleStore.setSiteLimit(domain, onSuccess.duration || 30);
+    } else {
+      await ctx.ruleStore.setUnblockSite(domain);
+    }
     return true;
   });
 }

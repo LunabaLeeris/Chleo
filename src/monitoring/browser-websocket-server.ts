@@ -13,8 +13,11 @@ export interface BrowserWebSocketServerOptions {
  * Manages WebSocket connection with the Chrome extension.
  * Parses tab navigation events and updates ActivityTracker and RuleStore in real-time.
  */
+const noopLog = () => { /* no-op */ };
+
 export class BrowserWebSocketServer {
   private wss: WebSocketServer | null = null;
+  private clients: Set<WebSocket> = new Set();
   private options: BrowserWebSocketServerOptions;
 
   constructor(options: BrowserWebSocketServerOptions) {
@@ -23,13 +26,14 @@ export class BrowserWebSocketServer {
 
   start(): void {
     const port = this.options.port ?? 8080;
-    const log = this.options.onLog ?? (() => {});
+    const log = this.options.onLog ?? noopLog;
 
     try {
       this.wss = new WebSocketServer({ port });
       log('success', 'websocket', `Chrome extension WebSocket listener active on ws://localhost:${port}`);
 
       this.wss.on('connection', (ws: WebSocket) => {
+        this.clients.add(ws);
         log('info', 'websocket', 'Chrome extension connected to WebSocket server');
 
         ws.on('message', async (data) => {
@@ -51,10 +55,12 @@ export class BrowserWebSocketServer {
         });
 
         ws.on('close', () => {
+          this.clients.delete(ws);
           log('info', 'websocket', 'Chrome extension disconnected from WebSocket server');
         });
 
         ws.on('error', (err) => {
+          this.clients.delete(ws);
           log('warn', 'websocket', `WebSocket client error: ${err?.message || err}`);
         });
       });
@@ -67,10 +73,29 @@ export class BrowserWebSocketServer {
     }
   }
 
+  broadcastCommand(command: { action: string; [key: string]: any }): void {
+    const log = this.options.onLog ?? noopLog;
+    const payloadStr = JSON.stringify(command);
+    let sentCount = 0;
+
+    for (const client of this.clients) {
+      if (client.readyState === WebSocket.OPEN) {
+        client.send(payloadStr);
+        sentCount++;
+      }
+    }
+    log('info', 'websocket', `Broadcast command "${command.action}" to ${sentCount} connected client(s)`, command);
+  }
+
+  closeActiveTab(domain?: string): void {
+    this.broadcastCommand({ action: 'close_tab', domain });
+  }
+
   stop(): void {
     if (this.wss) {
       this.wss.close();
       this.wss = null;
+      this.clients.clear();
     }
   }
 }

@@ -7,6 +7,31 @@ import type { StorageAdapter } from '../memory/memory-types';
 import type { ShortTermMemory } from '../memory/short-term-memory';
 import defaultBehavioralRules from './config/behavioral-rules.json';
 
+export interface PuzzleSuccessConfig {
+  status: 'unblock' | 'avoid';
+  duration?: number;
+}
+
+export interface PromptPuzzleConfig {
+  text?: string;
+  options: string[];
+  onSuccess?: PuzzleSuccessConfig;
+  draggable?: boolean;
+  closeAllTabs?: boolean;
+  orientation?: 'center' | 'remain' | string;
+}
+
+export interface BehavioralActions {
+  closeTab?: boolean;
+  promptPuzzle?: PromptPuzzleConfig;
+  openPuzzle?: Array<'snake' | 'chess' | 'sudoku' | string>;
+  orientation?: 'center' | 'left' | 'remain' | string;
+  avatarPosition?: 'bottom-right' | 'top-right' | 'center-right';
+  interactable?: boolean;
+  showReward?: boolean;
+  [key: string]: any;
+}
+
 // Behavioral types co-located with the engine that owns them
 export interface BehavioralRule {
   id: string;
@@ -16,6 +41,7 @@ export interface BehavioralRule {
     [key: string]: any;
   };
   emotionDeltas: Partial<Record<PrimaryEmotion, number>>;
+  actions?: BehavioralActions;
   rewards?: {
     coins?: number;
     itemDrop?: string;
@@ -34,6 +60,7 @@ export interface BehavioralReactionResult {
   responseType: ResponseResult['responseType'];
   emotionDeltas: BehavioralRule['emotionDeltas'];
   rewards?: BehavioralRule['rewards'];
+  actions?: BehavioralActions;
 }
 
 /**
@@ -177,8 +204,6 @@ export class BehavioralEngine {
     return rule;
   }
 
-  // --- Event Processing ---
-
   /**
    * Match an event to a behavioral rule, apply emotion deltas,
    * and delegate speech generation + memory recording to ResponseGenerator.
@@ -203,12 +228,45 @@ export class BehavioralEngine {
     // Delegate speech generation + memory recording to ResponseGenerator
     const response: ResponseResult = await this.responseGenerator.generateResponse(event, matchingRule);
 
+    const rawActions = (matchingRule as any).actions;
+    let normalizedActions: BehavioralActions | undefined = undefined;
+    if (rawActions && typeof rawActions === 'object') {
+      const promptData = rawActions['prompt-puzzle'] || rawActions.promptPuzzle;
+      let promptPuzzle: PromptPuzzleConfig | undefined = undefined;
+      if (promptData) {
+        const successData = promptData['on-success'] || promptData.onSuccess;
+        promptPuzzle = {
+          text: promptData.text || 'Do you want to solve a puzzle to unlock access?',
+          options: promptData.options || ['yes', 'no'],
+          onSuccess: successData ? {
+            status: successData.status || 'unblock',
+            duration: typeof successData.duration === 'number' ? successData.duration : undefined,
+          } : undefined,
+          draggable: promptData.draggable ?? true,
+          closeAllTabs: promptData['close-all-tabs'] ?? promptData.closeAllTabs ?? false,
+          orientation: promptData.orientation || 'remain',
+        };
+      }
+
+      normalizedActions = {
+        closeTab: rawActions['close-tab'] ?? rawActions.closeTab ?? false,
+        promptPuzzle,
+        openPuzzle: rawActions['open-puzzle'] || rawActions.openPuzzle || ['snake', 'chess', 'sudoku'],
+        orientation: rawActions.orientation || 'center',
+        avatarPosition: rawActions['avatar-position'] || rawActions.avatarPosition || 'bottom-right',
+        interactable: rawActions.interactable ?? true,
+        showReward: rawActions['show-reward'] ?? rawActions.showReward ?? false,
+        ...rawActions,
+      };
+    }
+
     return {
       rule: matchingRule,
       speechText: response.speechText,
       responseType: response.responseType,
       emotionDeltas: matchingRule.emotionDeltas,
       rewards: matchingRule.rewards,
+      actions: normalizedActions,
     };
   }
 

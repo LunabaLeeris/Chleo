@@ -356,19 +356,24 @@ export class RuleStore {
     this.saveActivityConfig(true);
   }
 
-  // --- Tick Evaluation (moved from ActivityTracker.onTick) ---
-
   /**
    * Evaluate a single tick for the given domain. Handles rule lookup,
    * time increment, warning/exceeded/milestone checks, and behavioral reactions.
    */
-  async evaluateTick(domain: string, deltaSeconds: number, isWarningActive: (d: string) => boolean, setWarning: (d: string, percent: number) => void): Promise<TickResult> {
+  async evaluateTick(
+    domain: string,
+    deltaSeconds: number,
+    isWarningActive: (d: string) => boolean,
+    setWarning: (d: string, percent: number) => void,
+    clearWarning?: (d: string) => void
+  ): Promise<TickResult> {
     let rule = this.findRuleForDomain(domain);
+    const targetDomain = rule?.domain || domain;
 
     // Blocked: don't increment time
     if (rule && rule.type === 'blocked') {
       return {
-        domain,
+        domain: targetDomain,
         spentTodaySeconds: rule.spentTodaySeconds,
         isBlocked: true,
         ruleChanged: false,
@@ -379,7 +384,7 @@ export class RuleStore {
     rule = this.updateSpentTime(domain, deltaSeconds, rule);
 
     if (!rule) {
-      return { domain, spentTodaySeconds: 0, isBlocked: false, ruleChanged: false };
+      return { domain: targetDomain, spentTodaySeconds: 0, isBlocked: false, ruleChanged: false };
     }
 
     // Avoid: check warning/exceeded
@@ -392,10 +397,13 @@ export class RuleStore {
       // Exceeded
       if (spent >= limit) {
         rule = await this.setBlockSite(domain, rule, { skipEvent: true });
+        if (clearWarning) {
+          clearWarning(rule.domain);
+        }
 
         const payload: MonitoringEventPayload = {
           eventId: 'LIMIT_EXCEEDED',
-          domain,
+          domain: rule.domain,
           timeSpentSeconds: spent,
           limitSeconds: limit,
           percentSpent: 100,
@@ -411,7 +419,7 @@ export class RuleStore {
           this.listeners.onRuleChanged();
         }
         return {
-          domain,
+          domain: rule.domain,
           spentTodaySeconds: spent,
           isBlocked: true,
           ruleChanged: true,
@@ -419,16 +427,21 @@ export class RuleStore {
         };
       }
 
+      // If spent time is below warning threshold (e.g. after reset or limit increase), clear active warning
+      if (percent < rule.warningThresholdPercent && clearWarning && isWarningActive(rule.domain)) {
+        clearWarning(rule.domain);
+      }
+
       // Warning threshold
-      if (percent >= rule.warningThresholdPercent && !isWarningActive(domain)) {
-        setWarning(domain, percent);
+      if (percent >= rule.warningThresholdPercent && !isWarningActive(rule.domain)) {
+        setWarning(rule.domain, Math.round(percent));
 
         const payload: MonitoringEventPayload = {
           eventId: 'LIMIT_WARNING',
-          domain,
+          domain: rule.domain,
           timeSpentSeconds: spent,
           limitSeconds: limit,
-          percentSpent: remaining,
+          percentSpent: Math.round(percent),
           remainingSeconds: remaining,
           siteType: 'avoid',
         };
@@ -438,7 +451,7 @@ export class RuleStore {
           this.listeners.onEventTriggered(payload, result.speechText, result);
         }
         return {
-          domain,
+          domain: rule.domain,
           spentTodaySeconds: spent,
           isBlocked: false,
           ruleChanged: false,
@@ -452,12 +465,16 @@ export class RuleStore {
       this.cumulativeProductiveSeconds += deltaSeconds;
       const rewardInterval = this.getProductiveRewardIntervalSeconds();
 
-      if (this.cumulativeProductiveSeconds > 0 &&
-        this.cumulativeProductiveSeconds % rewardInterval === 0) {
+      // Trigger milestone when spent time on this productive domain reaches interval multiples (e.g. 60s, 120s)
+      if (
+        rewardInterval > 0 &&
+        rule.spentTodaySeconds > 0 &&
+        rule.spentTodaySeconds % rewardInterval === 0
+      ) {
         const payload: MonitoringEventPayload = {
           eventId: 'PRODUCTIVE_MILESTONE',
-          domain,
-          timeSpentSeconds: this.cumulativeProductiveSeconds,
+          domain: rule.domain,
+          timeSpentSeconds: rule.spentTodaySeconds,
           limitSeconds: rewardInterval,
           percentSpent: 100,
           remainingSeconds: 0,
@@ -469,7 +486,7 @@ export class RuleStore {
           this.listeners.onEventTriggered(payload, result.speechText, result);
         }
         return {
-          domain,
+          domain: rule.domain,
           spentTodaySeconds: rule.spentTodaySeconds,
           isBlocked: false,
           ruleChanged: false,
@@ -479,7 +496,7 @@ export class RuleStore {
     }
 
     return {
-      domain,
+      domain: targetDomain,
       spentTodaySeconds: rule.spentTodaySeconds,
       isBlocked: false,
       ruleChanged: false,
@@ -491,12 +508,12 @@ export class RuleStore {
    */
   async evaluateVisit(domain: string): Promise<TickResult> {
     const rule = this.findRuleForDomain(domain);
+    const targetDomain = rule?.domain || domain;
 
-    // [add other rules for avoid and productive]
     if (rule && rule.type === 'blocked') {
       const payload: MonitoringEventPayload = {
         eventId: 'SITE_BLOCKED_VISIT',
-        domain,
+        domain: targetDomain,
         timeSpentSeconds: rule.spentTodaySeconds,
         limitSeconds: rule.dailyLimitSeconds,
         percentSpent: 100,
@@ -509,7 +526,7 @@ export class RuleStore {
         this.listeners.onEventTriggered(payload, result.speechText, result);
       }
       return {
-        domain,
+        domain: targetDomain,
         spentTodaySeconds: rule.spentTodaySeconds,
         isBlocked: true,
         ruleChanged: false,
@@ -517,7 +534,7 @@ export class RuleStore {
       };
     }
 
-    return { domain, spentTodaySeconds: rule?.spentTodaySeconds || 0, isBlocked: false, ruleChanged: false };
+    return { domain: targetDomain, spentTodaySeconds: rule?.spentTodaySeconds || 0, isBlocked: false, ruleChanged: false };
   }
 
   /**
@@ -525,10 +542,11 @@ export class RuleStore {
    */
   async evaluatePuzzleUnblock(domain: string): Promise<TickResult> {
     const rule = await this.setUnblockSite(domain, undefined, { skipEvent: true });
+    const targetDomain = rule?.domain || domain;
 
     const payload: MonitoringEventPayload = {
       eventId: 'PUZZLE_UNBLOCK_PENALTY',
-      domain,
+      domain: targetDomain,
       timeSpentSeconds: rule.spentTodaySeconds,
       limitSeconds: rule.dailyLimitSeconds,
       percentSpent: 0,
@@ -545,7 +563,7 @@ export class RuleStore {
     }
 
     return {
-      domain,
+      domain: targetDomain,
       spentTodaySeconds: rule.spentTodaySeconds,
       isBlocked: false,
       ruleChanged: true,

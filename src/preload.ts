@@ -37,6 +37,10 @@ contextBridge.exposeInMainWorld('electronAPI', {
     saveSiteRules: () => ipcRenderer.invoke('save-site-rules'),
     flushMemory: () => ipcRenderer.invoke('flush-memory'),
 
+    // Actions & Puzzle APIs
+    closeActiveTab: (domain?: string) => ipcRenderer.invoke('close-active-tab', domain),
+    unblockDomainSuccess: (domain: string, onSuccess?: any) => ipcRenderer.invoke('unblock-domain-success', domain, onSuccess),
+
     // Main -> Renderer Logging Stream
     onMainLog: (callback: (payload: any) => void) => {
         const listener = (_event: Electron.IpcRendererEvent, log: any) => callback(log);

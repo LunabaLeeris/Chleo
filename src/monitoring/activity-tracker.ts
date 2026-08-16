@@ -90,7 +90,8 @@ export class ActivityTracker {
       this.activeDomain,
       1,
       (d) => this.shortTermMemory.isWarningActive(d),
-      (d, p) => this.shortTermMemory.setWarning(d, p)
+      (d, p) => this.shortTermMemory.setWarning(d, p),
+      (d) => this.shortTermMemory.clearWarning(d)
     );
 
     if (this.listeners.onTick) {

@@ -10,9 +10,9 @@
     },
     {
       "domain": "youtube.com",
-      "type": "blocked",
-      "dailyLimitSeconds": 15,
-      "spentTodaySeconds": 15,
+      "type": "avoid",
+      "dailyLimitSeconds": 30,
+      "spentTodaySeconds": 0,
       "warningThresholdPercent": 80,
       "requiresPuzzleToUnblock": true
     },
@@ -20,7 +20,7 @@
       "domain": "github.com",
       "type": "productive",
       "dailyLimitSeconds": 0,
-      "spentTodaySeconds": 0,
+      "spentTodaySeconds": 53,
       "warningThresholdPercent": 80,
       "requiresPuzzleToUnblock": false
     },
@@ -36,7 +36,7 @@
       "domain": "localhost",
       "type": "neutral",
       "dailyLimitSeconds": 0,
-      "spentTodaySeconds": 251,
+      "spentTodaySeconds": 325,
       "warningThresholdPercent": 80,
       "requiresPuzzleToUnblock": false
     },
@@ -44,7 +44,7 @@
       "domain": "chrome://newtab/",
       "type": "neutral",
       "dailyLimitSeconds": 0,
-      "spentTodaySeconds": 8,
+      "spentTodaySeconds": 22,
       "warningThresholdPercent": 80,
       "requiresPuzzleToUnblock": false
     },
@@ -52,7 +52,15 @@
       "domain": "docs.google.com",
       "type": "neutral",
       "dailyLimitSeconds": 0,
-      "spentTodaySeconds": 4,
+      "spentTodaySeconds": 116,
+      "warningThresholdPercent": 80,
+      "requiresPuzzleToUnblock": false
+    },
+    {
+      "domain": "www.twitch.tv",
+      "type": "neutral",
+      "dailyLimitSeconds": 0,
+      "spentTodaySeconds": 44,
       "warningThresholdPercent": 80,
       "requiresPuzzleToUnblock": false
     }

@@ -1,62 +1,87 @@
 import './index.css';
 import React from 'react';
 import { createRoot, Root } from 'react-dom/client';
-import { AvatarCompositor, defaultAvatarConfig, defaultSpeechOrchestrator } from './avatar';
+import { AvatarCompositor, defaultAvatarConfig } from './avatar';
+import type { ResponseType } from './avatar';
 import { MenuBarComponent } from './components/menu-bar';
 import { PanelHost } from './components/panels/PanelHost';
+import { ActionPrompt } from './components/action-prompt/ActionPrompt';
+import { PuzzleHost } from './components/puzzles/PuzzleHost';
 import { logger } from './logger';
 
-import { ElectronAPI, ChleoResponsePayload } from './types/ipc';
-import { PlutchikEmotion, ResponseType } from './avatar';
+import type { ChleoResponsePayload } from './types/ipc';
 
 // Expose logger on window for dev console access
 (window as any).__CLEO_LOGGER__ = logger;
 
-// Type checking definitions for exposed window API
-interface Window {
-  electronAPI?: ElectronAPI;
-}
-
+const modalBackdrop = document.getElementById('modal-backdrop') as HTMLDivElement;
+const companionWrapper = document.getElementById('companion-wrapper') as HTMLDivElement;
 const bubble = document.getElementById('bubble') as HTMLDivElement | null;
 const avatar = document.getElementById('avatar') as HTMLDivElement;
 const canvas = document.getElementById('avatar-canvas') as HTMLCanvasElement;
 const menuBarContainer = document.getElementById('menu-bar') as HTMLDivElement;
 const featurePanelContainer = document.getElementById('feature-panel') as HTMLDivElement;
+const actionPromptContainer = document.getElementById('action-prompt') as HTMLDivElement;
+const puzzlePanelContainer = document.getElementById('puzzle-panel') as HTMLDivElement;
 
 const compositor = new AvatarCompositor(canvas, defaultAvatarConfig);
-const speechOrchestrator = defaultSpeechOrchestrator;
 
 let panelRoot: Root | null = null;
+let actionPromptRoot: Root | null = null;
+let puzzlePanelRoot: Root | null = null;
 
 if (featurePanelContainer) {
   panelRoot = createRoot(featurePanelContainer);
-
-  // Automatically update interactive rects whenever panel size or DOM children change
-  const resizeObserver = new ResizeObserver(() => {
-    updateInteractiveRects();
-  });
+  const resizeObserver = new ResizeObserver(() => updateInteractiveRects());
   resizeObserver.observe(featurePanelContainer);
+}
 
-  const mutationObserver = new MutationObserver(() => {
-    requestAnimationFrame(updateInteractiveRects);
-  });
-  mutationObserver.observe(featurePanelContainer, {
-    childList: true,
-    subtree: true,
-    attributes: true,
-  });
+if (actionPromptContainer) {
+  actionPromptRoot = createRoot(actionPromptContainer);
+}
+
+if (puzzlePanelContainer) {
+  puzzlePanelRoot = createRoot(puzzlePanelContainer);
+  const resizeObserver = new ResizeObserver(() => updateInteractiveRects());
+  resizeObserver.observe(puzzlePanelContainer);
 }
 
 let activeOptionId: string | null = null;
+let isInteractable = true;
+let currentPosX = 0;
+let currentPosY = 0;
 
-// Send bounding rects of avatar, menu bar, and active feature panel to main process
+interface ActivePromptState {
+  text: string;
+  options: string[];
+  domain: string;
+  actions?: any;
+}
+
+interface ActivePuzzleState {
+  id: string;
+  domain: string;
+  onSuccessConfig?: any;
+  orientation?: string;
+  avatarPosition?: string;
+}
+
+let activePrompt: ActivePromptState | null = null;
+let activePuzzle: ActivePuzzleState | null = null;
+
+// Send bounding rects of avatar, menu bar, active feature panel, prompt, puzzle and backdrop to main process
 function updateInteractiveRects() {
   const avatarRect = avatar.getBoundingClientRect();
   const menuRect = menuBarContainer.getBoundingClientRect();
   const panelRect = featurePanelContainer ? featurePanelContainer.getBoundingClientRect() : null;
+  const promptRect = actionPromptContainer ? actionPromptContainer.getBoundingClientRect() : null;
+  const puzzleRect = puzzlePanelContainer ? puzzlePanelContainer.getBoundingClientRect() : null;
 
   const menuVisible = menuBar ? menuBar.getIsOpen() : false;
   const panelVisible = Boolean(activeOptionId);
+  const promptVisible = Boolean(activePrompt);
+  const puzzleVisible = Boolean(activePuzzle);
+  const backdropVisible = modalBackdrop ? modalBackdrop.classList.contains('visible') : false;
 
   (window as any).electronAPI?.setInteractiveRects?.({
     avatar: {
@@ -79,7 +104,191 @@ function updateInteractiveRects() {
       height: panelRect.height,
       visible: panelVisible,
     } : undefined,
+    prompt: promptRect ? {
+      x: promptRect.left,
+      y: promptRect.top,
+      width: promptRect.width,
+      height: promptRect.height,
+      visible: promptVisible,
+    } : undefined,
+    puzzle: puzzleRect ? {
+      x: puzzleRect.left,
+      y: puzzleRect.top,
+      width: puzzleRect.width,
+      height: puzzleRect.height,
+      visible: puzzleVisible,
+    } : undefined,
+    backdrop: backdropVisible ? {
+      x: 0,
+      y: 0,
+      width: window.innerWidth,
+      height: window.innerHeight,
+      visible: true,
+    } : undefined,
   });
+}
+
+function applyLayoutModifiers(orientation?: string, avatarPosition?: string) {
+  const container = document.getElementById('app-container');
+  const isCenter = orientation === 'center';
+
+  if (modalBackdrop) {
+    if (isCenter) {
+      modalBackdrop.classList.add('visible');
+    } else {
+      modalBackdrop.classList.remove('visible');
+    }
+  }
+
+  if (container) {
+    container.classList.remove('layout-center', 'layout-left');
+    if (isCenter) {
+      container.classList.add('layout-center');
+    } else if (orientation === 'left') {
+      container.classList.add('layout-left');
+    }
+  }
+
+  if (!companionWrapper) return;
+
+  // Reset classes
+  companionWrapper.classList.remove(
+    'layout-center',
+    'layout-left',
+    'avatar-pos-bottom-right',
+    'avatar-pos-top-right',
+    'avatar-pos-center-right'
+  );
+
+  if (isCenter) {
+    companionWrapper.classList.add('layout-center');
+    companionWrapper.style.transform = '';
+  } else {
+    companionWrapper.style.transform = (currentPosX !== 0 || currentPosY !== 0)
+      ? `translate(${currentPosX}px, ${currentPosY}px)`
+      : '';
+    if (orientation === 'left') {
+      companionWrapper.classList.add('layout-left');
+    }
+  }
+
+  if (avatarPosition === 'top-right') {
+    companionWrapper.classList.add('avatar-pos-top-right');
+  } else if (avatarPosition === 'center-right') {
+    companionWrapper.classList.add('avatar-pos-center-right');
+  } else if (avatarPosition === 'bottom-right') {
+    companionWrapper.classList.add('avatar-pos-bottom-right');
+  }
+
+  updateInteractiveRects();
+  requestAnimationFrame(updateInteractiveRects);
+}
+
+function renderActionPrompt() {
+  if (!actionPromptContainer || !actionPromptRoot) return;
+
+  if (activePrompt) {
+    actionPromptContainer.classList.add('visible');
+    (window as any).electronAPI?.setIgnoreMouseEvents(false);
+
+    actionPromptRoot.render(
+      React.createElement(ActionPrompt, {
+        text: activePrompt.text,
+        options: activePrompt.options,
+        onSelect: (option: string) => {
+          logger.info('action-prompt', `User selected prompt option: "${option}"`);
+          if (option.toLowerCase() === 'yes') {
+            // Pick puzzle from open-puzzle candidates
+            const candidates = activePrompt?.actions?.openPuzzle || ['snake', 'chess', 'sudoku'];
+            const randomPuzzle = candidates[Math.floor(Math.random() * candidates.length)] || 'snake';
+            const domain = activePrompt?.domain || '';
+            const onSuccessConfig = activePrompt?.actions?.promptPuzzle?.onSuccess;
+            const orientation = activePrompt?.actions?.orientation || 'center';
+            const avatarPosition = activePrompt?.actions?.avatarPosition || 'bottom-right';
+            const interactable = activePrompt?.actions?.interactable ?? false;
+
+            // Lock interactable if requested
+            isInteractable = interactable;
+
+            activePrompt = null;
+            renderActionPrompt();
+
+            // Launch puzzle
+            activePuzzle = {
+              id: randomPuzzle,
+              domain,
+              onSuccessConfig,
+              orientation,
+              avatarPosition,
+            };
+            applyLayoutModifiers(orientation, avatarPosition);
+            renderPuzzlePanel();
+          } else {
+            // Dismiss prompt
+            activePrompt = null;
+            isInteractable = true;
+            applyLayoutModifiers();
+            renderActionPrompt();
+          }
+        },
+        onClose: () => {
+          activePrompt = null;
+          isInteractable = true;
+          applyLayoutModifiers();
+          renderActionPrompt();
+        },
+      })
+    );
+  } else {
+    actionPromptContainer.classList.remove('visible');
+    actionPromptRoot.render(null);
+  }
+
+  updateInteractiveRects();
+  requestAnimationFrame(updateInteractiveRects);
+}
+
+function renderPuzzlePanel() {
+  if (!puzzlePanelContainer || !puzzlePanelRoot) return;
+
+  if (activePuzzle) {
+    puzzlePanelContainer.classList.add('visible');
+    (window as any).electronAPI?.setIgnoreMouseEvents(false);
+
+    puzzlePanelRoot.render(
+      React.createElement(PuzzleHost, {
+        puzzleId: activePuzzle.id,
+        targetDomain: activePuzzle.domain,
+        onSuccessConfig: activePuzzle.onSuccessConfig,
+        onSuccess: async (score: number) => {
+          logger.info('puzzle', `Puzzle "${activePuzzle?.id}" completed with score: ${score}`);
+          if (activePuzzle?.domain) {
+            await (window as any).electronAPI?.unblockDomainSuccess?.(
+              activePuzzle.domain,
+              activePuzzle.onSuccessConfig
+            );
+          }
+          activePuzzle = null;
+          isInteractable = true;
+          applyLayoutModifiers();
+          renderPuzzlePanel();
+        },
+        onCancel: () => {
+          logger.info('puzzle', `Puzzle cancelled by user`);
+          activePuzzle = null;
+          isInteractable = true;
+          applyLayoutModifiers();
+          renderPuzzlePanel();
+        },
+      })
+    );
+  } else {
+    puzzlePanelContainer.classList.remove('visible');
+    puzzlePanelRoot.render(null);
+  }
+
+  updateInteractiveRects();
+  requestAnimationFrame(updateInteractiveRects);
 }
 
 function renderFeaturePanel() {
@@ -104,7 +313,6 @@ function renderFeaturePanel() {
     featurePanelContainer.classList.remove('visible');
   }
 
-  // Update rects synchronously, on next frame, and after React DOM layout finishes
   updateInteractiveRects();
   requestAnimationFrame(() => updateInteractiveRects());
   setTimeout(updateInteractiveRects, 50);
@@ -156,6 +364,33 @@ let bubbleTimer: ReturnType<typeof setTimeout> | null = null;
     responseType: data.responseType,
   });
 
+  // Check if speech event came with an action prompt
+  if (data.actions?.promptPuzzle) {
+    const promptConfig = data.actions.promptPuzzle;
+
+    // Close all open menus/panels if configured
+    if (promptConfig.closeAllTabs) {
+      activeOptionId = null;
+      renderFeaturePanel();
+      menuBar.close();
+    }
+
+    // Set draggable / interactable state
+    isInteractable = promptConfig.draggable ?? false;
+
+    // Set prompt orientation (e.g. 'center' vs 'remain')
+    const promptOrientation = promptConfig.orientation || 'remain';
+    applyLayoutModifiers(promptOrientation === 'center' ? 'center' : undefined);
+
+    activePrompt = {
+      text: promptConfig.text || 'Do you want to solve a puzzle to unlock access?',
+      options: promptConfig.options || ['yes', 'no'],
+      domain: data.domain || '',
+      actions: data.actions,
+    };
+    renderActionPrompt();
+  }
+
   if (bubble) {
     bubble.textContent = data.speechText;
     bubble.classList.add('visible');
@@ -204,16 +439,25 @@ function setInteractive(interactive: boolean) {
   (window as any).electronAPI?.setIgnoreMouseEvents(!interactive, { forward: true });
 }
 
-// Mouse enter/leave handlers on interactive element (avatar, menu bar & feature panel)
+// Check if any interactive UI component is currently hovered
+function checkIsHovered(): boolean {
+  return Boolean(
+    avatar.matches(':hover') ||
+    menuBarContainer.matches(':hover') ||
+    (featurePanelContainer && featurePanelContainer.matches(':hover')) ||
+    (actionPromptContainer && actionPromptContainer.classList.contains('visible') && actionPromptContainer.matches(':hover')) ||
+    (puzzlePanelContainer && puzzlePanelContainer.classList.contains('visible') && puzzlePanelContainer.matches(':hover')) ||
+    (bubble && bubble.classList.contains('visible') && bubble.matches(':hover'))
+  );
+}
+
+// Mouse enter/leave handlers on interactive element
 avatar.addEventListener('mouseenter', () => {
   setInteractive(true);
 });
 
 avatar.addEventListener('mouseleave', () => {
-  if (!isDragging && !menuBarContainer.matches(':hover')
-    && (!featurePanelContainer ||
-      !featurePanelContainer.matches(':hover')) &&
-    (!bubble || !bubble.matches(':hover'))) {
+  if (!isDragging && !checkIsHovered()) {
     setInteractive(false);
   }
 });
@@ -223,8 +467,7 @@ menuBarContainer.addEventListener('mouseenter', () => {
 });
 
 menuBarContainer.addEventListener('mouseleave', () => {
-  if (!isDragging && !avatar.matches(':hover') &&
-    (!featurePanelContainer || !featurePanelContainer.matches(':hover'))) {
+  if (!isDragging && !checkIsHovered()) {
     setInteractive(false);
   }
 });
@@ -235,7 +478,31 @@ if (featurePanelContainer) {
   });
 
   featurePanelContainer.addEventListener('mouseleave', () => {
-    if (!isDragging && !avatar.matches(':hover') && !menuBarContainer.matches(':hover')) {
+    if (!isDragging && !checkIsHovered()) {
+      setInteractive(false);
+    }
+  });
+}
+
+if (actionPromptContainer) {
+  actionPromptContainer.addEventListener('mouseenter', () => {
+    setInteractive(true);
+  });
+
+  actionPromptContainer.addEventListener('mouseleave', () => {
+    if (!isDragging && !checkIsHovered()) {
+      setInteractive(false);
+    }
+  });
+}
+
+if (puzzlePanelContainer) {
+  puzzlePanelContainer.addEventListener('mouseenter', () => {
+    setInteractive(true);
+  });
+
+  puzzlePanelContainer.addEventListener('mouseleave', () => {
+    if (!isDragging && !checkIsHovered()) {
       setInteractive(false);
     }
   });
@@ -247,20 +514,22 @@ if (bubble) {
   });
 
   bubble.addEventListener('mouseleave', () => {
-    if (!isDragging && !avatar.matches(':hover') && !menuBarContainer.matches(':hover')) {
+    if (!isDragging && !checkIsHovered()) {
       setInteractive(false);
     }
   });
 }
 
-// Right click on avatar toggles the menu bar
+// Right click on avatar toggles the menu bar (only if interactable)
 avatar.addEventListener('contextmenu', (e: MouseEvent) => {
   e.preventDefault();
+  if (!isInteractable) return;
   menuBar.toggle();
   updateInteractiveRects();
 });
 
 avatar.addEventListener('pointerdown', (e: PointerEvent) => {
+  if (!isInteractable) return;
   if (e.button === 0) { // Left click only
     isDragging = true;
     startX = e.screenX;
@@ -281,7 +550,10 @@ window.addEventListener('pointermove', (e: PointerEvent) => {
     const dy = e.screenY - startY;
     startX = e.screenX;
     startY = e.screenY;
-    (window as any).electronAPI?.dragWindow(dx, dy);
+    currentPosX += dx;
+    currentPosY += dy;
+    companionWrapper.style.transform = `translate(${currentPosX}px, ${currentPosY}px)`;
+    updateInteractiveRects();
   }
 });
 
@@ -299,13 +571,7 @@ const stopDragging = (e?: PointerEvent) => {
       }
     }
     (window as any).electronAPI?.setDragging(false);
-
-    // Check if mouse is hovering over avatar, menu, panel, or speech bubble
-    const isHovered = avatar.matches(':hover') ||
-      menuBarContainer.matches(':hover') ||
-      (featurePanelContainer && featurePanelContainer.matches(':hover')) ||
-      (bubble && bubble.classList.contains('visible') && bubble.matches(':hover'));
-    setInteractive(isHovered ?? false);
+    setInteractive(checkIsHovered());
   }
 };
 

@@ -13,8 +13,14 @@
 </head>
 
 <body>
-  <div class="container">
-    <div class="companion-wrapper">
+  <!-- Fullscreen Blur / Dim Backdrop for Centered Challenges -->
+  <div id="modal-backdrop" class="modal-backdrop"></div>
+
+  <div id="app-container" class="container">
+    <div id="companion-wrapper" class="companion-wrapper">
+      <!-- Puzzle Challenge Panel (Left or Centered) -->
+      <div id="puzzle-panel" class="puzzle-panel"></div>
+
       <!-- Feature Panel (Anchored to the left of Menu Bar) -->
       <div id="feature-panel" class="feature-panel"></div>
 
@@ -26,6 +32,8 @@
         <!-- Speech Bubble (Anchored directly above CLEO's head) -->
         <div id="bubble" class="speech-bubble"></div>
         <canvas id="avatar-canvas"></canvas>
+        <!-- Action Prompt (Anchored directly below CLEO's avatar) -->
+        <div id="action-prompt" class="action-prompt-container"></div>
       </div>
 
     </div>
