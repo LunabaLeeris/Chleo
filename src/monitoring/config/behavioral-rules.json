@@ -13,28 +13,28 @@
         "trust": -0.23
       },
       "actions": {
-        "close-tab": true,
-        "prompt-puzzle": {
+        "closeTab": true,
+        "promptPuzzle": {
           "text": "Do you want to solve a puzzle to unlock access?",
           "options": [
             "yes",
             "no"
           ],
-          "on-success": {
+          "onSuccess": {
             "status": "unblock",
             "duration": 30
           },
           "draggable": false,
-          "close-all-tabs": true,
+          "closeAllTabs": true,
           "orientation": "center"
         },
-        "open-puzzle": [
+        "openPuzzle": [
           "snake",
           "chess",
           "sudoku"
         ],
         "orientation": "center",
-        "avatar-position": "bottom-right",
+        "avatarPosition": "bottom-right",
         "interactable": false
       },
       "heuristicTemplates": [
@@ -74,28 +74,28 @@
         "trust": -0.1
       },
       "actions": {
-        "close-tab": true,
-        "prompt-puzzle": {
+        "closeTab": true,
+        "promptPuzzle": {
           "text": "Daily limit reached! Solve a puzzle to earn extra time?",
           "options": [
             "yes",
             "no"
           ],
-          "on-success": {
+          "onSuccess": {
             "status": "avoid",
             "duration": 30
           },
           "draggable": false,
-          "close-all-tabs": true,
+          "closeAllTabs": true,
           "orientation": "center"
         },
-        "open-puzzle": [
+        "openPuzzle": [
           "snake",
           "chess",
           "sudoku"
         ],
         "orientation": "center",
-        "avatar-position": "bottom-right",
+        "avatarPosition": "bottom-right",
         "interactable": false
       },
       "heuristicTemplates": [

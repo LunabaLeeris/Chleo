@@ -9,6 +9,28 @@ export interface ResponseResult {
   responseType: ResponseType;
 }
 
+export function cleanDomainName(rawDomain: string): string {
+  if (!rawDomain) return 'this site';
+  let cleaned = String(rawDomain).trim().toLowerCase();
+  // Remove protocol if present
+  cleaned = cleaned.replace(/^https?:\/\//i, '');
+  // Remove port or path/query
+  cleaned = cleaned.split('/')[0].split(':')[0];
+  // Remove leading www. or m.
+  cleaned = cleaned.replace(/^(www\d?|m)\./i, '');
+
+  // Extract base domain name without extension:
+  const parts = cleaned.split('.').filter(Boolean);
+  if (parts.length >= 2) {
+    const knownShortSLD = ['co', 'com', 'org', 'net', 'edu', 'gov'];
+    if (parts.length >= 3 && knownShortSLD.includes(parts[parts.length - 2])) {
+      return parts[parts.length - 3] || parts[0];
+    }
+    return parts[parts.length - 2] || parts[0];
+  }
+  return cleaned || 'this site';
+}
+
 /**
  * ResponseGenerator produces speech text for behavioral reactions.
  * Tries LLM first, falls back to heuristic template interpolation.
@@ -65,8 +87,10 @@ export class ResponseGenerator {
   }
 
   private interpolateTemplate(templates: string[], event: MonitoringEventPayload): string {
+    const displayDomain = cleanDomainName(event.domain);
+
     if (!templates || templates.length === 0) {
-      return event.message || `Activity event on ${event.domain}`;
+      return event.message || `Activity event on ${displayDomain}`;
     }
 
     // Pick template randomly to prevent repetitive phrasing
@@ -79,7 +103,7 @@ export class ResponseGenerator {
         : `${event.timeSpentSeconds}s`;
 
     return template
-      .replace(/\{domain\}/g, event.domain || 'this site')
+      .replace(/\{domain\}/g, displayDomain)
       .replace(/\{percent\}/g, Math.round(event.percentSpent).toString())
       .replace(/\{remainingSeconds\}/g, Math.round(event.remainingSeconds).toString())
       .replace(/\{limit\}/g, Math.round(event.limitSeconds / 60).toString())

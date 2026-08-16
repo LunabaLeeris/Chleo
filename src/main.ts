@@ -115,13 +115,13 @@ ruleStore.setListeners({
       actions: reaction?.actions,
     });
 
-    const closeTabAction = reaction?.actions?.closeTab ?? (reaction?.rule as any)?.actions?.['close-tab'];
+    const closeTabAction = reaction?.actions?.closeTab;
     if (closeTabAction) {
       browserWsServer.closeActiveTab(payload.domain);
       sendMainLog('info', 'behavior', `Executed closeActiveTab action for domain: ${payload.domain}`);
     }
 
-    const redirectAction = reaction?.actions?.redirect ?? (reaction?.rule as any)?.actions?.['redirect'];
+    const redirectAction = reaction?.actions?.redirect;
     if (redirectAction) {
       const redirectUrl = typeof redirectAction === 'string' ? redirectAction : 'about:blank';
       browserWsServer.broadcastCommand({ action: 'redirect_tab', url: redirectUrl, domain: payload.domain });

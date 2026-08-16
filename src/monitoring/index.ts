@@ -8,6 +8,18 @@ export type { ResponseResult } from './response-generator';
 export { LLMService } from './llm-service';
 export { parseMonitoringCommand } from './command-parser';
 export type { ParsedCommand } from './command-parser';
+export {
+  normalizeBehavioralActions,
+  normalizePromptPuzzleConfig,
+  normalizePuzzleSuccessConfig,
+  normaliseBehavioralActions,
+  parseBehavioralActions,
+} from './action-parser';
+export type {
+  BehavioralActions,
+  PromptPuzzleConfig,
+  PuzzleSuccessConfig,
+} from './action-parser';
 export type {
   SiteRule,
   SiteType,

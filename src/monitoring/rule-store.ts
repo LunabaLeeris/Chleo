@@ -1,5 +1,6 @@
 import type { SiteRule, MonitoringConfig, MonitoringEventPayload, TickResult } from './monitoring-types';
-import { BehavioralEngine, type BehavioralReactionResult } from './behavioral-engine';
+import { BehavioralActions, BehavioralEngine, type BehavioralReactionResult } from './behavioral-engine';
+import { cleanDomainName } from './response-generator';
 import type { StorageAdapter } from '../memory/memory-types';
 import defaultActivityRules from './config/activity-rules.json';
 import { parseMonitoringCommand, ParsedCommand } from './command-parser';
@@ -211,7 +212,7 @@ export class RuleStore {
         remainingSeconds: 0,
         siteType: 'blocked',
       };
-      const result = await this.behavioralEngine.processEvent(payload);
+      const result: BehavioralReactionResult = await this.behavioralEngine.processEvent(payload);
       if (result && this.listeners?.onEventTriggered) {
         this.listeners.onEventTriggered(payload, result.speechText, result);
       }
@@ -521,7 +522,7 @@ export class RuleStore {
         siteType: 'blocked',
       };
 
-      const result = await this.behavioralEngine.processEvent(payload);
+      const result: BehavioralReactionResult = await this.behavioralEngine.processEvent(payload);
       if (result && this.listeners?.onEventTriggered) {
         this.listeners.onEventTriggered(payload, result.speechText, result);
       }
@@ -582,14 +583,16 @@ export class RuleStore {
       case 'BLOCK': {
         if (parsed.domain) {
           await this.setBlockSite(parsed.domain);
-          responseText = `Okay, I have completely blocked ${parsed.domain}!`;
+          const domainName = cleanDomainName(parsed.domain);
+          responseText = `Okay, I have completely blocked ${domainName}!`;
         }
         break;
       }
 
       case 'UNBLOCK': {
         if (parsed.domain) {
-          responseText = `To unblock ${parsed.domain}, you must finish my puzzle challenge! Click the puzzle unblock button below.`;
+          const domainName = cleanDomainName(parsed.domain);
+          responseText = `To unblock ${domainName}, you must finish my puzzle challenge! Click the puzzle unblock button below.`;
         }
         break;
       }
@@ -597,8 +600,9 @@ export class RuleStore {
       case 'LIMIT': {
         if (parsed.domain && parsed.seconds) {
           this.setSiteLimit(parsed.domain, parsed.seconds);
+          const domainName = cleanDomainName(parsed.domain);
           const formatted = parsed.seconds >= 60 ? `${Math.round(parsed.seconds / 60)} minutes` : `${parsed.seconds} seconds`;
-          responseText = `Got it! Set a daily limit of ${formatted} for ${parsed.domain}.`;
+          responseText = `Got it! Set a daily limit of ${formatted} for ${domainName}.`;
         }
         break;
       }
@@ -606,7 +610,8 @@ export class RuleStore {
       case 'MARK_PRODUCTIVE': {
         if (parsed.domain) {
           await this.setSiteProductive(parsed.domain, true);
-          responseText = `Marked ${parsed.domain} as productive! You will earn rewards for staying focused there.`;
+          const domainName = cleanDomainName(parsed.domain);
+          responseText = `Marked ${domainName} as productive! You will earn rewards for staying focused there.`;
         }
         break;
       }
@@ -614,7 +619,8 @@ export class RuleStore {
       case 'UNMARK_PRODUCTIVE': {
         if (parsed.domain) {
           await this.setSiteProductive(parsed.domain, false);
-          responseText = `Removed ${parsed.domain} from productive sites.`;
+          const domainName = cleanDomainName(parsed.domain);
+          responseText = `Removed ${domainName} from productive sites.`;
         }
         break;
       }

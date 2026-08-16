@@ -14,20 +14,14 @@ export const ActionPrompt: React.FC<ActionPromptProps> = ({
   onClose,
 }) => {
   return (
-    <div className="action-prompt-card">
+    <div
+      className="action-prompt-card"
+      onPointerDown={(e) => e.stopPropagation()}
+      onMouseDown={(e) => e.stopPropagation()}
+    >
       <div className="action-prompt-header">
         <span className="action-prompt-title">CHALLENGE</span>
         <span className="action-prompt-badge">PROMPT</span>
-        {onClose && (
-          <button
-            type="button"
-            className="action-prompt-close-btn"
-            onClick={onClose}
-            title="Dismiss Prompt"
-          >
-            ✕
-          </button>
-        )}
       </div>
       <div className="action-prompt-body">
         <p className="action-prompt-text">{text}</p>
@@ -39,7 +33,12 @@ export const ActionPrompt: React.FC<ActionPromptProps> = ({
                 key={opt}
                 type="button"
                 className={`action-prompt-btn ${isYes ? 'btn-accept' : 'btn-decline'}`}
-                onClick={() => onSelect(opt)}
+                onPointerDown={(e) => e.stopPropagation()}
+                onMouseDown={(e) => e.stopPropagation()}
+                onClick={(e) => {
+                  e.stopPropagation();
+                  onSelect(opt);
+                }}
               >
                 {opt.toUpperCase()}
               </button>

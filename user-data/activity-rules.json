@@ -10,9 +10,9 @@
     },
     {
       "domain": "youtube.com",
-      "type": "avoid",
+      "type": "blocked",
       "dailyLimitSeconds": 30,
-      "spentTodaySeconds": 0,
+      "spentTodaySeconds": 30,
       "warningThresholdPercent": 80,
       "requiresPuzzleToUnblock": true
     },
@@ -20,7 +20,7 @@
       "domain": "github.com",
       "type": "productive",
       "dailyLimitSeconds": 0,
-      "spentTodaySeconds": 53,
+      "spentTodaySeconds": 171,
       "warningThresholdPercent": 80,
       "requiresPuzzleToUnblock": false
     },
@@ -36,7 +36,7 @@
       "domain": "localhost",
       "type": "neutral",
       "dailyLimitSeconds": 0,
-      "spentTodaySeconds": 325,
+      "spentTodaySeconds": 361,
       "warningThresholdPercent": 80,
       "requiresPuzzleToUnblock": false
     },
@@ -44,7 +44,7 @@
       "domain": "chrome://newtab/",
       "type": "neutral",
       "dailyLimitSeconds": 0,
-      "spentTodaySeconds": 22,
+      "spentTodaySeconds": 32,
       "warningThresholdPercent": 80,
       "requiresPuzzleToUnblock": false
     },
@@ -52,7 +52,7 @@
       "domain": "docs.google.com",
       "type": "neutral",
       "dailyLimitSeconds": 0,
-      "spentTodaySeconds": 116,
+      "spentTodaySeconds": 119,
       "warningThresholdPercent": 80,
       "requiresPuzzleToUnblock": false
     },
@@ -61,6 +61,14 @@
       "type": "neutral",
       "dailyLimitSeconds": 0,
       "spentTodaySeconds": 44,
+      "warningThresholdPercent": 80,
+      "requiresPuzzleToUnblock": false
+    },
+    {
+      "domain": "app.diagrams.net",
+      "type": "neutral",
+      "dailyLimitSeconds": 0,
+      "spentTodaySeconds": 566,
       "warningThresholdPercent": 80,
       "requiresPuzzleToUnblock": false
     }

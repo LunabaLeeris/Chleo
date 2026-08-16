@@ -13,32 +13,32 @@
         "trust": -0.23
       },
       "actions": {
-        "close-tab": true,
-        "prompt-puzzle": {
+        "closeTab": true,
+        "promptPuzzle": {
           "text": "Do you want to solve a puzzle to unlock access?",
           "options": [
             "yes",
             "no"
           ],
-          "on-success": {
+          "onSuccess": {
             "status": "unblock",
             "duration": 30
           },
-          "draggable": false,
-          "close-all-tabs": true,
+          "draggable": true,
+          "closeAllTabs": true,
           "orientation": "center"
         },
-        "open-puzzle": [
+        "openPuzzle": [
           "snake",
           "chess",
           "sudoku"
         ],
         "orientation": "center",
-        "avatar-position": "bottom-right",
+        "avatarPosition": "bottom-right",
         "interactable": false
       },
       "heuristicTemplates": [
-        "Hey! {domain} is completely blocked. You cannot visit it unless you complete my puzzle!",
+        "Hey! {domain} is completely blocked. Complete my puzzle to unblock it!",
         "Stop trying to open {domain}! Access is restricted until you pass my challenge."
       ],
       "llmDirective": "Chleo is angry that the user tried to open a blocked website."
@@ -56,7 +56,7 @@
         "trust": -0.13
       },
       "heuristicTemplates": [
-        "Warning! You have used {percent}% of your limit on {domain}. Only {remainingSeconds} seconds left!",
+        "Warning! You have used {percent}% of your limit on {domain}.",
         "Hey, you're almost out of time for {domain}! Wrap it up soon."
       ],
       "llmDirective": "Chleo warns the user sternly that their time limit on a website is almost up."
@@ -74,28 +74,28 @@
         "trust": -0.1
       },
       "actions": {
-        "close-tab": true,
-        "prompt-puzzle": {
+        "closeTab": true,
+        "promptPuzzle": {
           "text": "Daily limit reached! Solve a puzzle to earn extra time?",
           "options": [
             "yes",
             "no"
           ],
-          "on-success": {
+          "onSuccess": {
             "status": "avoid",
             "duration": 30
           },
           "draggable": false,
-          "close-all-tabs": true,
+          "closeAllTabs": true,
           "orientation": "center"
         },
-        "open-puzzle": [
+        "openPuzzle": [
           "snake",
           "chess",
           "sudoku"
         ],
         "orientation": "center",
-        "avatar-position": "bottom-right",
+        "avatarPosition": "bottom-right",
         "interactable": false
       },
       "heuristicTemplates": [

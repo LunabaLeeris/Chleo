@@ -153,9 +153,9 @@ export function registerIpcHandlers(ctx: IpcHandlerContext): void {
     return true;
   });
 
-  ipcMain.handle('unblock-domain-success', async (_event, domain: string, onSuccess?: { status: 'unblock' | 'avoid'; duration?: number }) => {
+  ipcMain.handle('modify-block-success', async (_event, domain: string, onSuccess?: { status: 'unblock' | 'avoid'; duration?: number }) => {
     if (!domain) return false;
-    ctx.sendMainLog('info', 'behavior', `Unblocking domain via puzzle success: ${domain}`, { onSuccess });
+    ctx.sendMainLog('info', 'behavior', `Modifying block/limit via puzzle success: ${domain}`, { onSuccess });
     if (onSuccess?.status === 'avoid') {
       ctx.ruleStore.setSiteLimit(domain, onSuccess.duration || 30);
     } else {

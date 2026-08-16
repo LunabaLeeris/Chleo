@@ -58,6 +58,13 @@ body {
   cursor: grab;
 }
 
+/* Anchored Speech Bubble (Expanded Width) */
+.speech-bubble {
+  min-width: 180px;
+  max-width: 380px;
+  width: max-content;
+}
+
 #avatar-canvas:active {
   cursor: grabbing;
 }

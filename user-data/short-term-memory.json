@@ -1,6 +1,364 @@
 {
   "events": [
     {
+      "type": "productive_milestone",
+      "domain": "github.com",
+      "details": "Great job! You've been productive on github for 3m! Here are 50 coins!",
+      "emotionDelta": {
+        "joy": 0.35,
+        "trust": 0.25
+      },
+      "id": "stm_1786878789724_gjpqg",
+      "timestamp": 1786878789724,
+      "formattedText": "default"
+    },
+    {
+      "type": "site_blocked_visit",
+      "domain": "facebook.com",
+      "details": "Hey! facebook is completely blocked. Complete my puzzle to unblock it!",
+      "emotionDelta": {
+        "anger": 0.35,
+        "sadness": 0.25,
+        "joy": -0.25,
+        "trust": -0.23
+      },
+      "id": "stm_1786878775193_67yxk",
+      "timestamp": 1786878775193,
+      "formattedText": "default"
+    },
+    {
+      "type": "site_blocked_visit",
+      "domain": "facebook.com",
+      "details": "Stop trying to open facebook! Access is restricted until you pass my challenge.",
+      "emotionDelta": {
+        "anger": 0.35,
+        "sadness": 0.25,
+        "joy": -0.25,
+        "trust": -0.23
+      },
+      "id": "stm_1786878753973_sjnnj",
+      "timestamp": 1786878753973,
+      "formattedText": "default"
+    },
+    {
+      "type": "site_blocked_visit",
+      "domain": "facebook.com",
+      "details": "Stop trying to open facebook! Access is restricted until you pass my challenge.",
+      "emotionDelta": {
+        "anger": 0.35,
+        "sadness": 0.25,
+        "joy": -0.25,
+        "trust": -0.23
+      },
+      "id": "stm_1786878734545_imq0s",
+      "timestamp": 1786878734545,
+      "formattedText": "default"
+    },
+    {
+      "type": "productive_milestone",
+      "domain": "github.com",
+      "details": "You're locked in! Keep up the good work on github. I gave you a reward!",
+      "emotionDelta": {
+        "joy": 0.35,
+        "trust": 0.25
+      },
+      "id": "stm_1786878307215_xjg7v",
+      "timestamp": 1786878307215,
+      "formattedText": "default"
+    },
+    {
+      "type": "site_blocked_visit",
+      "domain": "facebook.com",
+      "details": "Hey! facebook is completely blocked. Complete my puzzle to unblock it!",
+      "emotionDelta": {
+        "anger": 0.35,
+        "sadness": 0.25,
+        "joy": -0.25,
+        "trust": -0.23
+      },
+      "id": "stm_1786878276844_jnz7f",
+      "timestamp": 1786878276844,
+      "formattedText": "default"
+    },
+    {
+      "type": "site_blocked_visit",
+      "domain": "facebook.com",
+      "details": "Hey! facebook is completely blocked. Complete my puzzle to unblock it!",
+      "emotionDelta": {
+        "anger": 0.35,
+        "sadness": 0.25,
+        "joy": -0.25,
+        "trust": -0.23
+      },
+      "id": "stm_1786877824980_nqdlh",
+      "timestamp": 1786877824980,
+      "formattedText": "default"
+    },
+    {
+      "type": "productive_milestone",
+      "domain": "github.com",
+      "details": "Great job! You've been productive on github for 1m! Here are 50 coins!",
+      "emotionDelta": {
+        "joy": 0.35,
+        "trust": 0.25
+      },
+      "id": "stm_1786877807850_qkztc",
+      "timestamp": 1786877807850,
+      "formattedText": "default"
+    },
+    {
+      "type": "limit_exceeded",
+      "domain": "youtube.com",
+      "details": "Time's up! You exceeded your daily limit on youtube. It is now blocked!",
+      "emotionDelta": {
+        "anger": 0.4,
+        "sadness": 0.3,
+        "joy": -0.1,
+        "trust": -0.1
+      },
+      "id": "stm_1786877800804_5blkt",
+      "timestamp": 1786877800804,
+      "formattedText": "default"
+    },
+    {
+      "type": "limit_warning",
+      "domain": "youtube.com",
+      "details": "Hey, you're almost out of time for youtube! Wrap it up soon.",
+      "emotionDelta": {
+        "anger": 0.15,
+        "sadness": 0.1,
+        "joy": -0.15,
+        "trust": -0.13
+      },
+      "id": "stm_1786877794736_up6bf",
+      "timestamp": 1786877794736,
+      "formattedText": "default"
+    },
+    {
+      "type": "site_blocked_visit",
+      "domain": "facebook.com",
+      "details": "Stop trying to open facebook! Access is restricted until you pass my challenge.",
+      "emotionDelta": {
+        "anger": 0.35,
+        "sadness": 0.25,
+        "joy": -0.25,
+        "trust": -0.23
+      },
+      "id": "stm_1786877785071_jilb9",
+      "timestamp": 1786877785071,
+      "formattedText": "default"
+    },
+    {
+      "type": "site_blocked_visit",
+      "domain": "facebook.com",
+      "details": "Hey! facebook is completely blocked. Complete my puzzle to unblock it!",
+      "emotionDelta": {
+        "anger": 0.35,
+        "sadness": 0.25,
+        "joy": -0.25,
+        "trust": -0.23
+      },
+      "id": "stm_1786877761592_n6tcm",
+      "timestamp": 1786877761592,
+      "formattedText": "default"
+    },
+    {
+      "type": "site_blocked_visit",
+      "domain": "facebook.com",
+      "details": "Hey! facebook is completely blocked. Complete my puzzle to unblock it!",
+      "emotionDelta": {
+        "anger": 0.35,
+        "sadness": 0.25,
+        "joy": -0.25,
+        "trust": -0.23
+      },
+      "id": "stm_1786877392309_hwmnl",
+      "timestamp": 1786877392309,
+      "formattedText": "default"
+    },
+    {
+      "type": "site_blocked_visit",
+      "domain": "facebook.com",
+      "details": "Stop trying to open facebook! Access is restricted until you pass my challenge.",
+      "emotionDelta": {
+        "anger": 0.35,
+        "sadness": 0.25,
+        "joy": -0.25,
+        "trust": -0.23
+      },
+      "id": "stm_1786877372081_z5cg1",
+      "timestamp": 1786877372081,
+      "formattedText": "default"
+    },
+    {
+      "type": "site_blocked_visit",
+      "domain": "facebook.com",
+      "details": "Stop trying to open facebook! Access is restricted until you pass my challenge.",
+      "emotionDelta": {
+        "anger": 0.35,
+        "sadness": 0.25,
+        "joy": -0.25,
+        "trust": -0.23
+      },
+      "id": "stm_1786877195567_5k8ka",
+      "timestamp": 1786877195567,
+      "formattedText": "default"
+    },
+    {
+      "type": "site_blocked_visit",
+      "domain": "facebook.com",
+      "details": "Stop trying to open facebook! Access is restricted until you pass my challenge.",
+      "emotionDelta": {
+        "anger": 0.35,
+        "sadness": 0.25,
+        "joy": -0.25,
+        "trust": -0.23
+      },
+      "id": "stm_1786876942655_0c8cu",
+      "timestamp": 1786876942655,
+      "formattedText": "default"
+    },
+    {
+      "type": "site_blocked_visit",
+      "domain": "facebook.com",
+      "details": "Stop trying to open facebook! Access is restricted until you pass my challenge.",
+      "emotionDelta": {
+        "anger": 0.35,
+        "sadness": 0.25,
+        "joy": -0.25,
+        "trust": -0.23
+      },
+      "id": "stm_1786876843727_yg671",
+      "timestamp": 1786876843727,
+      "formattedText": "default"
+    },
+    {
+      "type": "site_blocked_visit",
+      "domain": "facebook.com",
+      "details": "Hey! facebook.com is completely blocked. You cannot visit it unless you complete my puzzle!",
+      "emotionDelta": {
+        "anger": 0.35,
+        "sadness": 0.25,
+        "joy": -0.25,
+        "trust": -0.23
+      },
+      "id": "stm_1786876823491_eiom9",
+      "timestamp": 1786876823491,
+      "formattedText": "default"
+    },
+    {
+      "type": "site_blocked_visit",
+      "domain": "facebook.com",
+      "details": "Hey! facebook.com is completely blocked. You cannot visit it unless you complete my puzzle!",
+      "emotionDelta": {
+        "anger": 0.35,
+        "sadness": 0.25,
+        "joy": -0.25,
+        "trust": -0.23
+      },
+      "id": "stm_1786876697245_crtw1",
+      "timestamp": 1786876697245,
+      "formattedText": "default"
+    },
+    {
+      "type": "limit_exceeded",
+      "domain": "youtube.com",
+      "details": "Time's up! You exceeded your daily limit on youtube.com. It is now blocked!",
+      "emotionDelta": {
+        "anger": 0.4,
+        "sadness": 0.3,
+        "joy": -0.1,
+        "trust": -0.1
+      },
+      "id": "stm_1786876642186_hxfmu",
+      "timestamp": 1786876642186,
+      "formattedText": "default"
+    },
+    {
+      "type": "limit_warning",
+      "domain": "youtube.com",
+      "details": "Warning! You have used 80% of your limit on youtube.com. Only 6 seconds left!",
+      "emotionDelta": {
+        "anger": 0.15,
+        "sadness": 0.1,
+        "joy": -0.15,
+        "trust": -0.13
+      },
+      "id": "stm_1786876636149_59exs",
+      "timestamp": 1786876636149,
+      "formattedText": "default"
+    },
+    {
+      "type": "site_blocked_visit",
+      "domain": "facebook.com",
+      "details": "Hey! facebook.com is completely blocked. You cannot visit it unless you complete my puzzle!",
+      "emotionDelta": {
+        "anger": 0.35,
+        "sadness": 0.25,
+        "joy": -0.25,
+        "trust": -0.23
+      },
+      "id": "stm_1786876594876_r0ec8",
+      "timestamp": 1786876594876,
+      "formattedText": "default"
+    },
+    {
+      "type": "site_blocked_visit",
+      "domain": "facebook.com",
+      "details": "Stop trying to open facebook.com! Access is restricted until you pass my challenge.",
+      "emotionDelta": {
+        "anger": 0.35,
+        "sadness": 0.25,
+        "joy": -0.25,
+        "trust": -0.23
+      },
+      "id": "stm_1786876553607_5au83",
+      "timestamp": 1786876553607,
+      "formattedText": "default"
+    },
+    {
+      "type": "site_blocked_visit",
+      "domain": "facebook.com",
+      "details": "Hey! facebook.com is completely blocked. You cannot visit it unless you complete my puzzle!",
+      "emotionDelta": {
+        "anger": 0.35,
+        "sadness": 0.25,
+        "joy": -0.25,
+        "trust": -0.23
+      },
+      "id": "stm_1786876310529_3kyou",
+      "timestamp": 1786876310529,
+      "formattedText": "default"
+    },
+    {
+      "type": "site_blocked_visit",
+      "domain": "facebook.com",
+      "details": "Hey! facebook.com is completely blocked. You cannot visit it unless you complete my puzzle!",
+      "emotionDelta": {
+        "anger": 0.35,
+        "sadness": 0.25,
+        "joy": -0.25,
+        "trust": -0.23
+      },
+      "id": "stm_1786876265797_n7zqg",
+      "timestamp": 1786876265797,
+      "formattedText": "default"
+    },
+    {
+      "type": "site_blocked_visit",
+      "domain": "facebook.com",
+      "details": "Hey! facebook.com is completely blocked. You cannot visit it unless you complete my puzzle!",
+      "emotionDelta": {
+        "anger": 0.35,
+        "sadness": 0.25,
+        "joy": -0.25,
+        "trust": -0.23
+      },
+      "id": "stm_1786876265771_tp2xd",
+      "timestamp": 1786876265771,
+      "formattedText": "default"
+    },
+    {
       "type": "limit_exceeded",
       "domain": "youtube.com",
       "details": "Time's up! You exceeded your daily limit on youtube.com. It is now blocked!",
@@ -333,162 +691,22 @@
       "id": "stm_1786864055675_4mo5c",
       "timestamp": 1786864055675,
       "formattedText": "default"
-    },
-    {
-      "type": "site_blocked_visit",
-      "domain": "www.youtube.com",
-      "details": "Stop trying to open www.youtube.com! Access is restricted until you pass my challenge.",
-      "emotionDelta": {
-        "anger": 0.35,
-        "sadness": 0.25,
-        "joy": -0.25,
-        "trust": -0.23
-      },
-      "id": "stm_1786808598322_lsecl",
-      "timestamp": 1786808598322,
-      "formattedText": "default"
-    },
-    {
-      "type": "limit_exceeded",
-      "domain": "www.youtube.com",
-      "details": "You spent too much time on www.youtube.com! I am locking access now.",
-      "emotionDelta": {
-        "anger": 0.4,
-        "sadness": 0.3,
-        "joy": -0.1,
-        "trust": -0.1
-      },
-      "id": "stm_1786808585279_wimkr",
-      "timestamp": 1786808585279,
-      "formattedText": "default"
-    },
-    {
-      "type": "site_blocked_visit",
-      "domain": "www.youtube.com",
-      "details": "Hey! www.youtube.com is completely blocked. You cannot visit it unless you complete my puzzle!",
-      "emotionDelta": {
-        "anger": 0.35,
-        "sadness": 0.25,
-        "joy": -0.25,
-        "trust": -0.23
-      },
-      "id": "stm_1786805758582_p66yj",
-      "timestamp": 1786805758582,
-      "formattedText": "default"
-    },
-    {
-      "type": "limit_exceeded",
-      "domain": "www.youtube.com",
-      "details": "You spent too much time on www.youtube.com! I am locking access now.",
-      "emotionDelta": {
-        "anger": 0.4,
-        "sadness": 0.3,
-        "joy": -0.1,
-        "trust": -0.1
-      },
-      "id": "stm_1786805746601_h77hp",
-      "timestamp": 1786805746601,
-      "formattedText": "default"
-    },
-    {
-      "type": "site_blocked_visit",
-      "domain": "www.youtube.com",
-      "details": "Hey! www.youtube.com is completely blocked. You cannot visit it unless you complete my puzzle!",
-      "emotionDelta": {
-        "anger": 0.35,
-        "sadness": 0.25,
-        "joy": -0.25,
-        "trust": -0.23
-      },
-      "id": "stm_1786805557911_cpsuq",
-      "timestamp": 1786805557911,
-      "formattedText": "default"
-    },
-    {
-      "type": "site_blocked_visit",
-      "domain": "www.youtube.com",
-      "details": "Hey! www.youtube.com is completely blocked. You cannot visit it unless you complete my puzzle!",
-      "emotionDelta": {
-        "anger": 0.35,
-        "sadness": 0.25,
-        "joy": -0.25,
-        "trust": -0.23
-      },
-      "id": "stm_1786800787190_hznoa",
-      "timestamp": 1786800787190,
-      "formattedText": "default"
-    },
-    {
-      "type": "limit_exceeded",
-      "domain": "www.youtube.com",
-      "details": "Time's up! You exceeded your daily limit on www.youtube.com. It is now blocked!",
-      "emotionDelta": {
-        "anger": 0.4,
-        "sadness": 0.3,
-        "joy": -0.1,
-        "trust": -0.1
-      },
-      "id": "stm_1786800773069_al7mo",
-      "timestamp": 1786800773069,
-      "formattedText": "default"
-    },
-    {
-      "type": "site_blocked_visit",
-      "domain": "www.youtube.com",
-      "details": "Hey! www.youtube.com is completely blocked. You cannot visit it unless you complete my puzzle!",
-      "emotionDelta": {
-        "anger": 0.35,
-        "sadness": 0.25,
-        "joy": -0.25,
-        "trust": -0.23
-      },
-      "id": "stm_1786800590223_0p0t9",
-      "timestamp": 1786800590223,
-      "formattedText": "default"
-    },
-    {
-      "type": "limit_exceeded",
-      "domain": "www.youtube.com",
-      "details": "Time's up! You exceeded your daily limit on www.youtube.com. It is now blocked!",
-      "emotionDelta": {
-        "anger": 0.4,
-        "sadness": 0.3,
-        "joy": -0.1,
-        "trust": -0.1
-      },
-      "id": "stm_1786800577187_f0mrf",
-      "timestamp": 1786800577187,
-      "formattedText": "default"
-    },
-    {
-      "type": "limit_warning",
-      "domain": "www.youtube.com",
-      "details": "Warning! You have used 15% of your limit on www.youtube.com. Only 15 seconds left!",
-      "emotionDelta": {
-        "anger": 0.15,
-        "sadness": 0.1,
-        "joy": -0.15,
-        "trust": -0.13
-      },
-      "id": "stm_1786800562089_cwc3e",
-      "timestamp": 1786800562089,
-      "formattedText": "default"
     }
   ],
   "recentSpeechPhrases": [
-    "Time's up! You exceeded your daily limit on youtube.com. It is now blocked!",
-    "Hey, you're almost out of time for youtube.com! Wrap it up soon.",
-    "Fine, youtube.com is unlocked now that you passed the puzzle, but don't stay here long!",
-    "Hey! youtube.com is completely blocked. You cannot visit it unless you complete my puzzle!",
-    "You spent too much time on youtube.com! I am locking access now.",
-    "Hey, you're almost out of time for youtube.com! Wrap it up soon.",
-    "Fine, youtube.com is unlocked now that you passed the puzzle, but don't stay here long!",
-    "Hey! youtube.com is completely blocked. You cannot visit it unless you complete my puzzle!",
-    "You spent too much time on youtube.com! I am locking access now.",
-    "Warning! You have used 80% of your limit on youtube.com. Only 4 seconds left!"
+    "Great job! You've been productive on github for 3m! Here are 50 coins!",
+    "Hey! facebook is completely blocked. Complete my puzzle to unblock it!",
+    "Stop trying to open facebook! Access is restricted until you pass my challenge.",
+    "Stop trying to open facebook! Access is restricted until you pass my challenge.",
+    "You're locked in! Keep up the good work on github. I gave you a reward!",
+    "Hey! facebook is completely blocked. Complete my puzzle to unblock it!",
+    "Hey! facebook is completely blocked. Complete my puzzle to unblock it!",
+    "Great job! You've been productive on github for 1m! Here are 50 coins!",
+    "Time's up! You exceeded your daily limit on youtube. It is now blocked!",
+    "Hey, you're almost out of time for youtube! Wrap it up soon."
   ],
   "activeWarnings": [],
-  "currentActiveDomain": "www.twitch.tv",
+  "currentActiveDomain": "github.com",
   "eventTemplate": "default",
   "memorableEventTypes": [
     "long_idle_duration",
