@@ -7,6 +7,7 @@ export interface MenuItemConfig {
 
 export const DEFAULT_MENU_ITEMS: MenuItemConfig[] = [
   { id: 'status', label: 'Status', icon: '' },
+  { id: 'puzzle', label: 'Puzzle', icon: '' },
   { id: 'monitoring', label: 'Monitoring', icon: '' },
   { id: 'config', label: 'Config', icon: '' },
   { id: 'debug', label: 'Debug', icon: '' },

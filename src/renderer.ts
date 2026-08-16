@@ -77,6 +77,7 @@ interface ActivePuzzleState {
   onSuccessConfig?: PuzzleSuccessConfig;
   orientation?: PanelOrientation | string;
   avatarPosition?: AvatarPosition | string;
+  isSandboxTest?: boolean;
 }
 
 let activePrompt: ActivePromptState | null = null;
@@ -300,17 +301,29 @@ function showPuzzlePanel(puzzleState: ActivePuzzleState) {
       onSuccessConfig: puzzleState.onSuccessConfig,
       onSuccess: async (score: number) => {
         logger.info('puzzle', `Puzzle "${puzzleState.id}" completed with score: ${score}`);
-        if (puzzleState.domain) {
+        if (puzzleState.domain && !puzzleState.isSandboxTest) {
           await (window as any).electronAPI?.modifyBlockSuccess?.(
             puzzleState.domain,
             puzzleState.onSuccessConfig
           );
         }
         closePuzzlePanel();
+        if (puzzleState.isSandboxTest) {
+          activeOptionId = 'puzzle';
+          menuBar.open();
+          menuBar.setActiveOption('puzzle');
+          renderFeaturePanel();
+        }
       },
       onCancel: () => {
-        logger.info('puzzle', `Puzzle cancelled by user`);
+        logger.info('puzzle', 'Puzzle cancelled by user');
         closePuzzlePanel();
+        if (puzzleState.isSandboxTest) {
+          activeOptionId = 'puzzle';
+          menuBar.open();
+          menuBar.setActiveOption('puzzle');
+          renderFeaturePanel();
+        }
       },
     })
   );
@@ -334,6 +347,22 @@ function renderFeaturePanel() {
           activeOptionId = null;
           menuBar.setActiveOption(null);
           renderFeaturePanel();
+        },
+        onSelectPuzzle: (puzzleId) => {
+          logger.info('puzzles-panel', `User launched test puzzle: "${puzzleId}"`);
+          // Close menu bar and feature panel
+          activeOptionId = null;
+          menuBar.close();
+          renderFeaturePanel();
+
+          // Open puzzle to the left of the avatar without centering
+          showPuzzlePanel({
+            id: puzzleId,
+            domain: '',
+            onSuccessConfig: undefined,
+            orientation: 'remain',
+            isSandboxTest: true,
+          });
         },
       })
     );
@@ -556,10 +585,25 @@ if (bubble) {
   });
 }
 
-// Right click on avatar toggles the menu bar (only if interactable)
+// Right click on avatar: if a puzzle or prompt is open, close it; otherwise toggle the menu bar
 avatar.addEventListener('contextmenu', (e: MouseEvent) => {
   e.preventDefault();
   if (!isInteractable) return;
+
+  if (activePuzzle) {
+    logger.info('puzzle', 'Active puzzle closed via avatar right-click');
+    closePuzzlePanel();
+    updateInteractiveRects();
+    return;
+  }
+
+  if (activePrompt) {
+    logger.info('action-prompt', 'Active prompt closed via avatar right-click');
+    closeActionPrompt();
+    updateInteractiveRects();
+    return;
+  }
+
   menuBar.toggle();
   updateInteractiveRects();
 });

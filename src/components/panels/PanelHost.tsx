@@ -8,16 +8,25 @@ import { MarketplacePanel } from './MarketplacePanel';
 import { ConfigPanel } from './ConfigPanel';
 import { DebugPanel } from './DebugPanel';
 import { MonitoringPanel } from './MonitoringPanel';
+import { PuzzlesPanel } from './PuzzlesPanel';
 
 export interface PanelHostProps {
   activeOptionId: string | null;
   onClose: () => void;
+  onSelectPuzzle?: (puzzleId: 'snake' | 'chess' | 'sudoku') => void;
 }
 
-export const PanelHost: React.FC<PanelHostProps> = ({ activeOptionId, onClose }) => {
+export const PanelHost: React.FC<PanelHostProps> = ({
+  activeOptionId,
+  onClose,
+  onSelectPuzzle,
+}) => {
   if (!activeOptionId) return null;
 
   switch (activeOptionId) {
+    case 'puzzle':
+    case 'puzzles':
+      return <PuzzlesPanel onClose={onClose} onSelectPuzzle={onSelectPuzzle} />;
     case 'calendar':
       return <CalendarPanel onClose={onClose} />;
     case 'fridge':

@@ -29,9 +29,7 @@
           "orientation": "center"
         },
         "openPuzzle": [
-          "snake",
-          "chess",
-          "sudoku"
+          "snake"
         ],
         "orientation": "center",
         "avatarPosition": "bottom-right",
