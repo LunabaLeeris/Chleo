@@ -1,6 +1,34 @@
 {
   "events": [
     {
+      "type": "limit_exceeded",
+      "domain": "youtube.com",
+      "details": "Time's up! You exceeded your daily limit on youtube. It is now blocked!",
+      "emotionDelta": {
+        "anger": 0.4,
+        "sadness": 0.3,
+        "joy": -0.1,
+        "trust": -0.1
+      },
+      "id": "stm_1786936319575_vz5a0",
+      "timestamp": 1786936319575,
+      "formattedText": "default"
+    },
+    {
+      "type": "limit_warning",
+      "domain": "youtube.com",
+      "details": "Hey, you're almost out of time for youtube! Wrap it up soon.",
+      "emotionDelta": {
+        "anger": 0.15,
+        "sadness": 0.1,
+        "joy": -0.15,
+        "trust": -0.13
+      },
+      "id": "stm_1786936317548_ql00a",
+      "timestamp": 1786936317548,
+      "formattedText": "default"
+    },
+    {
       "type": "puzzle_unblock_penalty",
       "domain": "youtube.com",
       "details": "Fine, youtube is unlocked now that you passed the puzzle, but don't stay here long!",
@@ -663,37 +691,11 @@
       "id": "stm_1786867500415_u7you",
       "timestamp": 1786867500415,
       "formattedText": "default"
-    },
-    {
-      "type": "limit_exceeded",
-      "domain": "youtube.com",
-      "details": "Time's up! You exceeded your daily limit on youtube.com. It is now blocked!",
-      "emotionDelta": {
-        "anger": 0.4,
-        "sadness": 0.3,
-        "joy": -0.1,
-        "trust": -0.1
-      },
-      "id": "stm_1786866989547_0dm30",
-      "timestamp": 1786866989547,
-      "formattedText": "default"
-    },
-    {
-      "type": "limit_warning",
-      "domain": "youtube.com",
-      "details": "Warning! You have used 80% of your limit on youtube.com. Only 4 seconds left!",
-      "emotionDelta": {
-        "anger": 0.15,
-        "sadness": 0.1,
-        "joy": -0.15,
-        "trust": -0.13
-      },
-      "id": "stm_1786866985513_4r7g6",
-      "timestamp": 1786866985513,
-      "formattedText": "default"
     }
   ],
   "recentSpeechPhrases": [
+    "Time's up! You exceeded your daily limit on youtube. It is now blocked!",
+    "Hey, you're almost out of time for youtube! Wrap it up soon.",
     "Fine, youtube is unlocked now that you passed the puzzle, but don't stay here long!",
     "Stop trying to open youtube! Access is restricted until you pass my challenge.",
     "You completed the puzzle so I unlocked facebook... but I'm still mad you visited it!",
@@ -701,12 +703,10 @@
     "You're locked in! Keep up the good work on github. I gave you a reward!",
     "Stop trying to open youtube! Access is restricted until you pass my challenge.",
     "Stop trying to open facebook! Access is restricted until you pass my challenge.",
-    "Hey! facebook is completely blocked. Complete my puzzle to unblock it!",
-    "Great job! You've been productive on github for 3m! Here are 50 coins!",
     "Hey! facebook is completely blocked. Complete my puzzle to unblock it!"
   ],
   "activeWarnings": [],
-  "currentActiveDomain": "vercel.com",
+  "currentActiveDomain": "www.facebook.com",
   "eventTemplate": "default",
   "memorableEventTypes": [
     "long_idle_duration",

@@ -2,35 +2,33 @@ import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { PuzzleContainer } from './PuzzleContainer';
 import type { PuzzleComponentProps, PuzzleConfig } from './puzzle-types';
 
-// ============================================================================
-// 🎨 Visual Palette & Colors (Easily customizable)
-// ============================================================================
 export const SNAKE_THEME = {
-  boardBackground: '#14141e',
-  gridLines: 'rgba(255, 255, 255, 0.03)',
-  snakeHead: '#22c55e',       // Solid bright green head
-  snakeBody: '#4ade80',       // Solid light green body
-  food: '#ef4444',            // Solid red pixel dot (prepared for future sprite)
+  boardBackground: '#0c0c0cff',
+  gridLines: 'rgba(172, 170, 170, 0.03)',
+  snakeHead: '#07aa43ff',
+  snakeBody: '#4ade80',
+  food: '#ef4444',
   border: '#38384a',
+  bomb: '#0b1aebff'
 } as const;
 
-// ============================================================================
-// ⚙️ Game Defaults & Settings
-// ============================================================================
+
 export const SNAKE_SETTINGS = {
-  gridSize: 14,               // 14x14 grid
+  gridSize: 20,               // 14x14 grid
   cellSize: 20,               // 20px per cell (Canvas = 280x280)
   initialSpeedMs: 100,        // Initial tick speed
   speedStepMs: 4,             // Speedup per apple eaten
-  minSpeedMs: 20,             // Max speed cap
+  minSpeedMs: 40,             // Max speed cap
   targetScore: 50,            // Points needed for puzzle completion
   scorePerFood: 10,           // Points per food
+  bombAmount: 2               // How many bombs are there
 } as const;
+
 
 export const SNAKE_CONFIG: PuzzleConfig = {
   id: 'snake',
   name: 'Retro Snake',
-  icon: '🐍',
+  icon: '',
   targetGoalScore: SNAKE_SETTINGS.targetScore,
   goalDescription: 'Collect apples without hitting walls or self',
   instructions: 'Use arrow keys or WASD to navigate.',
@@ -82,6 +80,7 @@ export const SnakePuzzle: React.FC<SnakePuzzleProps> = ({
   const dirRef = useRef<Direction>('RIGHT');
   const nextDirRef = useRef<Direction>('RIGHT');
   const foodRef = useRef<Position>({ x: 3, y: 3 });
+  const bombsRef = useRef<Position[]>([{ x: 5, y: 6 }, { x: 7, y: 7 }])
   const speedRef = useRef<number>(initialSpeedMs);
 
   const canvasWidth = gridSize * cellSize;
@@ -92,6 +91,7 @@ export const SnakePuzzle: React.FC<SnakePuzzleProps> = ({
     const occupied = new Set(snakeRef.current.map((p) => `${p.x},${p.y}`));
     const emptyCells: Position[] = [];
 
+    // ugly checks. 
     for (let x = 0; x < gridSize; x++) {
       for (let y = 0; y < gridSize; y++) {
         if (!occupied.has(`${x},${y}`)) {
@@ -136,11 +136,11 @@ export const SnakePuzzle: React.FC<SnakePuzzleProps> = ({
     const ctx = canvas.getContext('2d');
     if (!ctx) return;
 
-    // 1. Clear background
+    // Clear background
     ctx.fillStyle = SNAKE_THEME.boardBackground;
     ctx.fillRect(0, 0, canvasWidth, canvasHeight);
 
-    // 2. Subtle grid lines
+    // Subtle grid lines
     ctx.strokeStyle = SNAKE_THEME.gridLines;
     ctx.lineWidth = 1;
     for (let i = 0; i <= gridSize; i++) {
@@ -155,7 +155,7 @@ export const SnakePuzzle: React.FC<SnakePuzzleProps> = ({
       ctx.stroke();
     }
 
-    // 3. Draw Food (Pixel dot, prepared for sprite replacement)
+    // Draw Food (Pixel dot, prepared for sprite replacement)
     const food = foodRef.current;
     ctx.fillStyle = SNAKE_THEME.food;
     ctx.fillRect(
@@ -165,7 +165,19 @@ export const SnakePuzzle: React.FC<SnakePuzzleProps> = ({
       cellSize - 4
     );
 
-    // 4. Draw Snake Body & Head
+    // Draw Bombs
+    const bombs = bombsRef.current;
+    for (const bomb of bombs) {
+      ctx.fillStyle = SNAKE_THEME.bomb;
+      ctx.fillRect(
+        bomb.x * cellSize + 2,
+        bomb.y * cellSize + 2,
+        cellSize - 4,
+        cellSize - 4
+      );
+    }
+
+    // Draw Snake Body & Head
     const snake = snakeRef.current;
     snake.forEach((segment, index) => {
       const isHead = index === 0;
@@ -246,13 +258,13 @@ export const SnakePuzzle: React.FC<SnakePuzzleProps> = ({
       else if (currentDir === 'LEFT') nextX -= 1;
       else if (currentDir === 'RIGHT') nextX += 1;
 
-      // 1. Check Wall Boundary Collision
+      // Check Wall Boundary Collision
       if (nextX < 0 || nextX >= gridSize || nextY < 0 || nextY >= gridSize) {
         setGameState('gameover');
         return;
       }
 
-      // 2. Check Self Collision
+      // Check Self Collision
       const isSelfCollision = snake.some((segment) => segment.x === nextX && segment.y === nextY);
       if (isSelfCollision) {
         setGameState('gameover');
@@ -260,8 +272,14 @@ export const SnakePuzzle: React.FC<SnakePuzzleProps> = ({
       }
 
       const newHead: Position = { x: nextX, y: nextY };
-      const isEatingFood = nextX === foodRef.current.x && nextY === foodRef.current.y;
 
+      const isExploded = bombsRef.current.some(p => (p.x === newHead.x && p.y === newHead.y));
+      if (isExploded) {
+        setGameState('gameover');
+        return;
+      }
+
+      const isEatingFood = nextX === foodRef.current.x && nextY === foodRef.current.y;
       if (isEatingFood) {
         // Snake grows
         const newSnake = [newHead, ...snake];

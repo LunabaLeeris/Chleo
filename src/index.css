@@ -1406,6 +1406,7 @@ body {
     opacity: 0;
     transform: translateY(6px) scale(0.95);
   }
+
   to {
     opacity: 1;
     transform: translateY(0) scale(1);
@@ -1545,9 +1546,8 @@ body {
   box-shadow: 4px 4px 0px var(--border-pixel);
   border-radius: 10px;
   padding: 0.5rem 0.55rem;
-  width: 300px;
   min-width: 290px;
-  max-width: 310px;
+  max-width: 700px;
   box-sizing: border-box;
 }
 
@@ -2072,6 +2072,7 @@ body {
   gap: 6px;
   position: relative;
   user-select: none;
+  size: auto;
 }
 
 .snake-in-game-hud {
@@ -2107,10 +2108,7 @@ body {
   position: relative;
   display: inline-block;
   line-height: 0;
-  border-radius: 6px;
   overflow: hidden;
-  border: 2px solid var(--border-pixel);
-  box-shadow: 2px 2px 0px var(--border-pixel);
 }
 
 .snake-canvas {
@@ -2171,4 +2169,4 @@ body {
 .snake-restart-btn:hover {
   background: #16a34a;
   transform: translateY(-1px);
-}
+}
