@@ -9,7 +9,7 @@ export const SNAKE_THEME = {
   snakeBody: '#4ade80',
   food: '#ef4444',
   border: '#38384a',
-  bomb: '#0b1aebff'
+  bomb: '#950bebff'
 } as const;
 
 
@@ -21,7 +21,8 @@ export const SNAKE_SETTINGS = {
   minSpeedMs: 40,             // Max speed cap
   targetScore: 50,            // Points needed for puzzle completion
   scorePerFood: 10,           // Points per food
-  bombAmount: 2               // How many bombs are there
+  bombAmount: 2,              // How many bombs are there
+  foodChompsToResetBomb: 3       // How many food must be eaten for the bombs to find another position. 
 } as const;
 
 
@@ -69,6 +70,7 @@ export const SnakePuzzle: React.FC<SnakePuzzleProps> = ({
   const [gameState, setGameState] = useState<GameState>('idle');
   const [score, setScore] = useState<number>(0);
   const [highScore, setHighScore] = useState<number>(120);
+  const chompsRef = useRef<number>(0);
 
   // Snake coordinates, food, and direction
   const snakeRef = useRef<Position[]>([
@@ -80,32 +82,49 @@ export const SnakePuzzle: React.FC<SnakePuzzleProps> = ({
   const dirRef = useRef<Direction>('RIGHT');
   const nextDirRef = useRef<Direction>('RIGHT');
   const foodRef = useRef<Position>({ x: 3, y: 3 });
-  const bombsRef = useRef<Position[]>([{ x: 5, y: 6 }, { x: 7, y: 7 }])
+  const bombsRef = useRef<Position[]>([]);
   const speedRef = useRef<number>(initialSpeedMs);
 
   const canvasWidth = gridSize * cellSize;
   const canvasHeight = gridSize * cellSize;
 
-  // Helper to find a free random spot for food
-  const spawnFood = useCallback((): Position => {
-    const occupied = new Set(snakeRef.current.map((p) => `${p.x},${p.y}`));
-    const emptyCells: Position[] = [];
+  // Universal helper to pick N distinct unoccupied positions
+  const spawnPositions = useCallback((count: number, occupied: Position[] = snakeRef.current): Position[] => {
+    const totalCells = gridSize * gridSize;
+    const occupiedFlags = new Uint8Array(totalCells);
 
-    // ugly checks. 
-    for (let x = 0; x < gridSize; x++) {
-      for (let y = 0; y < gridSize; y++) {
-        if (!occupied.has(`${x},${y}`)) {
-          emptyCells.push({ x, y });
-        }
+    for (let i = 0; i < occupied.length; i++) {
+      const pos = occupied[i];
+      if (pos.x >= 0 && pos.x < gridSize && pos.y >= 0 && pos.y < gridSize) {
+        occupiedFlags[pos.y * gridSize + pos.x] = 1;
       }
     }
 
-    if (emptyCells.length === 0) {
-      return { x: 0, y: 0 };
+    const unoccupied: number[] = [];
+    for (let idx = 0; idx < totalCells; idx++) {
+      if (occupiedFlags[idx] === 0) {
+        unoccupied.push(idx);
+      }
     }
 
-    const randomIndex = Math.floor(Math.random() * emptyCells.length);
-    return emptyCells[randomIndex];
+    if (count > unoccupied.length) {
+      throw new Error(`Cannot spawn ${count} items: only ${unoccupied.length} empty cells available.`);
+    }
+
+    const results: Position[] = [];
+    for (let i = 0; i < count; i++) {
+      const rand = i + Math.floor(Math.random() * (unoccupied.length - i));
+      const chosenIndex = unoccupied[rand];
+      unoccupied[rand] = unoccupied[i];
+      unoccupied[i] = chosenIndex;
+
+      results.push({
+        x: chosenIndex % gridSize,
+        y: Math.floor(chosenIndex / gridSize),
+      });
+    }
+
+    return results;
   }, [gridSize]);
 
   // Reset/Initialize game
@@ -118,11 +137,16 @@ export const SnakePuzzle: React.FC<SnakePuzzleProps> = ({
     snakeRef.current = initialSnake;
     dirRef.current = 'RIGHT';
     nextDirRef.current = 'RIGHT';
-    foodRef.current = spawnFood();
+
+    const [newFood, ...newBombs] = spawnPositions(1 + SNAKE_SETTINGS.bombAmount, initialSnake);
+    foodRef.current = newFood;
+    bombsRef.current = newBombs;
+
     speedRef.current = initialSpeedMs;
+    chompsRef.current = 0;
     setScore(0);
     setGameState('idle');
-  }, [gridSize, initialSpeedMs, spawnFood]);
+  }, [gridSize, initialSpeedMs, spawnPositions]);
 
   // Initial setup
   useEffect(() => {
@@ -251,7 +275,7 @@ export const SnakePuzzle: React.FC<SnakePuzzleProps> = ({
 
       // Calculate next head position
       let nextX = head.x;
-      let nextY = head.y;
+      let nextY = head.y; ``
 
       if (currentDir === 'UP') nextY -= 1;
       else if (currentDir === 'DOWN') nextY += 1;
@@ -281,6 +305,8 @@ export const SnakePuzzle: React.FC<SnakePuzzleProps> = ({
 
       const isEatingFood = nextX === foodRef.current.x && nextY === foodRef.current.y;
       if (isEatingFood) {
+        chompsRef.current += 1;
+
         // Snake grows
         const newSnake = [newHead, ...snake];
         snakeRef.current = newSnake;
@@ -310,8 +336,15 @@ export const SnakePuzzle: React.FC<SnakePuzzleProps> = ({
           return;
         }
 
-        // Spawn next food
-        foodRef.current = spawnFood();
+        // Spawn next entities: if chomps threshold met, relocate both food and bombs
+        if (chompsRef.current % SNAKE_SETTINGS.foodChompsToResetBomb === 0) {
+          const [newFood, ...newBombs] = spawnPositions(1 + SNAKE_SETTINGS.bombAmount, newSnake);
+          foodRef.current = newFood;
+          bombsRef.current = newBombs;
+        } else {
+          const [newFood] = spawnPositions(1, [...newSnake, ...bombsRef.current]);
+          foodRef.current = newFood;
+        }
       } else {
         // Normal move
         snake.pop();
@@ -323,7 +356,7 @@ export const SnakePuzzle: React.FC<SnakePuzzleProps> = ({
     }, speedRef.current);
 
     return () => clearInterval(intervalId);
-  }, [gameState, score, highScore, gridSize, minSpeedMs, speedStepMs, targetScore, targetDomain, spawnFood, renderCanvas, onSuccess]);
+  }, [gameState, score, highScore, gridSize, minSpeedMs, speedStepMs, targetScore, targetDomain, spawnPositions, renderCanvas, onSuccess]);
 
   const isChallenge = Boolean(targetDomain);
 

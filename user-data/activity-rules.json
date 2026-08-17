@@ -36,7 +36,7 @@
       "domain": "localhost",
       "type": "neutral",
       "dailyLimitSeconds": 0,
-      "spentTodaySeconds": 2881,
+      "spentTodaySeconds": 4114,
       "warningThresholdPercent": 80,
       "requiresPuzzleToUnblock": false
     },
@@ -44,7 +44,7 @@
       "domain": "chrome://newtab/",
       "type": "neutral",
       "dailyLimitSeconds": 0,
-      "spentTodaySeconds": 193,
+      "spentTodaySeconds": 210,
       "warningThresholdPercent": 80,
       "requiresPuzzleToUnblock": false
     },

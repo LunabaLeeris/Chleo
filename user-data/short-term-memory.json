@@ -1,6 +1,20 @@
 {
   "events": [
     {
+      "type": "site_blocked_visit",
+      "domain": "youtube.com",
+      "details": "Hey! youtube is completely blocked. Complete my puzzle to unblock it!",
+      "emotionDelta": {
+        "anger": 0.35,
+        "sadness": 0.25,
+        "joy": -0.25,
+        "trust": -0.23
+      },
+      "id": "stm_1786957048695_nau8t",
+      "timestamp": 1786957048695,
+      "formattedText": "default"
+    },
+    {
       "type": "limit_exceeded",
       "domain": "youtube.com",
       "details": "Time's up! You exceeded your daily limit on youtube. It is now blocked!",
@@ -677,23 +691,10 @@
       "id": "stm_1786867504440_t042y",
       "timestamp": 1786867504440,
       "formattedText": "default"
-    },
-    {
-      "type": "limit_warning",
-      "domain": "youtube.com",
-      "details": "Warning! You have used 80% of your limit on youtube.com. Only 4 seconds left!",
-      "emotionDelta": {
-        "anger": 0.15,
-        "sadness": 0.1,
-        "joy": -0.15,
-        "trust": -0.13
-      },
-      "id": "stm_1786867500415_u7you",
-      "timestamp": 1786867500415,
-      "formattedText": "default"
     }
   ],
   "recentSpeechPhrases": [
+    "Hey! youtube is completely blocked. Complete my puzzle to unblock it!",
     "Time's up! You exceeded your daily limit on youtube. It is now blocked!",
     "Hey, you're almost out of time for youtube! Wrap it up soon.",
     "Fine, youtube is unlocked now that you passed the puzzle, but don't stay here long!",
@@ -702,11 +703,10 @@
     "Stop trying to open facebook! Access is restricted until you pass my challenge.",
     "You're locked in! Keep up the good work on github. I gave you a reward!",
     "Stop trying to open youtube! Access is restricted until you pass my challenge.",
-    "Stop trying to open facebook! Access is restricted until you pass my challenge.",
-    "Hey! facebook is completely blocked. Complete my puzzle to unblock it!"
+    "Stop trying to open facebook! Access is restricted until you pass my challenge."
   ],
   "activeWarnings": [],
-  "currentActiveDomain": "www.facebook.com",
+  "currentActiveDomain": "www.youtube.com",
   "eventTemplate": "default",
   "memorableEventTypes": [
     "long_idle_duration",
