@@ -9,12 +9,14 @@ import defaultBehavioralRules from './config/behavioral-rules.json';
 import { normalizeBehavioralActions } from './action-parser';
 import type {
   PuzzleSuccessConfig,
+  PuzzleRewardItem,
   PromptPuzzleConfig,
   BehavioralActions,
 } from './action-parser';
 
 export type {
   PuzzleSuccessConfig,
+  PuzzleRewardItem,
   PromptPuzzleConfig,
   BehavioralActions,
 };

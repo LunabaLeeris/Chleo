@@ -69,7 +69,7 @@ export interface ElectronAPI {
 
   // Actions & Puzzle APIs
   closeActiveTab: (domain?: string) => Promise<boolean>;
-  modifyBlockSuccess: (domain: string, onSuccess?: PuzzleSuccessConfig) => Promise<boolean>;
+  modifyBlockSuccess: (domain: string, onSuccess?: any) => Promise<boolean>;
 
   // Main -> Renderer Logging Stream
   onMainLog?: (callback: (payload: MainLogPayload) => void) => () => void;

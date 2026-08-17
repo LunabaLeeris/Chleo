@@ -2,15 +2,26 @@ export type PanelOrientation = 'center' | 'left' | 'remain';
 export type AvatarPosition = 'bottom-right' | 'top-right' | 'center-right';
 export type Puzzles = 'snake' | 'chess' | 'sudoku';
 
-export interface PuzzleSuccessConfig {
-  status: 'unblock' | 'avoid';
+export interface PuzzleRewardItem {
+  id?: string;
+  title?: string;
+  description?: string;
+  icon?: string;
+  status: 'unblock' | 'avoid' | string;
   duration?: number;
+  [key: string]: any;
 }
+
+export type PuzzleSuccessConfig = PuzzleRewardItem[];
 
 export interface PromptPuzzleConfig {
   text: string;
   options: string[];
   onSuccess?: PuzzleSuccessConfig;
+  completionSpeech?: string;
+  rewardTimeoutSeconds?: number;
+  rewardUrgeSpeech?: string;
+  rewardUrgePercent?: number;
   draggable: boolean;
   closeAllTabs: boolean;
   orientation: PanelOrientation | string;
@@ -28,19 +39,58 @@ export interface BehavioralActions {
 }
 
 /**
- * Normalizes on-success callback configuration for puzzle completions.
+ * Normalizes a single reward item into standard schema with sensible defaults.
  */
-export function normalizePuzzleSuccessConfig(
-  success?: Partial<PuzzleSuccessConfig>
-): PuzzleSuccessConfig | undefined {
-  if (!success || typeof success !== 'object') {
-    return undefined;
+export function normalizeRewardItem(
+  item?: Partial<PuzzleRewardItem>,
+  index = 0
+): PuzzleRewardItem {
+  const status = item?.status === 'avoid' ? 'avoid' : item?.status || 'unblock';
+  const duration = typeof item?.duration === 'number' ? item.duration : undefined;
+
+  let defaultTitle = 'Unblock Site';
+  let defaultDesc = 'Completely remove the block and restore access.';
+  let defaultIcon = '🔓';
+
+  if (status === 'avoid') {
+    defaultTitle = duration ? `Avoid Mode (${duration}m)` : 'Avoid Mode';
+    defaultDesc = duration
+      ? `Grant ${duration} minutes of monitored access.`
+      : 'Downgrade to temporary avoid mode.';
+    defaultIcon = '⏳';
   }
 
   return {
-    status: success.status === 'avoid' ? 'avoid' : 'unblock',
-    duration: typeof success.duration === 'number' ? success.duration : undefined,
+    id: item?.id || `${status}_${duration || index}`,
+    title: item?.title || defaultTitle,
+    description: item?.description || defaultDesc,
+    icon: item?.icon || defaultIcon,
+    status,
+    duration,
+    ...(item && typeof item === 'object' ? item : {}),
   };
+}
+
+/**
+ * Normalizes on-success callback configuration for puzzle completions into a list of reward items.
+ */
+export function normalizePuzzleSuccessConfig(
+  success?: Partial<PuzzleRewardItem> | Array<Partial<PuzzleRewardItem>>
+): PuzzleSuccessConfig | undefined {
+  if (!success) {
+    return undefined;
+  }
+
+  if (Array.isArray(success)) {
+    if (success.length === 0) return undefined;
+    return success.map((item, idx) => normalizeRewardItem(item, idx));
+  }
+
+  if (typeof success === 'object') {
+    return [normalizeRewardItem(success, 0)];
+  }
+
+  return undefined;
 }
 
 /**
@@ -54,9 +104,13 @@ export function normalizePromptPuzzleConfig(
   }
 
   return {
-    text: prompt.text || 'Do you want to solve a puzzle to unlock access?',
+    text: prompt.text || 'Do you want to solve a puzzle to modify access?',
     options: Array.isArray(prompt.options) && prompt.options.length > 0 ? prompt.options : ['yes', 'no'],
     onSuccess: normalizePuzzleSuccessConfig(prompt.onSuccess),
+    completionSpeech: prompt.completionSpeech || 'Fine, you win! Pick your reward.',
+    rewardTimeoutSeconds: typeof prompt.rewardTimeoutSeconds === 'number' ? prompt.rewardTimeoutSeconds : 60,
+    rewardUrgeSpeech: prompt.rewardUrgeSpeech || "Just pick one or else I'll pick one for you!",
+    rewardUrgePercent: typeof prompt.rewardUrgePercent === 'number' ? prompt.rewardUrgePercent : 50,
     draggable: prompt.draggable ?? true,
     closeAllTabs: prompt.closeAllTabs ?? false,
     orientation: prompt.orientation || 'remain',

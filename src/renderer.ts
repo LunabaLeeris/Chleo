@@ -7,6 +7,7 @@ import { MenuBarComponent } from './components/menu-bar';
 import { PanelHost } from './components/panels/PanelHost';
 import { ActionPrompt } from './components/action-prompt/ActionPrompt';
 import { PuzzleHost } from './components/puzzles/PuzzleHost';
+import { RewardPanel } from './components/panels/RewardPanel';
 import { logger } from './logger';
 import {
   adjustBubblePosition,
@@ -34,6 +35,7 @@ const compositor = new AvatarCompositor(canvas, defaultAvatarConfig);
 let panelRoot: Root | null = null;
 let actionPromptRoot: Root | null = null;
 let puzzlePanelRoot: Root | null = null;
+let bubbleTimer: any = null;
 
 if (featurePanelContainer) {
   panelRoot = createRoot(featurePanelContainer);
@@ -53,6 +55,7 @@ if (puzzlePanelContainer) {
 
 import type {
   PuzzleSuccessConfig,
+  PuzzleRewardItem,
   PanelOrientation,
   AvatarPosition,
   Puzzles,
@@ -69,12 +72,18 @@ interface ActivePromptState {
   options: string[];
   domain: string;
   actions?: BehavioralActions;
+  overallEmotion?: any;
 }
 
 interface ActivePuzzleState {
   id: Puzzles | string;
   domain: string;
   onSuccessConfig?: PuzzleSuccessConfig;
+  completionSpeech?: string;
+  rewardTimeoutSeconds?: number;
+  rewardUrgeSpeech?: string;
+  rewardUrgePercent?: number;
+  overallEmotion?: any;
   orientation?: PanelOrientation | string;
   avatarPosition?: AvatarPosition | string;
   isSandboxTest?: boolean;
@@ -217,6 +226,50 @@ function closeActionPrompt() {
   enforceBounds();
 }
 
+async function playCompanionSpeech(
+  speechText: string,
+  overallEmotion?: any,
+  responseType: ResponseType = 'declarative'
+) {
+  if (bubble) {
+    bubble.textContent = speechText;
+    bubble.classList.add('visible');
+    adjustBubblePosition(bubble);
+    requestAnimationFrame(() => adjustBubblePosition(bubble));
+    updateInteractiveRects();
+  }
+
+  try {
+    const packet = await compositor.speakWithEmotion(
+      speechText,
+      overallEmotion || 'annoyed',
+      responseType,
+      {
+        onComplete: () => {
+          compositor.resetAll();
+        },
+      }
+    );
+
+    const bubbleDuration = Math.max(1500, (packet?.totalDurationMs || 2500) + 1200);
+    if (bubbleTimer) {
+      clearTimeout(bubbleTimer);
+    }
+    bubbleTimer = setTimeout(() => {
+      if (bubble) {
+        bubble.classList.remove('visible');
+        bubble.style.transform = '';
+        bubble.style.maxWidth = '';
+        bubble.style.removeProperty('--tail-offset');
+        bubble.classList.remove('bubble-flipped');
+        updateInteractiveRects();
+      }
+    }, bubbleDuration);
+  } catch (err: any) {
+    logger.error('companion-speech', `Speech synthesis/animation error: ${err?.message || err}`);
+  }
+}
+
 function showActionPrompt(promptState: ActivePromptState) {
   activePrompt = promptState;
   if (!actionPromptContainer || !actionPromptRoot) return;
@@ -237,10 +290,16 @@ function showActionPrompt(promptState: ActivePromptState) {
           menuBar.close();
 
           // Prepare puzzle config from current prompt actions
+          const promptPuzzle = activePrompt?.actions?.promptPuzzle;
           const candidates = activePrompt?.actions?.openPuzzle || ['snake'];
           const randomPuzzle = candidates[Math.floor(Math.random() * candidates.length)] || 'snake';
           const domain = activePrompt?.domain || '';
-          const onSuccessConfig = activePrompt?.actions?.promptPuzzle?.onSuccess;
+          const onSuccessConfig = promptPuzzle?.onSuccess;
+          const completionSpeech = promptPuzzle?.completionSpeech;
+          const rewardTimeoutSeconds = promptPuzzle?.rewardTimeoutSeconds;
+          const rewardUrgeSpeech = promptPuzzle?.rewardUrgeSpeech;
+          const rewardUrgePercent = promptPuzzle?.rewardUrgePercent;
+          const overallEmotion = activePrompt?.overallEmotion;
           const orientation = activePrompt?.actions?.orientation;
           const avatarPosition = activePrompt?.actions?.avatarPosition;
           const interactable = activePrompt?.actions?.interactable;
@@ -252,6 +311,11 @@ function showActionPrompt(promptState: ActivePromptState) {
             id: randomPuzzle,
             domain,
             onSuccessConfig,
+            completionSpeech,
+            rewardTimeoutSeconds,
+            rewardUrgeSpeech,
+            rewardUrgePercent,
+            overallEmotion,
             orientation,
             avatarPosition,
           });
@@ -301,18 +365,54 @@ function showPuzzlePanel(puzzleState: ActivePuzzleState) {
       onSuccessConfig: puzzleState.onSuccessConfig,
       onSuccess: async (score: number) => {
         logger.info('puzzle', `Puzzle "${puzzleState.id}" completed with score: ${score}`);
-        if (puzzleState.domain && !puzzleState.isSandboxTest) {
-          await (window as any).electronAPI?.modifyBlockSuccess?.(
-            puzzleState.domain,
-            puzzleState.onSuccessConfig
+
+        // 1. Speak victory response using overall emotion from payload
+        const winSpeech = puzzleState.completionSpeech || 'Fine, you win! Pick your reward.';
+        playCompanionSpeech(winSpeech, puzzleState.overallEmotion);
+
+        // 2. Render RewardPanel in puzzle panel container
+        if (puzzlePanelRoot) {
+          puzzlePanelRoot.render(
+            React.createElement(RewardPanel, {
+              rewards: puzzleState.onSuccessConfig || [],
+              targetDomain: puzzleState.domain,
+              timeoutSeconds: puzzleState.rewardTimeoutSeconds || 60,
+              urgePercent: puzzleState.rewardUrgePercent || 50,
+              onUrge: () => {
+                const urgeText =
+                  puzzleState.rewardUrgeSpeech || "Just pick one or else I'll pick one for you!";
+                playCompanionSpeech(urgeText, puzzleState.overallEmotion);
+              },
+              onSelectReward: async (selectedReward: PuzzleRewardItem) => {
+                logger.info('reward-panel', `User chosen reward:`, selectedReward);
+                closePuzzlePanel();
+                if (puzzleState.domain && !puzzleState.isSandboxTest) {
+                  await (window as any).electronAPI?.modifyBlockSuccess?.(
+                    puzzleState.domain,
+                    selectedReward
+                  );
+                }
+                if (puzzleState.isSandboxTest) {
+                  activeOptionId = 'puzzle';
+                  menuBar.open();
+                  menuBar.setActiveOption('puzzle');
+                  renderFeaturePanel();
+                }
+              },
+              onClose: () => {
+                logger.info('reward-panel', 'Reward selection closed by user');
+                closePuzzlePanel();
+                if (puzzleState.isSandboxTest) {
+                  activeOptionId = 'puzzle';
+                  menuBar.open();
+                  menuBar.setActiveOption('puzzle');
+                  renderFeaturePanel();
+                }
+              },
+            })
           );
-        }
-        closePuzzlePanel();
-        if (puzzleState.isSandboxTest) {
-          activeOptionId = 'puzzle';
-          menuBar.open();
-          menuBar.setActiveOption('puzzle');
-          renderFeaturePanel();
+          updateInteractiveRects();
+          requestAnimationFrame(updateInteractiveRects);
         }
       },
       onCancel: () => {
@@ -413,8 +513,6 @@ const menuBar = new MenuBarComponent(menuBarContainer, {
   updateInteractiveRects();
 })();
 
-let bubbleTimer: ReturnType<typeof setTimeout> | null = null;
-
 // Listen for companion speech broadcast from Main process
 (window as any).electronAPI?.onCompanionSpeak?.(async (data: ChleoResponsePayload) => {
   logger.info('companion-speech', `Cleo dialogue: "${data.speechText}"`, {
@@ -445,46 +543,15 @@ let bubbleTimer: ReturnType<typeof setTimeout> | null = null;
       options: promptConfig.options,
       domain: data.domain || '',
       actions: data.actions,
+      overallEmotion: data.overallEmotion,
     });
   }
 
-  if (bubble) {
-    bubble.textContent = data.speechText;
-    bubble.classList.add('visible');
-    adjustBubblePosition(bubble);
-    requestAnimationFrame(() => adjustBubblePosition(bubble));
-    updateInteractiveRects();
-  }
-
-  try {
-    const packet = await compositor.speakWithEmotion(
-      data.speechText,
-      data.overallEmotion,
-      (data.responseType as ResponseType) || 'declarative',
-      {
-        onComplete: () => {
-          compositor.resetAll();
-        },
-      }
-    );
-
-    const bubbleDuration = Math.max(1500, (packet?.totalDurationMs || 2500) + 1200);
-    if (bubbleTimer) {
-      clearTimeout(bubbleTimer);
-    }
-    bubbleTimer = setTimeout(() => {
-      if (bubble) {
-        bubble.classList.remove('visible');
-        bubble.style.transform = '';
-        bubble.style.maxWidth = '';
-        bubble.style.removeProperty('--tail-offset');
-        bubble.classList.remove('bubble-flipped');
-        updateInteractiveRects();
-      }
-    }, bubbleDuration);
-  } catch (err: any) {
-    logger.error('companion-speech', `Speech synthesis/animation error: ${err?.message || err}`);
-  }
+  await playCompanionSpeech(
+    data.speechText,
+    data.overallEmotion,
+    (data.responseType as ResponseType) || 'declarative'
+  );
 });
 
 // Send initial rects & track resize
