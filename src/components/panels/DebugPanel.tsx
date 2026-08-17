@@ -77,7 +77,7 @@ export const DebugPanel: React.FC<DebugPanelProps> = ({ onClose }) => {
   ];
 
   return (
-    <PanelContainer title="Debug & Logs" icon="" className="debug-panel-card" onClose={onClose}>
+    <PanelContainer title="Debug & Logs" icon="debug" className="debug-panel-card" onClose={onClose}>
       {/* Top Header Controls */}
       <div className="debug-controls-bar">
         <div className="debug-stats-wrap">

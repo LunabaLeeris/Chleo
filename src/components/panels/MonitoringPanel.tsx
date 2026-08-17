@@ -103,7 +103,7 @@ export const MonitoringPanel: React.FC<PanelProps> = ({ onClose }) => {
   };
 
   return (
-    <PanelContainer title="Site Monitoring" icon="" className="monitoring-panel-card" onClose={onClose}>
+    <PanelContainer title="Site Monitoring" icon="monitoring" className="monitoring-panel-card" onClose={onClose}>
       {/* Top summary stats bar */}
       <div className="monitoring-stats-bar">
         <div className="monitoring-stat-pill">

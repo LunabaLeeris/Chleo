@@ -4,17 +4,17 @@
       "domain": "facebook.com",
       "type": "neutral",
       "dailyLimitSeconds": 0,
-      "spentTodaySeconds": 37,
+      "spentTodaySeconds": 724,
       "warningThresholdPercent": 50,
       "requiresPuzzleToUnblock": false
     },
     {
       "domain": "youtube.com",
-      "type": "neutral",
-      "dailyLimitSeconds": 0,
-      "spentTodaySeconds": 0,
+      "type": "blocked",
+      "dailyLimitSeconds": 15,
+      "spentTodaySeconds": 15,
       "warningThresholdPercent": 80,
-      "requiresPuzzleToUnblock": false
+      "requiresPuzzleToUnblock": true
     },
     {
       "domain": "github.com",
@@ -36,7 +36,7 @@
       "domain": "localhost",
       "type": "neutral",
       "dailyLimitSeconds": 0,
-      "spentTodaySeconds": 5929,
+      "spentTodaySeconds": 8732,
       "warningThresholdPercent": 80,
       "requiresPuzzleToUnblock": false
     },
@@ -44,7 +44,7 @@
       "domain": "chrome://newtab/",
       "type": "neutral",
       "dailyLimitSeconds": 0,
-      "spentTodaySeconds": 215,
+      "spentTodaySeconds": 238,
       "warningThresholdPercent": 80,
       "requiresPuzzleToUnblock": false
     },
@@ -76,7 +76,7 @@
       "domain": "vercel.com",
       "type": "neutral",
       "dailyLimitSeconds": 0,
-      "spentTodaySeconds": 128,
+      "spentTodaySeconds": 152,
       "warningThresholdPercent": 80,
       "requiresPuzzleToUnblock": false
     },
@@ -92,7 +92,31 @@
       "domain": "www.google.com",
       "type": "neutral",
       "dailyLimitSeconds": 0,
-      "spentTodaySeconds": 482,
+      "spentTodaySeconds": 8380,
+      "warningThresholdPercent": 80,
+      "requiresPuzzleToUnblock": false
+    },
+    {
+      "domain": "www.shutterstock.com",
+      "type": "neutral",
+      "dailyLimitSeconds": 0,
+      "spentTodaySeconds": 902,
+      "warningThresholdPercent": 80,
+      "requiresPuzzleToUnblock": false
+    },
+    {
+      "domain": "pixelorama.org",
+      "type": "neutral",
+      "dailyLimitSeconds": 0,
+      "spentTodaySeconds": 18,
+      "warningThresholdPercent": 80,
+      "requiresPuzzleToUnblock": false
+    },
+    {
+      "domain": "www.reddit.com",
+      "type": "neutral",
+      "dailyLimitSeconds": 0,
+      "spentTodaySeconds": 18,
       "warningThresholdPercent": 80,
       "requiresPuzzleToUnblock": false
     }

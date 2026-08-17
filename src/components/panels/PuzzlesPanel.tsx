@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { PanelContainer } from './PanelContainer';
+import { getIconSrc } from '../../assets/icon-loader';
 
 export interface PuzzleItem {
   id: 'typing' | 'snake' | 'chess' | 'sudoku';
@@ -16,7 +17,7 @@ export const AVAILABLE_PUZZLES: PuzzleItem[] = [
   {
     id: 'typing',
     name: 'Speed Typer',
-    icon: '⌨️',
+    icon: 'keyboard',
     badge: 'Speed',
     description: 'Type words accurately and beat the high score within 30s!',
     targetScore: 50,
@@ -26,7 +27,7 @@ export const AVAILABLE_PUZZLES: PuzzleItem[] = [
   {
     id: 'snake',
     name: 'Retro Snake',
-    icon: '🐍',
+    icon: 'snake',
     badge: 'Arcade',
     description: 'Slither, collect apples, and dodge walls to score points!',
     targetScore: 50,
@@ -93,7 +94,7 @@ export const PuzzlesPanel: React.FC<PuzzlesPanelProps> = ({ onClose, onSelectPuz
   }, []);
 
   return (
-    <PanelContainer title="Puzzles & Games" icon="" className="puzzles-panel-card" onClose={onClose}>
+    <PanelContainer title="Puzzles & Games" icon="puzzles" className="puzzles-panel-card" onClose={onClose}>
       {/* Top summary stats bar */}
       <div className="puzzles-stats-bar">
         <div className="puzzles-stat-pill">
@@ -127,7 +128,15 @@ export const PuzzlesPanel: React.FC<PuzzlesPanelProps> = ({ onClose, onSelectPuz
             >
               {/* Left: Game Icon Box */}
               <div className="puzzle-item-icon-box">
-                {puzzle.icon}
+                {getIconSrc(puzzle.icon) ? (
+                  <img
+                    src={getIconSrc(puzzle.icon)}
+                    alt={puzzle.name}
+                    className="puzzle-item-icon-img"
+                  />
+                ) : (
+                  puzzle.icon
+                )}
               </div>
 
               {/* Right: Info, Title, Description, Meta */}

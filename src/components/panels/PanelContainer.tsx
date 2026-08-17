@@ -1,4 +1,5 @@
 import React from 'react';
+import { getIconSrc } from '../../assets/icon-loader';
 
 export interface PanelContainerProps {
   title: string;
@@ -15,11 +16,21 @@ export const PanelContainer: React.FC<PanelContainerProps> = ({
   onClose,
   children,
 }) => {
+  const iconImgSrc = getIconSrc(icon);
+
   return (
     <div className={`feature-panel-card ${className}`.trim()}>
       <div className="panel-card-header">
         <div className="panel-card-title-wrap">
-          {icon && <span className="panel-card-icon">{icon}</span>}
+          {icon && (
+            <span className="panel-card-icon">
+              {iconImgSrc ? (
+                <img src={iconImgSrc} alt={title} className="panel-card-icon-img" />
+              ) : (
+                icon
+              )}
+            </span>
+          )}
           <h3 className="panel-card-title">{title}</h3>
         </div>
         {onClose && (

@@ -29,7 +29,7 @@ export const SNAKE_SETTINGS = {
 export const SNAKE_CONFIG: PuzzleConfig = {
   id: 'snake',
   name: 'Retro Snake',
-  icon: '',
+  icon: 'snake',
   targetGoalScore: SNAKE_SETTINGS.targetScore,
   goalDescription: 'Collect apples without hitting walls or self',
   instructions: 'Use arrow keys or WASD to navigate.',

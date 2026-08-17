@@ -29,7 +29,7 @@
               "id": "unblock_site",
               "title": "Unblock Site",
               "description": "Completely remove the block and restore access for today.",
-              "icon": "🔓",
+              "icon": "unblock",
               "status": "unblock"
             },
             {

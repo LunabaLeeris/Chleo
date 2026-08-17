@@ -1,5 +1,6 @@
 import React from 'react';
 import type { PuzzleConfig } from './puzzle-types';
+import { getIconSrc } from '../../assets/icon-loader';
 
 export interface PuzzleContainerProps {
   config: PuzzleConfig;
@@ -14,12 +15,22 @@ export const PuzzleContainer: React.FC<PuzzleContainerProps> = ({
   onCancel,
   children,
 }) => {
+  const iconSrc = getIconSrc(config.icon);
+
   return (
     <div className="puzzle-panel-card">
       {/* Header: Icon + Title + Close Button */}
       <div className="puzzle-card-header">
         <div className="puzzle-card-title-wrap">
-          {config.icon && <span className="puzzle-card-icon">{config.icon}</span>}
+          {config.icon && (
+            <span className="puzzle-card-icon">
+              {iconSrc ? (
+                <img src={iconSrc} alt={config.name} className="puzzle-card-icon-img" />
+              ) : (
+                config.icon
+              )}
+            </span>
+          )}
           <h3 className="puzzle-card-title">{config.name}</h3>
         </div>
         <button

@@ -48,7 +48,7 @@ export const TYPING_SETTINGS = {
 export const TYPING_CONFIG: PuzzleConfig = {
   id: 'typing',
   name: 'Speed Typer',
-  icon: '⌨️',
+  icon: 'keyboard',
   targetGoalScore: TYPING_SETTINGS.targetScore,
   goalDescription: 'Type words accurately and beat the high score before time runs out',
   instructions: 'Type the middle word. Press Space to finalize, Backspace to delete.',

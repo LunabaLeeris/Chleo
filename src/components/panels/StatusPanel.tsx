@@ -78,7 +78,7 @@ export const StatusPanel: React.FC<PanelProps> = ({ onClose }) => {
     : { title: 'Not Loaded', badge: 'Tier 0', color: '#64748b' };
 
   return (
-    <PanelContainer title="Companion Status" icon="" className="status-panel-card" onClose={onClose}>
+    <PanelContainer title="Companion Status" icon="status" className="status-panel-card" onClose={onClose}>
       <div className="status-wheel-box">
         <PlutchikWheelGraphic
           emotionEngine={emotionEngineRef.current}

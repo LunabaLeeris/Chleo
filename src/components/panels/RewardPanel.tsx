@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
 import type { PuzzleRewardItem } from '../../monitoring/behavioral-engine';
+import { getIconSrc } from '../../assets/icon-loader';
 
 export interface RewardPanelProps {
   rewards: PuzzleRewardItem[];
@@ -33,13 +34,13 @@ export const RewardPanel: React.FC<RewardPanelProps> = ({
         {
           id: 'unblock_site',
           title: 'Unblock Site',
-          description: 'Completely remove the block and restore access for today.',
-          icon: '🔓',
+          description: 'Completely remove the daily limit for today.',
+          icon: 'unblock',
           status: 'unblock',
         },
         {
           id: 'avoid_30m',
-          title: 'Avoid Mode',
+          title: 'Avoid Mode (30m)',
           description: 'Grant 30 minutes of temporary monitored access.',
           icon: '⏳',
           status: 'avoid',
@@ -47,7 +48,7 @@ export const RewardPanel: React.FC<RewardPanelProps> = ({
         },
         {
           id: 'avoid_15m',
-          title: 'Quick Pass',
+          title: 'Quick Pass (15m)',
           description: 'Grant 15 minutes of quick access to finish up.',
           icon: '⚡',
           status: 'avoid',
@@ -55,46 +56,53 @@ export const RewardPanel: React.FC<RewardPanelProps> = ({
         },
       ];
 
-  // Countdown timer with auto-pick and urge trigger
+  // Auto-countdown timer
   useEffect(() => {
-    const urgeThreshold = Math.floor(timeoutSeconds * (urgePercent / 100));
-
     const timer = setInterval(() => {
       setTimeLeft((prev) => {
-        const next = prev - 1;
-
-        // Trigger halfway urge speech
-        if (next <= urgeThreshold && !urgedRef.current) {
-          urgedRef.current = true;
-          onUrge?.();
-        }
-
-        // Timer runout: auto pick random reward
-        if (next <= 0) {
+        if (prev <= 1) {
           clearInterval(timer);
-          if (!selectHandledRef.current) {
-            selectHandledRef.current = true;
-            const randomReward =
-              activeRewards[Math.floor(Math.random() * activeRewards.length)] || activeRewards[0];
-            setSelectedRewardId(randomReward.id || 'auto_picked');
-            setTimeout(() => {
-              onSelectReward(randomReward);
-            }, 300);
-          }
+          handleTimeout();
           return 0;
         }
-
-        return next;
+        return prev - 1;
       });
     }, 1000);
 
     return () => clearInterval(timer);
-  }, [timeoutSeconds, urgePercent, activeRewards, onUrge, onSelectReward]);
+  }, []);
 
-  const handlePick = (reward: PuzzleRewardItem) => {
+  // Urge Trigger at percent threshold (default 50% left)
+  useEffect(() => {
+    const urgeThreshold = Math.floor((timeoutSeconds * urgePercent) / 100);
+    if (timeLeft <= urgeThreshold && !urgedRef.current) {
+      urgedRef.current = true;
+      if (onUrge) {
+        onUrge();
+      }
+    }
+  }, [timeLeft, timeoutSeconds, urgePercent, onUrge]);
+
+  // Timeout auto-selection: auto-pick the first available option
+  const handleTimeout = () => {
     if (selectHandledRef.current) return;
     selectHandledRef.current = true;
-    setSelectedRewardId(reward.id || 'selected');
+    const defaultChoice = activeRewards[0];
+    if (defaultChoice) {
+      setSelectedRewardId(defaultChoice.id || `${defaultChoice.status}_${defaultChoice.duration || 0}`);
+      setTimeout(() => {
+        onSelectReward(defaultChoice);
+      }, 300);
+    }
+  };
+
+  const handleCardClick = (reward: PuzzleRewardItem, index: number) => {
+    if (selectHandledRef.current) return;
+    selectHandledRef.current = true;
+    const chosenId = reward.id || `${reward.status}_${reward.duration || index}`;
+    setSelectedRewardId(chosenId);
+
+    // Brief delay to show active selection feedback
     setTimeout(() => {
       onSelectReward(reward);
     }, 200);
@@ -102,6 +110,7 @@ export const RewardPanel: React.FC<RewardPanelProps> = ({
 
   const progressPercent = Math.max(0, Math.min(100, (timeLeft / timeoutSeconds) * 100));
   const isUrgent = timeLeft <= 15;
+  const rewardIconSrc = getIconSrc('reward') || getIconSrc('star');
 
   return (
     <div
@@ -112,6 +121,13 @@ export const RewardPanel: React.FC<RewardPanelProps> = ({
       {/* Header */}
       <div className="reward-panel-header">
         <div className="reward-panel-title-wrap">
+          {rewardIconSrc && (
+            <img
+              src={rewardIconSrc}
+              alt="Victory Reward"
+              className="panel-card-icon-img"
+            />
+          )}
           <div>
             <h3 className="reward-panel-title">VICTORY REWARDS</h3>
             {targetDomain && (
@@ -153,41 +169,31 @@ export const RewardPanel: React.FC<RewardPanelProps> = ({
         {activeRewards.map((reward, index) => {
           const isSelected = selectedRewardId === (reward.id || `${reward.status}_${reward.duration || index}`);
           const isAvoid = reward.status === 'avoid';
-
-          const isImgIcon =
-            typeof reward.icon === 'string' &&
-            (reward.icon.endsWith('.png') ||
-              reward.icon.endsWith('.svg') ||
-              reward.icon.startsWith('http') ||
-              reward.icon.startsWith('/'));
+          const possibleRewardSrc = getIconSrc(reward.icon);
 
           return (
             <div
               key={reward.id || index}
               className={`reward-card-item ${isAvoid ? 'mode-avoid' : 'mode-unblock'} ${isSelected ? 'selected' : ''
                 }`}
-              onClick={() => handlePick(reward)}
+              onClick={() => handleCardClick(reward, index)}
               role="button"
               tabIndex={0}
               onKeyDown={(e) => {
                 if (e.key === 'Enter' || e.key === ' ') {
                   e.preventDefault();
-                  handlePick(reward);
+                  handleCardClick(reward, index);
                 }
               }}
             >
 
               {/* Icon Container */}
               <div className="reward-card-icon-box">
-                {isImgIcon ? (
-                  <img
-                    src={reward.icon}
-                    alt={reward.title || 'reward'}
-                    className="reward-icon-img"
-                  />
-                ) : (
-                  <span className="reward-icon-emoji">{reward.icon || '🎁'}</span>
-                )}
+                <img
+                  src={possibleRewardSrc}
+                  alt="Possible Reward"
+                  className="reward-icon-img"
+                />
               </div>
 
               {/* Title & Description */}

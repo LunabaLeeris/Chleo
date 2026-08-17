@@ -1,3 +1,5 @@
+import { REGISTERED_ICONS, renderIconHtml, preloadAllRegisteredIcons } from '../assets/icon-loader';
+
 export interface MenuItemConfig {
   id: string;
   label: string;
@@ -6,12 +8,12 @@ export interface MenuItemConfig {
 }
 
 export const DEFAULT_MENU_ITEMS: MenuItemConfig[] = [
-  { id: 'status', label: 'Status', icon: '' },
-  { id: 'puzzle', label: 'Puzzle', icon: '' },
-  { id: 'reward', label: 'Reward (Dev)', icon: '' }, // <-- [DEV PREVIEW: delete when done]
-  { id: 'monitoring', label: 'Monitoring', icon: '' },
+  { id: 'status', label: 'Status', icon: REGISTERED_ICONS.status || 'status' },
+  { id: 'puzzle', label: 'Puzzle', icon: REGISTERED_ICONS.puzzle || 'puzzle' },
+  { id: 'debug', label: 'Debug', icon: REGISTERED_ICONS.debug || 'debug' },
+  { id: 'monitoring', label: 'Monitoring', icon: REGISTERED_ICONS.monitoring || 'monitoring' },
+  { id: 'reward', label: 'Reward (Dev)', icon: REGISTERED_ICONS.reward || 'reward' }, // <-- [DEV PREVIEW: delete when done]
   { id: 'config', label: 'Config', icon: '' },
-  { id: 'debug', label: 'Debug', icon: '' },
   { id: 'marketplace', label: 'Marketplace', icon: '' },
   { id: 'calendar', label: 'Calendar', icon: '' },
   { id: 'fridge', label: 'Fridge', icon: '' },
@@ -40,6 +42,9 @@ export class MenuBarComponent {
     this.onItemClick = options?.onItemClick;
     this.onStateChange = options?.onStateChange;
 
+    // Preload icons into memory cache
+    preloadAllRegisteredIcons();
+
     this.render();
   }
 
@@ -55,7 +60,7 @@ export class MenuBarComponent {
         .map(
           (item) => `
             <button class="menu-item-btn ${this.activeOptionId === item.id ? 'active' : ''}" data-id="${item.id}" title="${item.label}">
-              <span class="menu-item-icon">${item.icon}</span>
+              <span class="menu-item-icon">${renderIconHtml(item.icon, 'menu-icon-img', item.label)}</span>
               <span class="menu-item-label">${item.label}</span>
             </button>
           `
