@@ -1,6 +1,124 @@
 {
   "events": [
     {
+      "type": "high_score_beaten",
+      "domain": "retro-snake",
+      "details": "Ooh... That's good",
+      "emotionDelta": {
+        "joy": 0,
+        "trust": 0,
+        "fear": 0,
+        "surprise": 0,
+        "sadness": 0,
+        "disgust": 0,
+        "anger": 0,
+        "anticipation": 0
+      },
+      "id": "stm_1786966764762_rp5nh",
+      "timestamp": 1786966764762,
+      "formattedText": "default"
+    },
+    {
+      "type": "high_score_beaten",
+      "domain": "retro-snake",
+      "details": "Not bad.",
+      "emotionDelta": {
+        "joy": 0,
+        "trust": 0,
+        "fear": 0,
+        "surprise": 0,
+        "sadness": 0,
+        "disgust": 0,
+        "anger": 0,
+        "anticipation": 0
+      },
+      "id": "stm_1786966540790_9ctuc",
+      "timestamp": 1786966540790,
+      "formattedText": "default"
+    },
+    {
+      "type": "high_score_beaten",
+      "domain": "retro-snake",
+      "details": "Ooh... That's good",
+      "emotionDelta": {
+        "joy": 0,
+        "trust": 0,
+        "fear": 0,
+        "surprise": 0,
+        "sadness": 0,
+        "disgust": 0,
+        "anger": 0,
+        "anticipation": 0
+      },
+      "id": "stm_1786965884022_3espc",
+      "timestamp": 1786965884022,
+      "formattedText": "default"
+    },
+    {
+      "type": "high_score_beaten",
+      "domain": "retro-snake",
+      "details": "Congrats",
+      "emotionDelta": {
+        "joy": 0,
+        "trust": 0,
+        "fear": 0,
+        "surprise": 0,
+        "sadness": 0,
+        "disgust": 0,
+        "anger": 0,
+        "anticipation": 0
+      },
+      "id": "stm_1786964906470_6ank0",
+      "timestamp": 1786964906470,
+      "formattedText": "default"
+    },
+    {
+      "type": "high_score_beaten",
+      "domain": "retro-snake",
+      "details": "Congrats",
+      "emotionDelta": {
+        "joy": 0,
+        "trust": 0,
+        "fear": 0,
+        "surprise": 0,
+        "sadness": 0,
+        "disgust": 0,
+        "anger": 0,
+        "anticipation": 0
+      },
+      "id": "stm_1786964827298_3bv3d",
+      "timestamp": 1786964827298,
+      "formattedText": "default"
+    },
+    {
+      "type": "puzzle_unblock_penalty",
+      "domain": "youtube.com",
+      "details": "You completed the puzzle so I unlocked youtube... but I'm still mad you visited it!",
+      "emotionDelta": {
+        "anger": 0.3,
+        "sadness": 0.2,
+        "joy": -0.25,
+        "trust": -0.32
+      },
+      "id": "stm_1786964137400_qy3vl",
+      "timestamp": 1786964137400,
+      "formattedText": "default"
+    },
+    {
+      "type": "site_blocked_visit",
+      "domain": "youtube.com",
+      "details": "Stop trying to open youtube! Access is restricted until you pass my challenge.",
+      "emotionDelta": {
+        "anger": 0.35,
+        "sadness": 0.25,
+        "joy": -0.25,
+        "trust": -0.23
+      },
+      "id": "stm_1786964100424_g589t",
+      "timestamp": 1786964100424,
+      "formattedText": "default"
+    },
+    {
       "type": "puzzle_unblock_penalty",
       "domain": "facebook.com",
       "details": "You completed the puzzle so I unlocked facebook... but I'm still mad you visited it!",
@@ -593,120 +711,22 @@
       "id": "stm_1786876310529_3kyou",
       "timestamp": 1786876310529,
       "formattedText": "default"
-    },
-    {
-      "type": "site_blocked_visit",
-      "domain": "facebook.com",
-      "details": "Hey! facebook.com is completely blocked. You cannot visit it unless you complete my puzzle!",
-      "emotionDelta": {
-        "anger": 0.35,
-        "sadness": 0.25,
-        "joy": -0.25,
-        "trust": -0.23
-      },
-      "id": "stm_1786876265797_n7zqg",
-      "timestamp": 1786876265797,
-      "formattedText": "default"
-    },
-    {
-      "type": "site_blocked_visit",
-      "domain": "facebook.com",
-      "details": "Hey! facebook.com is completely blocked. You cannot visit it unless you complete my puzzle!",
-      "emotionDelta": {
-        "anger": 0.35,
-        "sadness": 0.25,
-        "joy": -0.25,
-        "trust": -0.23
-      },
-      "id": "stm_1786876265771_tp2xd",
-      "timestamp": 1786876265771,
-      "formattedText": "default"
-    },
-    {
-      "type": "limit_exceeded",
-      "domain": "youtube.com",
-      "details": "Time's up! You exceeded your daily limit on youtube.com. It is now blocked!",
-      "emotionDelta": {
-        "anger": 0.4,
-        "sadness": 0.3,
-        "joy": -0.1,
-        "trust": -0.1
-      },
-      "id": "stm_1786869331886_jxwck",
-      "timestamp": 1786869331886,
-      "formattedText": "default"
-    },
-    {
-      "type": "limit_warning",
-      "domain": "youtube.com",
-      "details": "Hey, you're almost out of time for youtube.com! Wrap it up soon.",
-      "emotionDelta": {
-        "anger": 0.15,
-        "sadness": 0.1,
-        "joy": -0.15,
-        "trust": -0.13
-      },
-      "id": "stm_1786869327861_wu3ub",
-      "timestamp": 1786869327861,
-      "formattedText": "default"
-    },
-    {
-      "type": "puzzle_unblock_penalty",
-      "domain": "youtube.com",
-      "details": "Fine, youtube.com is unlocked now that you passed the puzzle, but don't stay here long!",
-      "emotionDelta": {
-        "anger": 0.3,
-        "sadness": 0.2,
-        "joy": -0.25,
-        "trust": -0.32
-      },
-      "id": "stm_1786869068455_i6fv4",
-      "timestamp": 1786869068455,
-      "formattedText": "default"
-    },
-    {
-      "type": "site_blocked_visit",
-      "domain": "youtube.com",
-      "details": "Hey! youtube.com is completely blocked. You cannot visit it unless you complete my puzzle!",
-      "emotionDelta": {
-        "anger": 0.35,
-        "sadness": 0.25,
-        "joy": -0.25,
-        "trust": -0.23
-      },
-      "id": "stm_1786869048142_mqxn5",
-      "timestamp": 1786869048142,
-      "formattedText": "default"
-    },
-    {
-      "type": "limit_exceeded",
-      "domain": "youtube.com",
-      "details": "You spent too much time on youtube.com! I am locking access now.",
-      "emotionDelta": {
-        "anger": 0.4,
-        "sadness": 0.3,
-        "joy": -0.1,
-        "trust": -0.1
-      },
-      "id": "stm_1786869014204_qzh6w",
-      "timestamp": 1786869014204,
-      "formattedText": "default"
     }
   ],
   "recentSpeechPhrases": [
+    "Ooh... That's good",
+    "Not bad.",
+    "Ooh... That's good",
+    "Congrats",
+    "Congrats",
+    "You completed the puzzle so I unlocked youtube... but I'm still mad you visited it!",
+    "Stop trying to open youtube! Access is restricted until you pass my challenge.",
     "You completed the puzzle so I unlocked facebook... but I'm still mad you visited it!",
     "Time's up! You exceeded your daily limit on facebook. It is now blocked!",
-    "Warning! You have used 3% of your limit on facebook.",
-    "Hey! facebook is completely blocked. Complete my puzzle to unblock it!",
-    "You completed the puzzle so I unlocked youtube... but I'm still mad you visited it!",
-    "Hey! youtube is completely blocked. Complete my puzzle to unblock it!",
-    "You completed the puzzle so I unlocked youtube... but I'm still mad you visited it!",
-    "Hey! youtube is completely blocked. Complete my puzzle to unblock it!",
-    "Hey! youtube is completely blocked. Complete my puzzle to unblock it!",
-    "Time's up! You exceeded your daily limit on youtube. It is now blocked!"
+    "Warning! You have used 3% of your limit on facebook."
   ],
   "activeWarnings": [],
-  "currentActiveDomain": "app.diagrams.net",
+  "currentActiveDomain": "www.facebook.com",
   "eventTemplate": "default",
   "memorableEventTypes": [
     "long_idle_duration",

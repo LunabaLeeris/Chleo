@@ -5,6 +5,8 @@ export interface PuzzleComponentProps {
   onSuccess: (score: number) => void;
   onCancel: () => void;
   onSuccessConfig?: PuzzleSuccessConfig;
+  onHighScoreBeaten?: (puzzleId: string, newHighScore: number) => void;
+  initialHighScore?: number;
 }
 
 export interface PuzzleConfig {

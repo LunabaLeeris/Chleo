@@ -57,6 +57,8 @@ export const SnakePuzzle: React.FC<SnakePuzzleProps> = ({
   targetDomain,
   onSuccess,
   onCancel,
+  onHighScoreBeaten,
+  initialHighScore,
   gridSize = SNAKE_SETTINGS.gridSize,
   cellSize = SNAKE_SETTINGS.cellSize,
   initialSpeedMs = SNAKE_SETTINGS.initialSpeedMs,
@@ -69,8 +71,34 @@ export const SnakePuzzle: React.FC<SnakePuzzleProps> = ({
   // Game logic states
   const [gameState, setGameState] = useState<GameState>('idle');
   const [score, setScore] = useState<number>(0);
-  const [highScore, setHighScore] = useState<number>(120);
+  const [highScore, setHighScore] = useState<number>(initialHighScore ?? 120);
+  const highScoreRef = useRef<number>(initialHighScore ?? 120);
   const chompsRef = useRef<number>(0);
+
+  // Load high score from puzzle-data.json on mount
+  useEffect(() => {
+    let isMounted = true;
+    const loadHighScore = async () => {
+      try {
+        if (typeof window !== 'undefined' && (window as any).electronAPI?.readMemoryFile) {
+          const raw = await (window as any).electronAPI.readMemoryFile('puzzle-data.json');
+          if (raw && isMounted) {
+            const parsed = JSON.parse(raw);
+            if (parsed?.snake?.highScore !== undefined && typeof parsed.snake.highScore === 'number') {
+              setHighScore(parsed.snake.highScore);
+              highScoreRef.current = parsed.snake.highScore;
+            }
+          }
+        }
+      } catch (e) {
+        console.warn('[SnakePuzzle] Failed to load high score from puzzle-data.json:', e);
+      }
+    };
+    loadHighScore();
+    return () => {
+      isMounted = false;
+    };
+  }, []);
 
   // Snake coordinates, food, and direction
   const snakeRef = useRef<Position[]>([
@@ -313,8 +341,10 @@ export const SnakePuzzle: React.FC<SnakePuzzleProps> = ({
 
         const newScore = score + SNAKE_SETTINGS.scorePerFood;
         setScore(newScore);
-        if (newScore > highScore) {
+        if (newScore > highScoreRef.current) {
+          highScoreRef.current = newScore;
           setHighScore(newScore);
+          onHighScoreBeaten?.('snake', newScore);
         }
 
         // Speed up slightly
@@ -356,7 +386,7 @@ export const SnakePuzzle: React.FC<SnakePuzzleProps> = ({
     }, speedRef.current);
 
     return () => clearInterval(intervalId);
-  }, [gameState, score, highScore, gridSize, minSpeedMs, speedStepMs, targetScore, targetDomain, spawnPositions, renderCanvas, onSuccess]);
+  }, [gameState, score, gridSize, minSpeedMs, speedStepMs, targetScore, targetDomain, spawnPositions, renderCanvas, onSuccess, onHighScoreBeaten]);
 
   const isChallenge = Boolean(targetDomain);
 

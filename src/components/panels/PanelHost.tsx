@@ -14,7 +14,7 @@ import { RewardPanel } from './RewardPanel'; // <-- [DEV PREVIEW: delete when do
 export interface PanelHostProps {
   activeOptionId: string | null;
   onClose: () => void;
-  onSelectPuzzle?: (puzzleId: 'snake' | 'chess' | 'sudoku') => void;
+  onSelectPuzzle?: (puzzleId: 'typing' | 'snake' | 'chess' | 'sudoku') => void;
 }
 
 export const PanelHost: React.FC<PanelHostProps> = ({

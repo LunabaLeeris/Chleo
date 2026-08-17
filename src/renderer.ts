@@ -358,19 +358,66 @@ function showPuzzlePanel(puzzleState: ActivePuzzleState) {
   puzzlePanelContainer.classList.add('visible');
   (window as any).electronAPI?.setIgnoreMouseEvents(false);
 
+  let hasTriggeredHighScoreEvent = false;
+
   puzzlePanelRoot.render(
     React.createElement(PuzzleHost, {
       puzzleId: puzzleState.id,
       targetDomain: puzzleState.domain,
       onSuccessConfig: puzzleState.onSuccessConfig,
+      onHighScoreBeaten: async (puzzleId: string, newHighScore: number) => {
+        logger.info('puzzle', `High score beaten for "${puzzleId}"! New high score: ${newHighScore}`);
+
+        // Rewrite the high score in backend for that puzzle
+        try {
+          let puzzleData: Record<string, any> = {};
+          const raw = await (window as any).electronAPI?.readMemoryFile?.('puzzle-data.json');
+          if (raw) {
+            try {
+              puzzleData = JSON.parse(raw);
+            } catch {
+              puzzleData = {};
+            }
+          }
+          puzzleData[puzzleId] = {
+            ...(puzzleData[puzzleId] || {}),
+            highScore: newHighScore,
+          };
+          await (window as any).electronAPI?.saveMemoryFile?.(
+            'puzzle-data.json',
+            JSON.stringify(puzzleData, null, 2)
+          );
+        } catch (err: any) {
+          logger.error('puzzle', `Failed to save new high score for ${puzzleId}: ${err?.message || err}`);
+        }
+
+        // Incur an event for beating high score
+        if (!hasTriggeredHighScoreEvent) {
+          hasTriggeredHighScoreEvent = true;
+          try {
+            const reaction = await (window as any).electronAPI?.processMonitoringEvent?.({
+              eventId: 'HIGH_SCORE_BEATEN',
+              domain: puzzleState.domain || 'retro-snake',
+              message: `High score beaten in ${puzzleId}! New high score: ${newHighScore}`,
+              timestamp: Date.now(),
+            });
+
+            if (reaction?.speechText) {
+              playCompanionSpeech(reaction.speechText, 'happy', reaction.responseType);
+            }
+          } catch (err: any) {
+            logger.error('puzzle', `Failed to process HIGH_SCORE_BEATEN event: ${err?.message || err}`);
+          }
+        }
+      },
       onSuccess: async (score: number) => {
         logger.info('puzzle', `Puzzle "${puzzleState.id}" completed with score: ${score}`);
 
-        // 1. Speak victory response using overall emotion from payload
+        // Speak victory response using overall emotion from payload
         const winSpeech = puzzleState.completionSpeech || 'Fine, you win! Pick your reward.';
         playCompanionSpeech(winSpeech, puzzleState.overallEmotion);
 
-        // 2. Render RewardPanel in puzzle panel container
+        // Render RewardPanel in puzzle panel container
         if (puzzlePanelRoot) {
           puzzlePanelRoot.render(
             React.createElement(RewardPanel, {

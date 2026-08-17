@@ -391,7 +391,7 @@ body.theme-pixel-grid #avatar-stage {
   bottom: calc(100% + 14px);
   left: 50%;
   transform: translateX(-50%) translateY(8px) scale(0.95);
-  z-index: 30;
+  z-index: 9999;
 
   background-color: #ffffff;
   background-image: var(--speech-bg-img);
@@ -1740,7 +1740,7 @@ input[type="range"] {
   display: flex;
   flex-direction: column;
   align-items: center;
-  z-index: 5;
+  z-index: 30;
 }
 
 .avatar-canvas-box {

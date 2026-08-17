@@ -54,7 +54,8 @@
           "orientation": "center"
         },
         "openPuzzle": [
-          "snake"
+          "snake",
+          "typing"
         ],
         "orientation": "center",
         "avatarPosition": "bottom-right",
@@ -139,6 +140,7 @@
         },
         "openPuzzle": [
           "snake",
+          "typing",
           "chess",
           "sudoku"
         ],
@@ -228,6 +230,29 @@
         "Removed productive status from {domain}."
       ],
       "llmDirective": "Chleo confirms that the site is no longer marked as productive."
+    },
+    {
+      "id": "HIGH_SCORE_BEATEN",
+      "name": "Puzzle High Score Beaten",
+      "conditions": {
+        "event": "HIGH_SCORE_BEATEN"
+      },
+      "emotionDeltas": {
+        "joy": 0,
+        "trust": 0,
+        "fear": 0,
+        "surprise": 0,
+        "sadness": 0,
+        "disgust": 0,
+        "anger": 0,
+        "anticipation": 0
+      },
+      "heuristicTemplates": [
+        "Congrats. you beat your high score!",
+        "Not bad.",
+        "Ooh... That's good"
+      ],
+      "llmDirective": "Chleo congratulates the user for beating the puzzle high score."
     }
   ]
 }

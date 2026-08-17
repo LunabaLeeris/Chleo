@@ -112,7 +112,6 @@ export const RewardPanel: React.FC<RewardPanelProps> = ({
       {/* Header */}
       <div className="reward-panel-header">
         <div className="reward-panel-title-wrap">
-          <span className="reward-panel-trophy"></span>
           <div>
             <h3 className="reward-panel-title">VICTORY REWARDS</h3>
             {targetDomain && (
