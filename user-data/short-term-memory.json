@@ -1,6 +1,78 @@
 {
   "events": [
     {
+      "type": "productive_milestone",
+      "domain": "github.com",
+      "details": "You're locked in! Keep up the good work on github. I gave you a reward!",
+      "emotionDelta": {
+        "joy": 0.35,
+        "trust": 0.25
+      },
+      "id": "stm_1787154879959_kms7l",
+      "timestamp": 1787154879959,
+      "formattedText": "default"
+    },
+    {
+      "type": "productive_milestone",
+      "domain": "github.com",
+      "details": "Great job! You've been productive on github for 4m! Here are 50 coins!",
+      "emotionDelta": {
+        "joy": 0.35,
+        "trust": 0.25
+      },
+      "id": "stm_1787154869867_8aspj",
+      "timestamp": 1787154869867,
+      "formattedText": "default"
+    },
+    {
+      "type": "productive_milestone",
+      "domain": "github.com",
+      "details": "You're locked in! Keep up the good work on github. I gave you a reward!",
+      "emotionDelta": {
+        "joy": 0.35,
+        "trust": 0.25
+      },
+      "id": "stm_1787154859782_57kek",
+      "timestamp": 1787154859782,
+      "formattedText": "default"
+    },
+    {
+      "type": "productive_milestone",
+      "domain": "github.com",
+      "details": "Great job! You've been productive on github for 3m! Here are 50 coins!",
+      "emotionDelta": {
+        "joy": 0.35,
+        "trust": 0.25
+      },
+      "id": "stm_1787154849695_rjvu3",
+      "timestamp": 1787154849695,
+      "formattedText": "default"
+    },
+    {
+      "type": "productive_milestone",
+      "domain": "github.com",
+      "details": "Great job! You've been productive on github for 3m! Here are 50 coins!",
+      "emotionDelta": {
+        "joy": 0.35,
+        "trust": 0.25
+      },
+      "id": "stm_1787154839600_qqj4m",
+      "timestamp": 1787154839600,
+      "formattedText": "default"
+    },
+    {
+      "type": "productive_milestone",
+      "domain": "github.com",
+      "details": "You're locked in! Keep up the good work on github. I gave you a reward!",
+      "emotionDelta": {
+        "joy": 0.35,
+        "trust": 0.25
+      },
+      "id": "stm_1787154829531_u4i26",
+      "timestamp": 1787154829531,
+      "formattedText": "default"
+    },
+    {
       "type": "high_score_beaten",
       "domain": "retro-snake",
       "details": "Not bad.",
@@ -641,104 +713,22 @@
       "id": "stm_1786877824980_nqdlh",
       "timestamp": 1786877824980,
       "formattedText": "default"
-    },
-    {
-      "type": "productive_milestone",
-      "domain": "github.com",
-      "details": "Great job! You've been productive on github for 1m! Here are 50 coins!",
-      "emotionDelta": {
-        "joy": 0.35,
-        "trust": 0.25
-      },
-      "id": "stm_1786877807850_qkztc",
-      "timestamp": 1786877807850,
-      "formattedText": "default"
-    },
-    {
-      "type": "limit_exceeded",
-      "domain": "youtube.com",
-      "details": "Time's up! You exceeded your daily limit on youtube. It is now blocked!",
-      "emotionDelta": {
-        "anger": 0.4,
-        "sadness": 0.3,
-        "joy": -0.1,
-        "trust": -0.1
-      },
-      "id": "stm_1786877800804_5blkt",
-      "timestamp": 1786877800804,
-      "formattedText": "default"
-    },
-    {
-      "type": "limit_warning",
-      "domain": "youtube.com",
-      "details": "Hey, you're almost out of time for youtube! Wrap it up soon.",
-      "emotionDelta": {
-        "anger": 0.15,
-        "sadness": 0.1,
-        "joy": -0.15,
-        "trust": -0.13
-      },
-      "id": "stm_1786877794736_up6bf",
-      "timestamp": 1786877794736,
-      "formattedText": "default"
-    },
-    {
-      "type": "site_blocked_visit",
-      "domain": "facebook.com",
-      "details": "Stop trying to open facebook! Access is restricted until you pass my challenge.",
-      "emotionDelta": {
-        "anger": 0.35,
-        "sadness": 0.25,
-        "joy": -0.25,
-        "trust": -0.23
-      },
-      "id": "stm_1786877785071_jilb9",
-      "timestamp": 1786877785071,
-      "formattedText": "default"
-    },
-    {
-      "type": "site_blocked_visit",
-      "domain": "facebook.com",
-      "details": "Hey! facebook is completely blocked. Complete my puzzle to unblock it!",
-      "emotionDelta": {
-        "anger": 0.35,
-        "sadness": 0.25,
-        "joy": -0.25,
-        "trust": -0.23
-      },
-      "id": "stm_1786877761592_n6tcm",
-      "timestamp": 1786877761592,
-      "formattedText": "default"
-    },
-    {
-      "type": "site_blocked_visit",
-      "domain": "facebook.com",
-      "details": "Hey! facebook is completely blocked. Complete my puzzle to unblock it!",
-      "emotionDelta": {
-        "anger": 0.35,
-        "sadness": 0.25,
-        "joy": -0.25,
-        "trust": -0.23
-      },
-      "id": "stm_1786877392309_hwmnl",
-      "timestamp": 1786877392309,
-      "formattedText": "default"
     }
   ],
   "recentSpeechPhrases": [
+    "You're locked in! Keep up the good work on github. I gave you a reward!",
+    "Great job! You've been productive on github for 4m! Here are 50 coins!",
+    "You're locked in! Keep up the good work on github. I gave you a reward!",
+    "Great job! You've been productive on github for 3m! Here are 50 coins!",
+    "Great job! You've been productive on github for 3m! Here are 50 coins!",
+    "You're locked in! Keep up the good work on github. I gave you a reward!",
     "Not bad.",
     "Ooh... That's good",
     "Not bad.",
-    "You completed the puzzle so I unlocked youtube... but I'm still mad you visited it!",
-    "Hey! youtube is completely blocked. Complete my puzzle to unblock it!",
-    "Hey! youtube is completely blocked. Complete my puzzle to unblock it!",
-    "Stop trying to open youtube! Access is restricted until you pass my challenge.",
-    "Stop trying to open youtube! Access is restricted until you pass my challenge.",
-    "You spent too much time on youtube! I am locking access now.",
-    "Warning! You have used 80% of your limit on youtube."
+    "You completed the puzzle so I unlocked youtube... but I'm still mad you visited it!"
   ],
   "activeWarnings": [],
-  "currentActiveDomain": "www.facebook.com",
+  "currentActiveDomain": "github.com",
   "eventTemplate": "default",
   "memorableEventTypes": [
     "long_idle_duration",

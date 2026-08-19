@@ -9,6 +9,7 @@ import { BrowserWebSocketServer } from './monitoring/browser-websocket-server';
 
 import { LongTermMemory } from './memory/long-term-memory';
 import { ShortTermMemory } from './memory/short-term-memory';
+import { UserItemsStore } from './main/user-items-store';
 import { LLMService } from './monitoring/llm-service';
 import { ResponseGenerator } from './monitoring/response-generator';
 import { EmotionsOrchestrator } from './avatar/emotions/emotions-orchestrator';
@@ -72,6 +73,32 @@ const shortTermMemory = new ShortTermMemory(longTermMemory, mainStorageAdapter);
 sendMainLog('success', 'short-term-memory', 'ShortTermMemory initialized with working buffer', {
   eventsCount: shortTermMemory.getEvents()?.length ?? 0,
 });
+
+const userItemsStore = new UserItemsStore(mainStorageAdapter);
+sendMainLog('success', 'user-items', 'UserItemsStore initialized with native storage adapter', {
+  coins: userItemsStore.getCoins(),
+});
+
+// Listener to broadcast coin changes to renderer window
+userItemsStore.onCoinsChange((newCoins, previousCoins) => {
+  sendMainLog('info', 'coins', `Coins updated: ${previousCoins} -> ${newCoins}`);
+  if (mainWindowInstance && !mainWindowInstance.isDestroyed()) {
+    try {
+      mainWindowInstance.webContents.send('coins-changed', newCoins);
+    } catch (_) {
+      /* ignore */
+    }
+  }
+});
+
+// Export convenience functions for main process / modules
+export const getCoins = (): number => userItemsStore.getCoins();
+export const setCoins = (amount: number): number => userItemsStore.setCoins(amount);
+export const modifyCoins = (delta: number): number => userItemsStore.modifyCoins(delta);
+export const getUserItems = () => userItemsStore.getUserItems();
+export const saveUserItems = (data: any): boolean => userItemsStore.save(data);
+export { userItemsStore };
+
 const llmService = new LLMService();
 sendMainLog('info', 'llm-service', 'LLMService instance created and ready');
 
@@ -128,6 +155,13 @@ ruleStore.setListeners({
       sendMainLog('info', 'behavior', `Executed redirect_tab action to "${redirectUrl}" for domain: ${payload.domain}`);
     }
 
+    // Award coins if configured in the behavioral rule reaction rewards
+    const coinReward = reaction?.rewards?.coins;
+    if (typeof coinReward === 'number' && coinReward !== 0) {
+      const newBalance = modifyCoins(coinReward);
+      sendMainLog('info', 'behavior', `Processed coin reward (${coinReward > 0 ? '+' : ''}${coinReward}) for ${payload.eventId} on ${payload.domain}. New coin balance: ${newBalance}`);
+    }
+
     if (mainWindowInstance && !mainWindowInstance.isDestroyed()) {
       const responsePayload: ChleoResponsePayload = {
         speechText,
@@ -137,6 +171,7 @@ ruleStore.setListeners({
         domain: payload.domain,
         eventId: payload.eventId,
         actions: reaction?.actions,
+        rewards: reaction?.rewards,
       };
       try {
         mainWindowInstance.webContents.send('companion-speak', responsePayload);
@@ -177,7 +212,8 @@ const flushAllMemoryAndRules = () => {
     longTermMemory.updateLastEmotion(emotionsOrchestrator.getState());
     longTermMemory.save();
     shortTermMemory.save();
-    sendMainLog('success', 'main', 'Memory and rules successfully flushed to user-data');
+    userItemsStore.save();
+    sendMainLog('success', 'main', 'Memory, rules, and user items successfully flushed to user-data');
   } catch (err: any) {
     console.error('[Main] Failed to flush data on exit:', err);
   }
@@ -186,6 +222,7 @@ const flushAllMemoryAndRules = () => {
 // Register all modular IPC handlers
 registerIpcHandlers({
   mainStorageAdapter,
+  userItemsStore,
   longTermMemory,
   shortTermMemory,
   emotionsOrchestrator,

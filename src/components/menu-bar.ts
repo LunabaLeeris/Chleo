@@ -23,6 +23,7 @@ export const DEFAULT_MENU_ITEMS: MenuItemConfig[] = [
 
 export interface MenuBarOptions {
   items?: MenuItemConfig[];
+  coins?: number;
   onItemClick?: (id: string) => void;
   onStateChange?: (isOpen: boolean) => void;
 }
@@ -30,6 +31,7 @@ export interface MenuBarOptions {
 export class MenuBarComponent {
   private container: HTMLElement;
   private items: MenuItemConfig[];
+  private coins = 0;
   private isOpen = false;
   private activeOptionId: string | null = null;
 
@@ -39,6 +41,7 @@ export class MenuBarComponent {
   constructor(container: HTMLElement, options?: MenuBarOptions) {
     this.container = container;
     this.items = options?.items || DEFAULT_MENU_ITEMS;
+    this.coins = typeof options?.coins === 'number' ? options.coins : 0;
     this.onItemClick = options?.onItemClick;
     this.onStateChange = options?.onStateChange;
 
@@ -53,7 +56,10 @@ export class MenuBarComponent {
       <div class="menu-bar-panel">
         <div class="menu-bar-header">
           <span class="menu-bar-title">CLEO</span>
-          <span class="menu-bar-badge">MENU</span>
+          <div class="menu-bar-coins" id="menu-bar-coins" title="Coins: ${this.coins}">
+            <span class="menu-bar-coin-icon">${renderIconHtml(REGISTERED_ICONS.coin || 'coin', 'coin-icon-img', 'Coins')}</span>
+            <span class="menu-bar-coin-amount" id="menu-bar-coin-amount">${this.coins}</span>
+          </div>
         </div>
         <div class="menu-bar-list">
           ${this.items
@@ -147,4 +153,21 @@ export class MenuBarComponent {
     this.items = newItems;
     this.render();
   }
+
+  public setCoins(coins: number): void {
+    this.coins = typeof coins === 'number' ? Math.max(0, Math.floor(coins)) : 0;
+    const coinContainer = this.container.querySelector('#menu-bar-coins');
+    const amountEl = this.container.querySelector('#menu-bar-coin-amount');
+    if (amountEl) {
+      amountEl.textContent = String(this.coins);
+    }
+    if (coinContainer) {
+      coinContainer.setAttribute('title', `Coins: ${this.coins}`);
+    }
+  }
+
+  public getCoins(): number {
+    return this.coins;
+  }
 }
+

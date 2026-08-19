@@ -130,6 +130,47 @@ body {
   box-shadow: 1px 1px 0px var(--border-pixel);
 }
 
+.menu-bar-coins {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  background: white;
+  color: var(--text-dark);
+  padding: 2px 7px;
+  border-radius: 4px;
+  border: 1.5px solid var(--border-pixel);
+  box-shadow: 1px 1px 0px var(--border-pixel);
+  font-family: var(--font-pixel);
+  font-size: 0.68rem;
+  font-weight: 700;
+  line-height: 1;
+}
+
+.menu-bar-coin-icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 18px;
+  height: 18px;
+}
+
+.menu-bar-coin-icon img,
+.menu-bar-coin-icon .coin-icon-img {
+  width: 18px;
+  height: 18px;
+  object-fit: contain;
+  image-rendering: pixelated;
+  image-rendering: crisp-edges;
+  display: block;
+}
+
+.menu-bar-coin-amount {
+  font-family: var(--font-pixel);
+  font-size: 0.68rem;
+  font-weight: 700;
+  letter-spacing: -0.2px;
+}
+
 .menu-bar-list {
   display: flex;
   flex-direction: column;
@@ -2519,6 +2560,7 @@ body {
   from {
     transform: scale(1);
   }
+
   to {
     transform: scale(1.06);
   }
@@ -2691,6 +2733,7 @@ body {
     opacity: 0;
     transform: scale(0.92);
   }
+
   to {
     opacity: 1;
     transform: scale(1);
@@ -2897,7 +2940,7 @@ body {
   cursor: pointer;
   position: relative;
   transition: transform 0.2s cubic-bezier(0.34, 1.56, 0.64, 1),
-              box-shadow 0.2s cubic-bezier(0.34, 1.56, 0.64, 1);
+    box-shadow 0.2s cubic-bezier(0.34, 1.56, 0.64, 1);
   box-shadow: 3px 3px 0px var(--border-pixel);
   user-select: none;
   animation: rewardCardReveal 0.5s cubic-bezier(0.2, 0.85, 0.35, 1.2) backwards;
@@ -2923,13 +2966,16 @@ body {
     opacity: 0;
     transform: perspective(600px) rotateY(180deg) scale(0.85);
   }
+
   65% {
     opacity: 1;
     transform: perspective(600px) rotateY(-8deg) scale(1.03);
   }
+
   85% {
     transform: perspective(600px) rotateY(3deg) scale(0.99);
   }
+
   100% {
     opacity: 1;
     transform: perspective(600px) rotateY(0deg) scale(1);

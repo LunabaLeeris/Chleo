@@ -1,6 +1,6 @@
 import type { PlutchikEmotion, EmotionalState } from '../avatar/emotions/emotion-types';
 import type { MonitoringEventPayload, SiteRule } from '../monitoring/monitoring-types';
-import type { BehavioralRule, BehavioralReactionResult, BehavioralActions, PuzzleSuccessConfig } from '../monitoring/behavioral-engine';
+import type { BehavioralRule, BehavioralReactionResult, BehavioralActions } from '../monitoring/behavioral-engine';
 import type { ShortTermMemoryEvent, LongTermMemoryData } from '../memory/memory-types';
 
 export interface ComponentRect {
@@ -32,6 +32,10 @@ export interface ChleoResponsePayload {
   domain?: string;
   eventId?: string;
   actions?: BehavioralActions;
+  rewards?: {
+    coins?: number;
+    itemDrop?: string;
+  };
 }
 
 export type MainLogLevel = 'info' | 'warn' | 'error' | 'success' | 'debug';
@@ -43,6 +47,13 @@ export interface MainLogPayload {
   details?: unknown;
 }
 
+export interface UserItemsData {
+  coins: number;
+  storage?: any[];
+  fridge?: any[];
+  [key: string]: any;
+}
+
 export interface ElectronAPI {
   setIgnoreMouseEvents: (ignore: boolean, options?: IgnoreMouseEventsOptions) => void;
   dragWindow: (dx: number, dy: number) => void;
@@ -51,6 +62,14 @@ export interface ElectronAPI {
   setInteractiveRects: (rects: InteractiveRects) => void;
   saveMemoryFile: (filename: string, content: string) => Promise<boolean>;
   readMemoryFile: (filename: string) => Promise<string | null>;
+
+  // User Items & Coins APIs
+  getUserItems: () => Promise<UserItemsData>;
+  saveUserItems: (data: UserItemsData) => Promise<boolean>;
+  getCoins: () => Promise<number>;
+  setCoins: (amount: number) => Promise<number>;
+  modifyCoins: (delta: number) => Promise<number>;
+  onCoinsChanged?: (callback: (coins: number) => void) => () => void;
 
   // Emotion & Brain APIs
   getOverallEmotion: () => Promise<PlutchikEmotion>;
@@ -79,4 +98,5 @@ export interface ElectronAPI {
   onCompanionSpeak?: (callback: (payload: ChleoResponsePayload) => void) => () => void;
   onRulesChanged?: (callback: () => void) => () => void;
 }
+
 

@@ -12,7 +12,7 @@
       "domain": "youtube.com",
       "type": "neutral",
       "dailyLimitSeconds": 0,
-      "spentTodaySeconds": 0,
+      "spentTodaySeconds": 230,
       "warningThresholdPercent": 80,
       "requiresPuzzleToUnblock": false
     },
@@ -20,7 +20,7 @@
       "domain": "github.com",
       "type": "productive",
       "dailyLimitSeconds": 0,
-      "spentTodaySeconds": 191,
+      "spentTodaySeconds": 233,
       "warningThresholdPercent": 80,
       "requiresPuzzleToUnblock": false
     },
@@ -36,7 +36,7 @@
       "domain": "localhost",
       "type": "neutral",
       "dailyLimitSeconds": 0,
-      "spentTodaySeconds": 10001,
+      "spentTodaySeconds": 10970,
       "warningThresholdPercent": 80,
       "requiresPuzzleToUnblock": false
     },
@@ -92,7 +92,7 @@
       "domain": "www.google.com",
       "type": "neutral",
       "dailyLimitSeconds": 0,
-      "spentTodaySeconds": 13830,
+      "spentTodaySeconds": 13835,
       "warningThresholdPercent": 80,
       "requiresPuzzleToUnblock": false
     },
@@ -121,7 +121,7 @@
       "requiresPuzzleToUnblock": false
     }
   ],
-  "productiveRewardIntervalSeconds": 60,
+  "productiveRewardIntervalSeconds": 10,
   "unblockPuzzlePenalty": {
     "anger": 0.35,
     "sadness": 0.25

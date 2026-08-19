@@ -547,6 +547,23 @@ const menuBar = new MenuBarComponent(menuBarContainer, {
   },
 });
 
+// Load initial coins and listen for coin updates
+(async () => {
+  try {
+    const coins = await (window as any).electronAPI?.getCoins?.();
+    if (typeof coins === 'number') {
+      menuBar.setCoins(coins);
+    }
+  } catch (err: any) {
+    logger.error('menu-bar', `Failed to load initial coins: ${err?.message || err}`);
+  }
+})();
+
+(window as any).electronAPI?.onCoinsChanged?.((newCoins: number) => {
+  logger.info('menu-bar', `Received coins-changed event: ${newCoins}`);
+  menuBar.setCoins(newCoins);
+});
+
 // Avatar & Speech Compositor initialization
 (async () => {
   try {

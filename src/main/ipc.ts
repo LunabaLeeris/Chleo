@@ -1,5 +1,6 @@
 import { BrowserWindow, ipcMain } from 'electron';
 import type { StorageAdapter } from '../memory/memory-types';
+import type { UserItemsStore } from './user-items-store';
 import type { LongTermMemory } from '../memory/long-term-memory';
 import type { ShortTermMemory } from '../memory/short-term-memory';
 import type { EmotionsOrchestrator } from '../avatar/emotions/emotions-orchestrator';
@@ -13,6 +14,7 @@ import type { BrowserWebSocketServer } from '../monitoring/browser-websocket-ser
 
 export interface IpcHandlerContext {
   mainStorageAdapter: StorageAdapter;
+  userItemsStore: UserItemsStore;
   longTermMemory: LongTermMemory;
   shortTermMemory: ShortTermMemory;
   emotionsOrchestrator: EmotionsOrchestrator;
@@ -93,6 +95,27 @@ export function registerIpcHandlers(ctx: IpcHandlerContext): void {
 
   ipcMain.handle('read-memory-file', (_event, filename: string) => {
     return ctx.mainStorageAdapter.readMemoryFile(filename);
+  });
+
+  // User Items & Coins IPC
+  ipcMain.handle('get-user-items', () => {
+    return ctx.userItemsStore.getUserItems();
+  });
+
+  ipcMain.handle('save-user-items', (_event, data: any) => {
+    return ctx.userItemsStore.save(data);
+  });
+
+  ipcMain.handle('get-coins', () => {
+    return ctx.userItemsStore.getCoins();
+  });
+
+  ipcMain.handle('set-coins', (_event, amount: number) => {
+    return ctx.userItemsStore.setCoins(amount);
+  });
+
+  ipcMain.handle('modify-coins', (_event, delta: number) => {
+    return ctx.userItemsStore.modifyCoins(delta);
   });
 
   // Emotion & Brain IPC

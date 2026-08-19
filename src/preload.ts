@@ -22,6 +22,20 @@ contextBridge.exposeInMainWorld('electronAPI', {
     saveMemoryFile: (filename: string, content: string) => ipcRenderer.invoke('save-memory-file', filename, content),
     readMemoryFile: (filename: string) => ipcRenderer.invoke('read-memory-file', filename),
 
+    // User Items & Coins APIs
+    getUserItems: () => ipcRenderer.invoke('get-user-items'),
+    saveUserItems: (data: any) => ipcRenderer.invoke('save-user-items', data),
+    getCoins: () => ipcRenderer.invoke('get-coins'),
+    setCoins: (amount: number) => ipcRenderer.invoke('set-coins', amount),
+    modifyCoins: (delta: number) => ipcRenderer.invoke('modify-coins', delta),
+    onCoinsChanged: (callback: (coins: number) => void) => {
+        const listener = (_event: Electron.IpcRendererEvent, coins: number) => callback(coins);
+        ipcRenderer.on('coins-changed', listener);
+        return () => {
+            ipcRenderer.removeListener('coins-changed', listener);
+        };
+    },
+
     // Emotion & Brain APIs
     getOverallEmotion: () => ipcRenderer.invoke('get-overall-emotion'),
     getEmotionState: () => ipcRenderer.invoke('get-emotion-state'),

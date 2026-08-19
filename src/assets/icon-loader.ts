@@ -9,6 +9,7 @@ import UNBLOCK_ICON from './icons/unblock.png';
 import HOURGLASS_ICON from './icons/hourglass.png';
 import LIGHTNING_ICON from './icons/lightning.png';
 import CARDBG_ICON from './icons/cardbg.png';
+import COIN_ICON from './icons/coin.png'
 
 
 /**
@@ -24,6 +25,8 @@ export const REGISTERED_ICONS: Record<string, string> = {
   reward: STAR_ICON,
   rewards: STAR_ICON,
   star: STAR_ICON,
+  coin: COIN_ICON,
+  coins: COIN_ICON,
   typing: KEYBOARD_ICON,
   keyboard: KEYBOARD_ICON,
   snake: SNAKE_ICON,
@@ -33,9 +36,6 @@ export const REGISTERED_ICONS: Record<string, string> = {
   lightning: LIGHTNING_ICON,
   quick_pass: LIGHTNING_ICON,
   quickpass: LIGHTNING_ICON,
-  '⚡': LIGHTNING_ICON,
-  '⏳': HOURGLASS_ICON,
-  '🔓': UNBLOCK_ICON,
   cardbg: CARDBG_ICON,
   matching: CARDBG_ICON,
 };
