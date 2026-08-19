@@ -3,7 +3,7 @@ import { PanelContainer } from './PanelContainer';
 import { getIconSrc } from '../../assets/icon-loader';
 
 export interface PuzzleItem {
-  id: 'typing' | 'snake' | 'chess' | 'sudoku';
+  id: 'typing' | 'snake' | 'chess' | 'sudoku' | 'matching';
   name: string;
   icon: string;
   badge: string;
@@ -14,6 +14,16 @@ export interface PuzzleItem {
 }
 
 export const AVAILABLE_PUZZLES: PuzzleItem[] = [
+  {
+    id: 'matching',
+    name: 'Memory Match',
+    icon: 'cardbg',
+    badge: 'Memory',
+    description: 'Match pairs of pixel icons before time runs out!',
+    targetScore: 60,
+    highScore: 60,
+    timePlayed: '12m',
+  },
   {
     id: 'typing',
     name: 'Speed Typer',
@@ -58,7 +68,7 @@ export const AVAILABLE_PUZZLES: PuzzleItem[] = [
 
 export interface PuzzlesPanelProps {
   onClose: () => void;
-  onSelectPuzzle?: (puzzleId: 'typing' | 'snake' | 'chess' | 'sudoku') => void;
+  onSelectPuzzle?: (puzzleId: 'typing' | 'snake' | 'chess' | 'sudoku' | 'matching') => void;
 }
 
 export const PuzzlesPanel: React.FC<PuzzlesPanelProps> = ({ onClose, onSelectPuzzle }) => {

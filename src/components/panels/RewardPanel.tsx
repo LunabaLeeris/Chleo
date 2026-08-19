@@ -33,26 +33,26 @@ export const RewardPanel: React.FC<RewardPanelProps> = ({
       : [
         {
           id: 'unblock_site',
-          title: 'Unblock Site',
-          description: 'Completely remove the daily limit for today.',
+          title: 'Unblock',
+          description: 'Restore access for today. Gives huge panalty on emotions.',
           icon: 'unblock',
           status: 'unblock',
         },
         {
           id: 'avoid_30m',
-          title: 'Avoid Mode (30m)',
-          description: 'Grant 30 minutes of temporary monitored access.',
-          icon: '⏳',
+          title: 'Avoid',
+          description: 'Grant 30 minutes access. Gives some panalty on emotions.',
+          icon: 'hourglass',
           status: 'avoid',
           duration: 30,
         },
         {
           id: 'avoid_15m',
-          title: 'Quick Pass (15m)',
-          description: 'Grant 15 minutes of quick access to finish up.',
-          icon: '⚡',
+          title: 'Blitz',
+          description: 'Grant 5 minutes access. Gives little penalty on emotions.',
+          icon: 'lightning',
           status: 'avoid',
-          duration: 15,
+          duration: 5,
         },
       ];
 
@@ -111,6 +111,7 @@ export const RewardPanel: React.FC<RewardPanelProps> = ({
   const progressPercent = Math.max(0, Math.min(100, (timeLeft / timeoutSeconds) * 100));
   const isUrgent = timeLeft <= 15;
   const rewardIconSrc = getIconSrc('reward') || getIconSrc('star');
+  const timerIconSrc = getIconSrc('hourglass');
 
   return (
     <div
@@ -139,7 +140,16 @@ export const RewardPanel: React.FC<RewardPanelProps> = ({
         <div className="reward-header-actions">
           {/* Countdown timer pill */}
           <div className={`reward-timer-pill ${isUrgent ? 'urgent' : ''}`}>
-            <span className="timer-icon">⏳</span>
+            {timerIconSrc ? (
+              <img
+                src={timerIconSrc}
+                alt="Timer"
+                className="reward-timer-icon-img"
+                style={{ width: '13px', height: '13px', objectFit: 'contain' }}
+              />
+            ) : (
+              <span className="timer-icon">⏳</span>
+            )}
             <span className="timer-digits">{timeLeft}s</span>
           </div>
 
@@ -169,13 +179,28 @@ export const RewardPanel: React.FC<RewardPanelProps> = ({
         {activeRewards.map((reward, index) => {
           const isSelected = selectedRewardId === (reward.id || `${reward.status}_${reward.duration || index}`);
           const isAvoid = reward.status === 'avoid';
-          const possibleRewardSrc = getIconSrc(reward.icon);
+          const isQuickPass =
+            reward.id === 'avoid_15m' ||
+            reward.id === 'avoid_5m' ||
+            reward.icon === 'lightning' ||
+            reward.icon === '⚡' ||
+            (typeof reward.title === 'string' &&
+              (reward.title.toLowerCase().includes('blitz') ||
+                reward.title.toLowerCase().includes('quick')));
+          const possibleRewardSrc =
+            getIconSrc(reward.icon) ||
+            (isQuickPass
+              ? getIconSrc('lightning')
+              : isAvoid
+              ? getIconSrc('hourglass')
+              : getIconSrc('unblock'));
 
           return (
             <div
               key={reward.id || index}
               className={`reward-card-item ${isAvoid ? 'mode-avoid' : 'mode-unblock'} ${isSelected ? 'selected' : ''
                 }`}
+              style={{ animationDelay: `${index * 120 + 80}ms` }}
               onClick={() => handleCardClick(reward, index)}
               role="button"
               tabIndex={0}
@@ -189,11 +214,15 @@ export const RewardPanel: React.FC<RewardPanelProps> = ({
 
               {/* Icon Container */}
               <div className="reward-card-icon-box">
-                <img
-                  src={possibleRewardSrc}
-                  alt="Possible Reward"
-                  className="reward-icon-img"
-                />
+                {possibleRewardSrc ? (
+                  <img
+                    src={possibleRewardSrc}
+                    alt={reward.title || (isQuickPass ? 'Blitz' : isAvoid ? 'Avoid' : 'Unblock')}
+                    className="reward-icon-img"
+                  />
+                ) : (
+                  <span className="reward-icon-emoji">{reward.icon || (isQuickPass ? '⚡' : isAvoid ? '⏳' : '🔓')}</span>
+                )}
               </div>
 
               {/* Title & Description */}

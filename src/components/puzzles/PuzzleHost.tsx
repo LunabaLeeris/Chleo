@@ -3,6 +3,7 @@ import { SnakePuzzle } from './SnakePuzzle';
 import { ChessPuzzle } from './ChessPuzzle';
 import { SudokuPuzzle } from './SudokuPuzzle';
 import { TypingPuzzle } from './TypingPuzzle';
+import { MatchingPuzzle } from './MatchingPuzzle';
 import type { PuzzleSuccessConfig } from '../../monitoring/behavioral-engine';
 
 export interface PuzzleHostProps {
@@ -25,6 +26,18 @@ export const PuzzleHost: React.FC<PuzzleHostProps> = ({
   initialHighScore,
 }) => {
   switch (puzzleId.toLowerCase()) {
+    case 'matching':
+    case 'memory':
+      return (
+        <MatchingPuzzle
+          targetDomain={targetDomain}
+          onSuccess={onSuccess}
+          onCancel={onCancel}
+          onSuccessConfig={onSuccessConfig}
+          onHighScoreBeaten={onHighScoreBeaten}
+          initialHighScore={initialHighScore}
+        />
+      );
     case 'typing':
       return (
         <TypingPuzzle

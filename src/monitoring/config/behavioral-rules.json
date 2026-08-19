@@ -27,26 +27,26 @@
           "onSuccess": [
             {
               "id": "unblock_site",
-              "title": "Unblock Site",
-              "description": "Completely remove the block and restore access for today.",
-              "icon": "🔓",
+              "title": "Unblock",
+              "description": "Restore access for today. Gives huge panalty on emotions.",
+              "icon": "unblock",
               "status": "unblock"
             },
             {
               "id": "avoid_30m",
-              "title": "Avoid Mode (30m)",
-              "description": "Grant 30 minutes of temporary monitored access.",
-              "icon": "⏳",
+              "title": "Avoid",
+              "description": "Grant 30 minutes access. Gives some panalty on emotions.",
+              "icon": "hourglass",
               "status": "avoid",
               "duration": 30
             },
             {
               "id": "avoid_15m",
-              "title": "Quick Pass (15m)",
-              "description": "Grant 15 minutes of quick access to finish up.",
-              "icon": "⚡",
+              "title": "Blitz",
+              "description": "Grant 5 minutes access. Gives little penalty on emotions.",
+              "icon": "lightning",
               "status": "avoid",
-              "duration": 15
+              "duration": 5
             }
           ],
           "draggable": false,
@@ -113,27 +113,27 @@
           "rewardUrgePercent": 50,
           "onSuccess": [
             {
+              "id": "unblock_site",
+              "title": "Unblock",
+              "description": "Restore access for today. Gives huge panalty on emotions.",
+              "icon": "unblock",
+              "status": "unblock"
+            },
+            {
               "id": "avoid_30m",
-              "title": "Avoid Mode (30m)",
-              "description": "Grant 30 minutes of temporary monitored access.",
-              "icon": "⏳",
+              "title": "Avoid",
+              "description": "Grant 30 minutes access. Gives some panalty on emotions.",
+              "icon": "hourglass",
               "status": "avoid",
               "duration": 30
             },
             {
               "id": "avoid_15m",
-              "title": "Quick Pass (15m)",
-              "description": "Grant 15 minutes of quick access to finish up.",
-              "icon": "⚡",
+              "title": "Blitz",
+              "description": "Grant 5 minutes access. Gives little penalty on emotions.",
+              "icon": "lightning",
               "status": "avoid",
-              "duration": 15
-            },
-            {
-              "id": "unblock_site",
-              "title": "Unblock Site",
-              "description": "Completely remove the daily limit for today.",
-              "icon": "🔓",
-              "status": "unblock"
+              "duration": 5
             }
           ],
           "draggable": false,

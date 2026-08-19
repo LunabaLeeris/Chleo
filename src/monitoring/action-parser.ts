@@ -1,6 +1,6 @@
 export type PanelOrientation = 'center' | 'left' | 'remain';
 export type AvatarPosition = 'bottom-right' | 'top-right' | 'center-right';
-export type Puzzles = 'snake' | 'chess' | 'sudoku';
+export type Puzzles = 'snake' | 'chess' | 'sudoku' | 'typing' | 'matching';
 
 export interface PuzzleRewardItem {
   id?: string;
@@ -50,14 +50,14 @@ export function normalizeRewardItem(
 
   let defaultTitle = 'Unblock Site';
   let defaultDesc = 'Completely remove the block and restore access.';
-  let defaultIcon = '🔓';
+  let defaultIcon = 'unblock';
 
   if (status === 'avoid') {
     defaultTitle = duration ? `Avoid Mode (${duration}m)` : 'Avoid Mode';
     defaultDesc = duration
       ? `Grant ${duration} minutes of monitored access.`
       : 'Downgrade to temporary avoid mode.';
-    defaultIcon = '⏳';
+    defaultIcon = 'hourglass';
   }
 
   return {

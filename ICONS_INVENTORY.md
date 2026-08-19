@@ -80,6 +80,7 @@ Puzzles displayed in `PuzzlesPanel` cards and inside `PuzzleContainer` headers.
 
 | Puzzle ID | Puzzle Name | Current Icon | File Location | Notes / Suggested Art |
 | :--- | :--- | :---: | :--- | :--- |
+| `matching` | Memory Match | ✅ `puzzles` (`puzzles.png`) | `src/components/puzzles/MatchingPuzzle.tsx` | Pixel cards / memory puzzle pieces |
 | `typing` | Speed Typer | ✅ `keyboard` (`keyboard.png`) | `src/components/puzzles/TypingPuzzle.tsx` | Pixel mechanical keyboard / typing icon |
 | `snake` | Retro Snake | ✅ `snake` (`snake.png`) | `src/components/puzzles/SnakePuzzle.tsx` | Pixel retro snake icon |
 | `chess` | Pixel Chess | `♟️` (Emoji) | `src/components/puzzles/ChessPuzzle.tsx` | Pixel chess knight or pawn piece |
@@ -92,11 +93,11 @@ Rewards presented to the user when completing a puzzle challenge to regain brows
 
 | Reward ID / Element | Label / Context | Current Icon | File Location | Suggested Icon Theme / Description |
 | :--- | :--- | :---: | :--- | :--- |
-| `avoid_30m` | Avoid Mode (30m) | `⏳` (Emoji) | `user-data/behavioral-rules.json` | Hourglass / Sand timer |
-| `avoid_15m` | Quick Pass (15m) | `⚡` (Emoji) | `user-data/behavioral-rules.json` | Lightning bolt / Energy spark |
-| `unblock_site` | Unblock Site | `🔓` (Emoji) | `user-data/behavioral-rules.json` | Open padlock / Key |
+| `avoid_30m` | Avoid Mode (30m) | ✅ `assets/icons/hourglass.png` | `user-data/behavioral-rules.json`, `RewardPanel.tsx` | Hourglass / Sand timer |
+| `avoid_15m` | Quick Pass (15m) | ✅ `assets/icons/lightning.png` | `user-data/behavioral-rules.json`, `RewardPanel.tsx` | Lightning bolt / Quick pass spark |
+| `unblock_site` | Unblock Site | ✅ `assets/icons/unblock.png` | `user-data/behavioral-rules.json`, `RewardPanel.tsx` | Open padlock / Unblock |
 | `reward-fallback` | Default Reward Icon | `🎁` (Emoji) | `src/components/panels/RewardPanel.tsx` | Gift box with ribbon |
-| `timer-icon` | Reward Countdown Timer | `⏳` (Emoji) | `src/components/panels/RewardPanel.tsx` | Stopwatch / Ticking clock |
+| `timer-icon` | Reward Countdown Timer | ✅ `assets/icons/hourglass.png` | `src/components/panels/RewardPanel.tsx` | Hourglass / Sand timer |
 | `star-icon` | Victory Header Star | ✅ `assets/icons/star.png` | `src/components/panels/RewardPanel.tsx` | Pixel Star badge |
 
 ---
@@ -124,6 +125,10 @@ These icons already exist as image files and are used across the companion deskt
 | `assets/icons/star.png` | PNG | `src/components/menu-bar.ts`, `RewardPanel.tsx` | Victory reward star icon |
 | `assets/icons/keyboard.png` | PNG | `TypingPuzzle.tsx`, `PuzzlesPanel.tsx` | Speed Typer game icon |
 | `assets/icons/snake.png` | PNG | `SnakePuzzle.tsx`, `PuzzlesPanel.tsx` | Retro Snake game icon |
+| `assets/icons/unblock.png` | PNG | `RewardPanel.tsx`, `behavioral-rules.json` | Unblock site reward icon |
+| `assets/icons/hourglass.png` | PNG | `RewardPanel.tsx`, `behavioral-rules.json` | Avoid mode & countdown timer icon |
+| `assets/icons/lightning.png` | PNG | `RewardPanel.tsx`, `behavioral-rules.json` | Quick pass reward icon |
+| `assets/icons/cardbg.png` | PNG | `MatchingPuzzle.tsx` | Memory card back face background art |
 | `assets/brain.png` | PNG | `web/pages/HomePage.tsx`, `BlogPage.tsx` | Intelligence feature icon |
 | `assets/eyes.png` | PNG | `web/pages/HomePage.tsx`, `BlogPage.tsx` | Monitoring feature icon |
 | `assets/mouth.png` | PNG | `web/pages/HomePage.tsx`, `BlogPage.tsx` | Speech feature icon |
