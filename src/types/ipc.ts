@@ -47,11 +47,27 @@ export interface MainLogPayload {
   details?: unknown;
 }
 
+export type InventoryTarget = 'storage' | 'fridge' | 'closet';
+
 export interface UserItemsData {
   coins: number;
   storage?: any[];
   fridge?: any[];
+  closet?: any[];
   [key: string]: any;
+}
+
+export interface PurchaseItemPayload {
+  target: InventoryTarget;
+  itemId: string;
+  amount: number;
+  costPerUnit: number;
+}
+
+export interface PurchaseItemResult {
+  success: boolean;
+  error?: string;
+  remainingCoins: number;
 }
 
 export interface ElectronAPI {
@@ -69,6 +85,8 @@ export interface ElectronAPI {
   getCoins: () => Promise<number>;
   setCoins: (amount: number) => Promise<number>;
   modifyCoins: (delta: number) => Promise<number>;
+  purchaseItem?: (payload: PurchaseItemPayload) => Promise<PurchaseItemResult>;
+  addUserItem?: (target: InventoryTarget, itemId: string, quantity?: number) => Promise<boolean>;
   onCoinsChanged?: (callback: (coins: number) => void) => () => void;
 
   // Emotion & Brain APIs

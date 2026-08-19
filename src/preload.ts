@@ -1,7 +1,7 @@
 import { contextBridge, ipcRenderer } from 'electron';
-import { InteractiveRects, IgnoreMouseEventsOptions } from './types/ipc';
+import { InteractiveRects, IgnoreMouseEventsOptions, InventoryTarget, PurchaseItemPayload } from './types/ipc';
 
-export type { ComponentRect, InteractiveRects, IgnoreMouseEventsOptions, ElectronAPI } from './types/ipc';
+export type { ComponentRect, InteractiveRects, IgnoreMouseEventsOptions, ElectronAPI, InventoryTarget, PurchaseItemPayload } from './types/ipc';
 
 contextBridge.exposeInMainWorld('electronAPI', {
     setIgnoreMouseEvents: (ignore: boolean, options?: IgnoreMouseEventsOptions) => {
@@ -28,6 +28,10 @@ contextBridge.exposeInMainWorld('electronAPI', {
     getCoins: () => ipcRenderer.invoke('get-coins'),
     setCoins: (amount: number) => ipcRenderer.invoke('set-coins', amount),
     modifyCoins: (delta: number) => ipcRenderer.invoke('modify-coins', delta),
+    purchaseItem: (payload: PurchaseItemPayload) =>
+        ipcRenderer.invoke('purchase-item', payload),
+    addUserItem: (target: InventoryTarget, itemId: string, quantity?: number) =>
+        ipcRenderer.invoke('add-user-item', target, itemId, quantity),
     onCoinsChanged: (callback: (coins: number) => void) => {
         const listener = (_event: Electron.IpcRendererEvent, coins: number) => callback(coins);
         ipcRenderer.on('coins-changed', listener);

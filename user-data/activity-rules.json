@@ -4,7 +4,7 @@
       "domain": "facebook.com",
       "type": "neutral",
       "dailyLimitSeconds": 0,
-      "spentTodaySeconds": 3412,
+      "spentTodaySeconds": 4452,
       "warningThresholdPercent": 50,
       "requiresPuzzleToUnblock": false
     },
@@ -12,7 +12,7 @@
       "domain": "youtube.com",
       "type": "neutral",
       "dailyLimitSeconds": 0,
-      "spentTodaySeconds": 230,
+      "spentTodaySeconds": 1618,
       "warningThresholdPercent": 80,
       "requiresPuzzleToUnblock": false
     },
@@ -20,7 +20,7 @@
       "domain": "github.com",
       "type": "productive",
       "dailyLimitSeconds": 0,
-      "spentTodaySeconds": 233,
+      "spentTodaySeconds": 261,
       "warningThresholdPercent": 80,
       "requiresPuzzleToUnblock": false
     },
@@ -36,7 +36,7 @@
       "domain": "localhost",
       "type": "neutral",
       "dailyLimitSeconds": 0,
-      "spentTodaySeconds": 10970,
+      "spentTodaySeconds": 12254,
       "warningThresholdPercent": 80,
       "requiresPuzzleToUnblock": false
     },
@@ -44,7 +44,7 @@
       "domain": "chrome://newtab/",
       "type": "neutral",
       "dailyLimitSeconds": 0,
-      "spentTodaySeconds": 255,
+      "spentTodaySeconds": 260,
       "warningThresholdPercent": 80,
       "requiresPuzzleToUnblock": false
     },
@@ -52,7 +52,7 @@
       "domain": "docs.google.com",
       "type": "neutral",
       "dailyLimitSeconds": 0,
-      "spentTodaySeconds": 119,
+      "spentTodaySeconds": 120,
       "warningThresholdPercent": 80,
       "requiresPuzzleToUnblock": false
     },
@@ -68,7 +68,7 @@
       "domain": "app.diagrams.net",
       "type": "neutral",
       "dailyLimitSeconds": 0,
-      "spentTodaySeconds": 672,
+      "spentTodaySeconds": 673,
       "warningThresholdPercent": 80,
       "requiresPuzzleToUnblock": false
     },
@@ -76,7 +76,7 @@
       "domain": "vercel.com",
       "type": "neutral",
       "dailyLimitSeconds": 0,
-      "spentTodaySeconds": 152,
+      "spentTodaySeconds": 157,
       "warningThresholdPercent": 80,
       "requiresPuzzleToUnblock": false
     },
@@ -92,7 +92,7 @@
       "domain": "www.google.com",
       "type": "neutral",
       "dailyLimitSeconds": 0,
-      "spentTodaySeconds": 13835,
+      "spentTodaySeconds": 14919,
       "warningThresholdPercent": 80,
       "requiresPuzzleToUnblock": false
     },
@@ -117,6 +117,14 @@
       "type": "neutral",
       "dailyLimitSeconds": 0,
       "spentTodaySeconds": 18,
+      "warningThresholdPercent": 80,
+      "requiresPuzzleToUnblock": false
+    },
+    {
+      "domain": "www.magnific.com",
+      "type": "neutral",
+      "dailyLimitSeconds": 0,
+      "spentTodaySeconds": 1032,
       "warningThresholdPercent": 80,
       "requiresPuzzleToUnblock": false
     }

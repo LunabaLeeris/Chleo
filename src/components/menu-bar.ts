@@ -10,14 +10,15 @@ export interface MenuItemConfig {
 export const DEFAULT_MENU_ITEMS: MenuItemConfig[] = [
   { id: 'status', label: 'Status', icon: REGISTERED_ICONS.status || 'status' },
   { id: 'puzzle', label: 'Puzzle', icon: REGISTERED_ICONS.puzzle || 'puzzle' },
-  { id: 'debug', label: 'Debug', icon: REGISTERED_ICONS.debug || 'debug' },
+  { id: 'storage', label: 'Storage', icon: REGISTERED_ICONS.storage || 'storage' },
+  { id: 'store', label: 'Store', icon: REGISTERED_ICONS.store || 'store' },
   { id: 'monitoring', label: 'Monitoring', icon: REGISTERED_ICONS.monitoring || 'monitoring' },
-  { id: 'reward', label: 'Reward (Dev)', icon: REGISTERED_ICONS.reward || 'reward' }, // <-- [DEV PREVIEW: delete when done]
+  { id: 'debug', label: 'Debug', icon: REGISTERED_ICONS.debug || 'debug' },
+  //{ id: 'reward', label: 'Reward (Dev)', icon: REGISTERED_ICONS.reward || 'reward' }, // <-- [DEV PREVIEW: delete when done]
   { id: 'config', label: 'Config', icon: '' },
   { id: 'marketplace', label: 'Marketplace', icon: '' },
   { id: 'calendar', label: 'Calendar', icon: '' },
   { id: 'fridge', label: 'Fridge', icon: '' },
-  { id: 'storage', label: 'Storage', icon: '' },
   { id: 'closet', label: 'Closet', icon: '' },
 ];
 

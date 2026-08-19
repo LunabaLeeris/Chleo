@@ -7,6 +7,8 @@ import type { StorageAdapter } from '../memory/memory-types';
 import type { ShortTermMemory } from '../memory/short-term-memory';
 import defaultBehavioralRules from './config/behavioral-rules.json';
 import { normalizeBehavioralActions } from './action-parser';
+import { setItemsConfig } from '../items/items-registry';
+import type { ItemsConfig } from '../items/items-registry';
 import type {
   PuzzleSuccessConfig,
   PuzzleRewardItem,
@@ -75,7 +77,24 @@ export class BehavioralEngine {
     this.responseGenerator = responseGenerator;
     this.shortTermMemory = shortTermMemory;
     this.storageAdapter = storageAdapter;
+    this.loadItemsConfig();
     this.behavioralConfig = this.loadBehavioralConfig();
+  }
+
+  private loadItemsConfig(): void {
+    try {
+      if (this.storageAdapter) {
+        const raw = this.storageAdapter.readMemoryFile('items-config.json');
+        if (typeof raw === 'string' && raw.trim()) {
+          const parsed = JSON.parse(raw) as ItemsConfig;
+          if (parsed && typeof parsed === 'object' && parsed.items) {
+            setItemsConfig(parsed);
+          }
+        }
+      }
+    } catch (e) {
+      console.warn('[BehavioralEngine] Failed to load items config:', e);
+    }
   }
 
   private loadBehavioralConfig(): BehavioralConfig {

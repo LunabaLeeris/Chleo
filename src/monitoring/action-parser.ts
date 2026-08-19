@@ -1,3 +1,5 @@
+import { resolveRewardItem } from '../items/items-registry';
+
 export type PanelOrientation = 'center' | 'left' | 'remain';
 export type AvatarPosition = 'bottom-right' | 'top-right' | 'center-right';
 export type Puzzles = 'snake' | 'chess' | 'sudoku' | 'typing' | 'matching';
@@ -9,6 +11,7 @@ export interface PuzzleRewardItem {
   icon?: string;
   status: 'unblock' | 'avoid' | string;
   duration?: number;
+  cost?: number;
   [key: string]: any;
 }
 
@@ -39,36 +42,13 @@ export interface BehavioralActions {
 }
 
 /**
- * Normalizes a single reward item into standard schema with sensible defaults.
+ * Normalizes a single reward item into standard schema with sensible defaults and items-config resolution.
  */
 export function normalizeRewardItem(
   item?: Partial<PuzzleRewardItem>,
   index = 0
 ): PuzzleRewardItem {
-  const status = item?.status === 'avoid' ? 'avoid' : item?.status || 'unblock';
-  const duration = typeof item?.duration === 'number' ? item.duration : undefined;
-
-  let defaultTitle = 'Unblock Site';
-  let defaultDesc = 'Completely remove the block and restore access.';
-  let defaultIcon = 'unblock';
-
-  if (status === 'avoid') {
-    defaultTitle = duration ? `Avoid Mode (${duration}m)` : 'Avoid Mode';
-    defaultDesc = duration
-      ? `Grant ${duration} minutes of monitored access.`
-      : 'Downgrade to temporary avoid mode.';
-    defaultIcon = 'hourglass';
-  }
-
-  return {
-    id: item?.id || `${status}_${duration || index}`,
-    title: item?.title || defaultTitle,
-    description: item?.description || defaultDesc,
-    icon: item?.icon || defaultIcon,
-    status,
-    duration,
-    ...(item && typeof item === 'object' ? item : {}),
-  };
+  return resolveRewardItem(item, index);
 }
 
 /**

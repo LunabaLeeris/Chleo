@@ -88,7 +88,7 @@ export function registerIpcHandlers(ctx: IpcHandlerContext): void {
     }
   });
 
-  // Storage IPC
+  // Storage & Memory IPC
   ipcMain.handle('save-memory-file', (_event, filename: string, content: string) => {
     return ctx.mainStorageAdapter.saveMemoryFile(filename, content);
   });
@@ -116,6 +116,22 @@ export function registerIpcHandlers(ctx: IpcHandlerContext): void {
 
   ipcMain.handle('modify-coins', (_event, delta: number) => {
     return ctx.userItemsStore.modifyCoins(delta);
+  });
+
+  ipcMain.handle(
+    'purchase-item',
+    (_event, payload: PurchaseItemPayload) => {
+      return ctx.userItemsStore.purchaseItem(
+        payload.target,
+        payload.itemId,
+        payload.amount,
+        payload.costPerUnit
+      );
+    }
+  );
+
+  ipcMain.handle('add-user-item', (_event, target: InventoryTarget, itemId: string, quantity?: number) => {
+    return ctx.userItemsStore.addItem(target, itemId, quantity || 1);
   });
 
   // Emotion & Brain IPC

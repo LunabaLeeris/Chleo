@@ -1,5 +1,5 @@
 import type { StorageAdapter } from '../memory/memory-types';
-import type { UserItemsData } from '../types/ipc';
+import type { UserItemsData, InventoryTarget } from '../types/ipc';
 
 const USER_ITEMS_FILENAME = 'user-items.json';
 
@@ -7,6 +7,7 @@ const DEFAULT_USER_ITEMS: UserItemsData = {
   coins: 0,
   storage: [],
   fridge: [],
+  closet: [],
 };
 
 export type CoinsChangeListener = (newCoins: number, previousCoins: number) => void;
@@ -35,6 +36,7 @@ export class UserItemsStore {
           coins: typeof parsed.coins === 'number' ? parsed.coins : 0,
           storage: Array.isArray(parsed.storage) ? parsed.storage : [],
           fridge: Array.isArray(parsed.fridge) ? parsed.fridge : [],
+          closet: Array.isArray(parsed.closet) ? parsed.closet : [],
         };
       } else {
         this.cachedData = { ...DEFAULT_USER_ITEMS };
@@ -74,6 +76,73 @@ export class UserItemsStore {
   public getUserItems(): UserItemsData {
     const data = this.cachedData || this.load();
     return { ...data };
+  }
+
+  /**
+   * Append an item to user inventory category (storage, fridge, closet).
+   * Increments quantity if item already exists in that category.
+   */
+  public addItem(target: InventoryTarget, itemId: string, quantity = 1): boolean {
+    const data = this.cachedData || this.load();
+    if (!Array.isArray(data[target])) {
+      data[target] = [];
+    }
+
+    const list = data[target] as any[];
+    let found = false;
+
+    for (let i = 0; i < list.length; i++) {
+      const entry = list[i];
+      if (Array.isArray(entry) && entry[0] === itemId) {
+        entry[1] = (typeof entry[1] === 'number' ? entry[1] : 0) + quantity;
+        found = true;
+        break;
+      } else if (entry && typeof entry === 'object' && (entry.id === itemId || entry.itemId === itemId)) {
+        entry.quantity = (typeof entry.quantity === 'number' ? entry.quantity : (entry.amount || 0)) + quantity;
+        found = true;
+        break;
+      }
+    }
+
+    if (!found) {
+      list.push([itemId, quantity]);
+    }
+
+    data[target] = list;
+    this.cachedData = data;
+    return this.save();
+  }
+
+  /**
+   * Purchase item: validates coin balance, deducts coins, and deposits item into target inventory.
+   */
+  public purchaseItem(
+    target: InventoryTarget,
+    itemId: string,
+    quantity = 1,
+    costPerUnit = 0
+  ): { success: boolean; error?: string; remainingCoins: number } {
+    const totalCost = Math.max(0, costPerUnit * quantity);
+    const currentCoins = this.getCoins();
+
+    if (currentCoins < totalCost) {
+      return {
+        success: false,
+        error: `Insufficient coins. Need ${totalCost}, have ${currentCoins}.`,
+        remainingCoins: currentCoins,
+      };
+    }
+
+    if (totalCost > 0) {
+      this.modifyCoins(-totalCost);
+    }
+
+    this.addItem(target, itemId, quantity);
+
+    return {
+      success: true,
+      remainingCoins: this.getCoins(),
+    };
   }
 
   /**

@@ -8,6 +8,54 @@
         "joy": 0.35,
         "trust": 0.25
       },
+      "id": "stm_1787162272444_xyrap",
+      "timestamp": 1787162272444,
+      "formattedText": "default"
+    },
+    {
+      "type": "productive_milestone",
+      "domain": "github.com",
+      "details": "You're locked in! Keep up the good work on github. I gave you a reward!",
+      "emotionDelta": {
+        "joy": 0.35,
+        "trust": 0.25
+      },
+      "id": "stm_1787162262348_8tgob",
+      "timestamp": 1787162262348,
+      "formattedText": "default"
+    },
+    {
+      "type": "productive_milestone",
+      "domain": "github.com",
+      "details": "You're locked in! Keep up the good work on github. I gave you a reward!",
+      "emotionDelta": {
+        "joy": 0.35,
+        "trust": 0.25
+      },
+      "id": "stm_1787162251257_db0dt",
+      "timestamp": 1787162251257,
+      "formattedText": "default"
+    },
+    {
+      "type": "productive_milestone",
+      "domain": "github.com",
+      "details": "Great job! You've been productive on github for 4m! Here are 50 coins!",
+      "emotionDelta": {
+        "joy": 0.35,
+        "trust": 0.25
+      },
+      "id": "stm_1787159185349_z1nar",
+      "timestamp": 1787159185349,
+      "formattedText": "default"
+    },
+    {
+      "type": "productive_milestone",
+      "domain": "github.com",
+      "details": "You're locked in! Keep up the good work on github. I gave you a reward!",
+      "emotionDelta": {
+        "joy": 0.35,
+        "trust": 0.25
+      },
       "id": "stm_1787154879959_kms7l",
       "timestamp": 1787154879959,
       "formattedText": "default"
@@ -659,73 +707,19 @@
       "id": "stm_1786878753973_sjnnj",
       "timestamp": 1786878753973,
       "formattedText": "default"
-    },
-    {
-      "type": "site_blocked_visit",
-      "domain": "facebook.com",
-      "details": "Stop trying to open facebook! Access is restricted until you pass my challenge.",
-      "emotionDelta": {
-        "anger": 0.35,
-        "sadness": 0.25,
-        "joy": -0.25,
-        "trust": -0.23
-      },
-      "id": "stm_1786878734545_imq0s",
-      "timestamp": 1786878734545,
-      "formattedText": "default"
-    },
-    {
-      "type": "productive_milestone",
-      "domain": "github.com",
-      "details": "You're locked in! Keep up the good work on github. I gave you a reward!",
-      "emotionDelta": {
-        "joy": 0.35,
-        "trust": 0.25
-      },
-      "id": "stm_1786878307215_xjg7v",
-      "timestamp": 1786878307215,
-      "formattedText": "default"
-    },
-    {
-      "type": "site_blocked_visit",
-      "domain": "facebook.com",
-      "details": "Hey! facebook is completely blocked. Complete my puzzle to unblock it!",
-      "emotionDelta": {
-        "anger": 0.35,
-        "sadness": 0.25,
-        "joy": -0.25,
-        "trust": -0.23
-      },
-      "id": "stm_1786878276844_jnz7f",
-      "timestamp": 1786878276844,
-      "formattedText": "default"
-    },
-    {
-      "type": "site_blocked_visit",
-      "domain": "facebook.com",
-      "details": "Hey! facebook is completely blocked. Complete my puzzle to unblock it!",
-      "emotionDelta": {
-        "anger": 0.35,
-        "sadness": 0.25,
-        "joy": -0.25,
-        "trust": -0.23
-      },
-      "id": "stm_1786877824980_nqdlh",
-      "timestamp": 1786877824980,
-      "formattedText": "default"
     }
   ],
   "recentSpeechPhrases": [
+    "You're locked in! Keep up the good work on github. I gave you a reward!",
+    "You're locked in! Keep up the good work on github. I gave you a reward!",
+    "You're locked in! Keep up the good work on github. I gave you a reward!",
+    "Great job! You've been productive on github for 4m! Here are 50 coins!",
     "You're locked in! Keep up the good work on github. I gave you a reward!",
     "Great job! You've been productive on github for 4m! Here are 50 coins!",
     "You're locked in! Keep up the good work on github. I gave you a reward!",
     "Great job! You've been productive on github for 3m! Here are 50 coins!",
     "Great job! You've been productive on github for 3m! Here are 50 coins!",
-    "You're locked in! Keep up the good work on github. I gave you a reward!",
-    "Not bad.",
-    "Ooh... That's good",
-    "Not bad.",
-    "You completed the puzzle so I unlocked youtube... but I'm still mad you visited it!"
+    "You're locked in! Keep up the good work on github. I gave you a reward!"
   ],
   "activeWarnings": [],
   "currentActiveDomain": "github.com",

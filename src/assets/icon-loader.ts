@@ -9,8 +9,8 @@ import UNBLOCK_ICON from './icons/unblock.png';
 import HOURGLASS_ICON from './icons/hourglass.png';
 import LIGHTNING_ICON from './icons/lightning.png';
 import CARDBG_ICON from './icons/cardbg.png';
-import COIN_ICON from './icons/coin.png'
-
+import COIN_ICON from './icons/coin.png';
+import CHEST_ICON from './icons/chest.png';
 
 /**
  * Registry of all known/drawn icons.
@@ -36,6 +36,9 @@ export const REGISTERED_ICONS: Record<string, string> = {
   lightning: LIGHTNING_ICON,
   quick_pass: LIGHTNING_ICON,
   quickpass: LIGHTNING_ICON,
+  storage: CHEST_ICON,
+  chest: CHEST_ICON,
+  store: COIN_ICON,
   cardbg: CARDBG_ICON,
   matching: CARDBG_ICON,
 };
@@ -117,8 +120,8 @@ export async function preloadAllRegisteredIcons(): Promise<HTMLImageElement[]> {
 
 export function renderIconHtml(
   iconOrId?: string,
-  className: string = 'menu-icon-img',
-  altText: string = 'icon'
+  className = 'menu-icon-img',
+  altText = 'icon'
 ): string {
   if (!iconOrId) return '';
   const src = getIconSrc(iconOrId);

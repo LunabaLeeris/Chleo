@@ -10,6 +10,7 @@ import { DebugPanel } from './DebugPanel';
 import { MonitoringPanel } from './MonitoringPanel';
 import { PuzzlesPanel } from './PuzzlesPanel';
 import { RewardPanel } from './RewardPanel'; // <-- [DEV PREVIEW: delete when done]
+import { Store } from './Store';
 
 export interface PanelHostProps {
   activeOptionId: string | null;
@@ -55,6 +56,15 @@ export const PanelHost: React.FC<PanelHostProps> = ({
       return <MonitoringPanel onClose={onClose} />;
     case 'marketplace':
       return <MarketplacePanel onClose={onClose} />;
+    case 'store':
+      return (
+        <Store
+          onClose={onClose}
+          onPurchase={(itemId, amount, target) => {
+            console.log(`[Store Purchase] Item: ${itemId}, Amount: ${amount}, Target: ${target}`);
+          }}
+        />
+      );
     case 'config':
       return <ConfigPanel onClose={onClose} />;
     case 'debug':

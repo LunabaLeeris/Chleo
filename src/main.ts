@@ -1,7 +1,7 @@
 import { app, BrowserWindow, screen } from 'electron';
 import path from 'node:path';
 import started from 'electron-squirrel-startup';
-import type { InteractiveRects, ChleoResponsePayload } from './types/ipc';
+import type { InteractiveRects, ChleoResponsePayload, InventoryTarget } from './types/ipc';
 
 import { mainStorageAdapter, getUserDataDir, getConfigDir } from './main/storage';
 import { registerIpcHandlers } from './main/ipc';
@@ -91,12 +91,22 @@ userItemsStore.onCoinsChange((newCoins, previousCoins) => {
   }
 });
 
-// Export convenience functions for main process / modules
 export const getCoins = (): number => userItemsStore.getCoins();
 export const setCoins = (amount: number): number => userItemsStore.setCoins(amount);
 export const modifyCoins = (delta: number): number => userItemsStore.modifyCoins(delta);
 export const getUserItems = () => userItemsStore.getUserItems();
 export const saveUserItems = (data: any): boolean => userItemsStore.save(data);
+export const purchaseItem = (
+  target: InventoryTarget,
+  itemId: string,
+  amount = 1,
+  costPerUnit = 0
+) => userItemsStore.purchaseItem(target, itemId, amount, costPerUnit);
+export const addUserItem = (
+  target: InventoryTarget,
+  itemId: string,
+  quantity = 1
+) => userItemsStore.addItem(target, itemId, quantity);
 export { userItemsStore };
 
 const llmService = new LLMService();

@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import type { PuzzleRewardItem } from '../../monitoring/behavioral-engine';
 import { getIconSrc } from '../../assets/icon-loader';
+import { resolveRewardItem } from '../../items/items-registry';
 
 export interface RewardPanelProps {
   rewards: PuzzleRewardItem[];
@@ -11,6 +12,21 @@ export interface RewardPanelProps {
   onUrge?: () => void;
   onClose?: () => void;
 }
+
+const DEFAULT_FALLBACK_REWARDS: Partial<PuzzleRewardItem>[] = [
+  {
+    id: 'unblock_site',
+    description: 'Restore access for today. Gives huge penalty on emotions.',
+  },
+  {
+    id: 'avoid_30m',
+    description: 'Grant 30 minutes access. Gives some penalty on emotions.',
+  },
+  {
+    id: 'avoid_1m',
+    description: 'Grant 1 minute access. Gives little penalty on emotions.',
+  },
+];
 
 export const RewardPanel: React.FC<RewardPanelProps> = ({
   rewards,
@@ -26,35 +42,9 @@ export const RewardPanel: React.FC<RewardPanelProps> = ({
   const urgedRef = useRef<boolean>(false);
   const selectHandledRef = useRef<boolean>(false);
 
-  // Normalize fallback rewards if array is empty
-  const activeRewards: PuzzleRewardItem[] =
-    rewards && rewards.length > 0
-      ? rewards
-      : [
-        {
-          id: 'unblock_site',
-          title: 'Unblock',
-          description: 'Restore access for today. Gives huge panalty on emotions.',
-          icon: 'unblock',
-          status: 'unblock',
-        },
-        {
-          id: 'avoid_30m',
-          title: 'Avoid',
-          description: 'Grant 30 minutes access. Gives some panalty on emotions.',
-          icon: 'hourglass',
-          status: 'avoid',
-          duration: 30,
-        },
-        {
-          id: 'avoid_15m',
-          title: 'Blitz',
-          description: 'Grant 5 minutes access. Gives little penalty on emotions.',
-          icon: 'lightning',
-          status: 'avoid',
-          duration: 5,
-        },
-      ];
+  // Normalize rewards using ItemsRegistry
+  const rawList = rewards && rewards.length > 0 ? rewards : DEFAULT_FALLBACK_REWARDS;
+  const activeRewards: PuzzleRewardItem[] = rawList.map((r, idx) => resolveRewardItem(r, idx));
 
   // Auto-countdown timer
   useEffect(() => {

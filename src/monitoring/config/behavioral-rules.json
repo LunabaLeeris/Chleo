@@ -27,26 +27,15 @@
           "onSuccess": [
             {
               "id": "unblock_site",
-              "title": "Unblock",
-              "description": "Restore access for today. Gives huge panalty on emotions.",
-              "icon": "unblock",
-              "status": "unblock"
+              "description": "Restore access for today. Gives huge panalty on emotions."
             },
             {
               "id": "avoid_30m",
-              "title": "Avoid",
-              "description": "Grant 30 minutes access. Gives some panalty on emotions.",
-              "icon": "hourglass",
-              "status": "avoid",
-              "duration": 30
+              "description": "Grant 30 minutes access. Gives some panalty on emotions."
             },
             {
-              "id": "avoid_15m",
-              "title": "Blitz",
-              "description": "Grant 5 minutes access. Gives little penalty on emotions.",
-              "icon": "lightning",
-              "status": "avoid",
-              "duration": 5
+              "id": "avoid_1m",
+              "description": "Grant 1 minute access. Gives little penalty on emotions."
             }
           ],
           "draggable": false,
@@ -114,26 +103,15 @@
           "onSuccess": [
             {
               "id": "unblock_site",
-              "title": "Unblock",
-              "description": "Restore access for today. Gives huge panalty on emotions.",
-              "icon": "unblock",
-              "status": "unblock"
+              "description": "Restore access for today. Gives huge panalty on emotions."
             },
             {
               "id": "avoid_30m",
-              "title": "Avoid",
-              "description": "Grant 30 minutes access. Gives some panalty on emotions.",
-              "icon": "hourglass",
-              "status": "avoid",
-              "duration": 30
+              "description": "Grant 30 minutes access. Gives some panalty on emotions."
             },
             {
-              "id": "avoid_15m",
-              "title": "Blitz",
-              "description": "Grant 5 minutes access. Gives little penalty on emotions.",
-              "icon": "lightning",
-              "status": "avoid",
-              "duration": 5
+              "id": "avoid_1m",
+              "description": "Grant 1 minute access. Gives little penalty on emotions."
             }
           ],
           "draggable": false,
