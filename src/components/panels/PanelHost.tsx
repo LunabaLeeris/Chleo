@@ -57,14 +57,7 @@ export const PanelHost: React.FC<PanelHostProps> = ({
     case 'marketplace':
       return <MarketplacePanel onClose={onClose} />;
     case 'store':
-      return (
-        <Store
-          onClose={onClose}
-          onPurchase={(itemId, amount, target) => {
-            console.log(`[Store Purchase] Item: ${itemId}, Amount: ${amount}, Target: ${target}`);
-          }}
-        />
-      );
+      return <Store onClose={onClose} />;
     case 'config':
       return <ConfigPanel onClose={onClose} />;
     case 'debug':

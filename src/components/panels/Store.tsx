@@ -4,23 +4,33 @@ import { PanelProps } from './CalendarPanel';
 import { getItemsConfig, ItemConfigEntry, ItemsConfig } from '../../items/items-registry';
 import { getIconSrc } from '../../assets/icon-loader';
 import { InventoryTarget } from '../../types/ipc';
+import { Particle, ParticlePosition } from '../Particle';
 
 export type StoreTab = 'items' | 'groceries' | 'clothing';
 
-export interface StoreProps extends PanelProps {
-  onPurchase?: (itemId: string, amount: number, target: InventoryTarget) => void;
-}
+export interface StoreProps extends PanelProps { }
 
 export interface StoreItemEntry extends ItemConfigEntry {
   id: string;
 }
 
-export const Store: React.FC<StoreProps> = ({ onClose, onPurchase }) => {
+export interface ActiveParticleData {
+  id: string;
+  icon?: string;
+  emoji?: string;
+  title?: string;
+  startPos: ParticlePosition;
+  endPos: ParticlePosition;
+  delayMs?: number;
+}
+
+export const Store: React.FC<StoreProps> = ({ onClose }) => {
   const [activeTab, setActiveTab] = useState<StoreTab>('items');
   const [config, setConfig] = useState<ItemsConfig>(getItemsConfig());
   const [selectedItem, setSelectedItem] = useState<StoreItemEntry | null>(null);
   const [purchaseAmount, setPurchaseAmount] = useState<number>(1);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
+  const [particles, setParticles] = useState<ActiveParticleData[]>([]);
 
   // Fetch initial item config
   useEffect(() => {
@@ -55,6 +65,90 @@ export const Store: React.FC<StoreProps> = ({ onClose, onPurchase }) => {
     setErrorMessage(null);
   };
 
+  const spawnParticleEffect = (item: StoreItemEntry, target: InventoryTarget, amount: number = 1) => {
+    // Starting position: center of the Store panel
+    const storeEl = document.querySelector('.store-panel-card');
+    let startX = window.innerWidth / 2;
+    let startY = window.innerHeight / 2;
+
+    if (storeEl) {
+      const rect = storeEl.getBoundingClientRect();
+      startX = rect.left + rect.width / 2;
+      startY = rect.top + rect.height / 2;
+    }
+
+    // Ending position: storage menu bar item (or target specific button if available)
+    const targetBtn =
+      document.querySelector(`.menu-item-btn[data-id="${target}"]`) ||
+      document.querySelector('.menu-item-btn[data-id="storage"]');
+
+    const menuListEl =
+      document.querySelector('.menu-bar-list') ||
+      document.querySelector('.menu-bar-panel') ||
+      document.querySelector('#menu-bar');
+
+    let endX = startX + 220;
+    let endY = startY;
+
+    if (menuListEl) {
+      const menuRect = menuListEl.getBoundingClientRect();
+      const marginY = 18; // Half-height of menu item button
+      const minY = menuRect.top + marginY;
+      const maxY = menuRect.bottom - marginY;
+
+      if (targetBtn) {
+        const btnRect = targetBtn.getBoundingClientRect();
+        endX = btnRect.left + btnRect.width / 2;
+        endY = btnRect.top + btnRect.height / 2;
+      } else {
+        endX = menuRect.left + menuRect.width / 2;
+        endY = menuRect.top + menuRect.height / 2;
+      }
+
+      // Clamp vertical position so it never despawns outside the top or bottom of the menu bar
+      if (endY < minY) {
+        endY = minY;
+      } else if (endY > maxY) {
+        endY = maxY;
+      }
+
+      // Ensure horizontal position stays centered inside the menu bar
+      const minX = menuRect.left + 16;
+      const maxX = menuRect.right - 16;
+      if (endX < minX) endX = minX;
+      if (endX > maxX) endX = maxX;
+    } else if (targetBtn) {
+      const rect = targetBtn.getBoundingClientRect();
+      endX = rect.left + rect.width / 2;
+      endY = rect.top + rect.height / 2;
+    }
+
+    // Spawn 1 particle per item bought (capped at a max of 12 for smooth rendering on large bulk buys)
+    const particleCount = Math.min(Math.max(1, amount), 12);
+    const newParticles: ActiveParticleData[] = [];
+
+    for (let i = 0; i < particleCount; i++) {
+      // Subtle spread so particles don't completely overlap
+      const jitterX = particleCount > 1 ? (Math.random() - 0.5) * 24 : 0;
+      const jitterY = particleCount > 1 ? (Math.random() - 0.5) * 24 : 0;
+
+      newParticles.push({
+        id: `particle-${item.id}-${Date.now()}-${i}-${Math.random().toString(36).slice(2, 7)}`,
+        icon: item.icon,
+        title: item.title,
+        startPos: { x: startX + jitterX, y: startY + jitterY },
+        endPos: { x: endX, y: endY },
+        delayMs: i * 85, // Stagger particle launch
+      });
+    }
+
+    setParticles((prev) => [...prev, ...newParticles]);
+  };
+
+  const handleParticleComplete = (particleId: string) => {
+    setParticles((prev) => prev.filter((p) => p.id !== particleId));
+  };
+
   const handleConfirmPurchase = async () => {
     if (!selectedItem) return;
 
@@ -66,6 +160,8 @@ export const Store: React.FC<StoreProps> = ({ onClose, onPurchase }) => {
       target = 'closet';
     }
 
+    const itemToAnimate = selectedItem;
+    const countToSpawn = purchaseAmount;
     const costPerUnit = typeof selectedItem.cost === 'number' ? selectedItem.cost : 0;
 
     try {
@@ -83,9 +179,8 @@ export const Store: React.FC<StoreProps> = ({ onClose, onPurchase }) => {
         }
       }
 
-      if (onPurchase) {
-        onPurchase(selectedItem.id, purchaseAmount, target);
-      }
+      // Trigger particle animation effect matching quantity purchased
+      spawnParticleEffect(itemToAnimate, target, countToSpawn);
 
       setSelectedItem(null);
       setPurchaseAmount(1);
@@ -286,6 +381,21 @@ export const Store: React.FC<StoreProps> = ({ onClose, onPurchase }) => {
           </div>
         </div>
       )}
+
+      {/* Render active purchase animation particles */}
+      {particles.map((particle) => (
+        <Particle
+          key={particle.id}
+          id={particle.id}
+          icon={particle.icon}
+          emoji={particle.emoji}
+          title={particle.title}
+          startPos={particle.startPos}
+          endPos={particle.endPos}
+          delayMs={particle.delayMs}
+          onComplete={handleParticleComplete}
+        />
+      ))}
     </PanelContainer>
   );
 };

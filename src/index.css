@@ -3704,3 +3704,102 @@ body {
   background: #16a34a;
   transform: translateY(-1px);
 }
+
+/* ==========================================================================
+   Store Purchase Particle Animation
+   ========================================================================== */
+
+.cleo-particle-item {
+  position: fixed;
+  top: 0;
+  left: 0;
+  z-index: 99999;
+  pointer-events: none;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 52px;
+  height: 52px;
+  animation-name: cleo-particle-flight;
+  animation-timing-function: cubic-bezier(0.25, 1, 0.5, 1);
+  animation-fill-mode: both;
+  will-change: transform, opacity;
+}
+
+.cleo-particle-badge {
+  position: relative;
+  z-index: 2;
+  width: 48px;
+  height: 48px;
+  background: var(--bg-card, #ffffff);
+  border: 2px solid var(--border-pixel, #1f2937);
+  border-radius: 10px;
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.25), 2px 2px 0px var(--border-pixel, #1f2937);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-sizing: border-box;
+}
+
+.cleo-particle-icon-img {
+  width: 32px;
+  height: 32px;
+  object-fit: contain;
+  image-rendering: pixelated;
+}
+
+.cleo-particle-emoji {
+  font-size: 1.6rem;
+  line-height: 1;
+}
+
+.cleo-particle-glow {
+  position: absolute;
+  top: -6px;
+  left: -6px;
+  right: -6px;
+  bottom: -6px;
+  border-radius: 14px;
+  background: radial-gradient(circle, rgba(251, 191, 36, 0.45) 0%, rgba(251, 191, 36, 0) 75%);
+  z-index: 1;
+  pointer-events: none;
+}
+
+@keyframes cleo-particle-flight {
+  0% {
+    transform: translate3d(var(--particle-start-x), var(--particle-start-y), 0) translate(-50%, -50%) scale(0.2);
+    opacity: 0;
+  }
+
+  18% {
+    transform: translate3d(var(--particle-start-x), var(--particle-start-y), 0) translate(-50%, -50%) scale(1.28);
+    opacity: 1;
+  }
+
+  26% {
+    transform: translate3d(var(--particle-start-x), var(--particle-start-y), 0) translate(-50%, -50%) scale(1.0);
+    opacity: 1;
+  }
+
+  /* Stop duration: hold in the middle of the store panel so the user can clearly see the item */
+  55% {
+    transform: translate3d(var(--particle-start-x), var(--particle-start-y), 0) translate(-50%, -50%) scale(1.0);
+    opacity: 1;
+  }
+
+  60% {
+    transform: translate3d(var(--particle-start-x), var(--particle-start-y), 0) translate(-50%, -50%) scale(1.08);
+    opacity: 1;
+  }
+
+  /* Ease out and fly towards destination, shrinking down into storage slot */
+  92% {
+    transform: translate3d(var(--particle-end-x), var(--particle-end-y), 0) translate(-50%, -50%) scale(0.32);
+    opacity: 0.9;
+  }
+
+  100% {
+    transform: translate3d(var(--particle-end-x), var(--particle-end-y), 0) translate(-50%, -50%) scale(0.12);
+    opacity: 0;
+  }
+}
