@@ -4,7 +4,7 @@ import { PanelProps } from './CalendarPanel';
 import { getItemsConfig, ItemConfigEntry, ItemsConfig } from '../../items/items-registry';
 import { getIconSrc } from '../../assets/icon-loader';
 import { InventoryTarget } from '../../types/ipc';
-import { Particle, ParticlePosition } from '../Particle';
+import { Particle, ParticlePosition } from '../effects/Particle';
 
 export type StoreTab = 'items' | 'groceries' | 'clothing';
 
