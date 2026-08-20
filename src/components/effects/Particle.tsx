@@ -1,6 +1,6 @@
 import React from 'react';
 import { createPortal } from 'react-dom';
-import { getIconSrc } from '../assets/icon-loader';
+import { getIconSrc } from '../../assets/icon-loader';
 
 export interface ParticlePosition {
   x: number;

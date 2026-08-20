@@ -33,9 +33,6 @@ export type ChleoExpression =
   | 'happy'
   | 'question';
 
-/** Alias for backward compatibility during CHLEO rebranding. */
-export type ChleoExpression = ChleoExpression;
-
 /**
  * Animation definition for an individual avatar part.
  * Sprite sheet uses horizontal strip image format or an array of src
