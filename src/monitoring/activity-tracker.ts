@@ -1,6 +1,6 @@
-import { RuleStore } from './rule-store';
-import { ShortTermMemory } from '../memory/short-term-memory';
-import type { TickResult } from './monitoring-types';
+import { RuleStore } from "./rule-store";
+import { ShortTermMemory } from "../memory/short-term-memory";
+import type { TickResult } from "./monitoring-types";
 
 export interface ActivityTrackerListeners {
   onTick?: (activeDomain: string, spentTodaySeconds: number) => void;
@@ -16,13 +16,13 @@ export class ActivityTracker {
   private listeners: ActivityTrackerListeners;
 
   private tickerInterval: number | null = null;
-  private activeDomain: string = 'localhost';
+  private activeDomain: string = "localhost";
   private lastCheckedDate: string = new Date().toDateString();
 
   constructor(
     ruleStore: RuleStore,
     shortTermMemory: ShortTermMemory,
-    listeners: ActivityTrackerListeners = {}
+    listeners: ActivityTrackerListeners = {},
   ) {
     this.ruleStore = ruleStore;
     this.shortTermMemory = shortTermMemory;
@@ -55,10 +55,10 @@ export class ActivityTracker {
   setActiveDomain(url: string): string {
     let domain = url;
     try {
-      if (url.startsWith('http://') || url.startsWith('https://')) {
+      if (url.startsWith("http://") || url.startsWith("https://")) {
         domain = new URL(url).hostname;
       }
-    } catch (_) { }
+    } catch (_) {}
 
     this.activeDomain = domain;
     this.shortTermMemory.setActiveDomain(domain);
@@ -80,14 +80,14 @@ export class ActivityTracker {
     const currentDate = new Date().toDateString();
     if (currentDate !== this.lastCheckedDate) {
       this.lastCheckedDate = currentDate;
-      this.shortTermMemory.consolidateToLongTermMemory('day_change');
+      this.shortTermMemory.consolidateToLongTermMemory("day_change");
     }
 
     const result: TickResult = await this.ruleStore.evaluateTick(
       this.activeDomain,
       1,
       (d) => this.shortTermMemory.isWarningActive(d),
-      (d, p) => this.shortTermMemory.setWarning(d, p)
+      (d, p) => this.shortTermMemory.setWarning(d, p),
     );
 
     if (this.listeners.onTick) {

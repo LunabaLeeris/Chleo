@@ -1,7 +1,7 @@
-import React from 'react';
+import React from "react";
 
 export interface BadgeProps {
-  variant?: 'dev-locked' | 'status' | 'count' | 'pill' | 'nav';
+  variant?: "dev-locked" | "status" | "count" | "pill" | "nav";
   icon?: React.ReactNode;
   children: React.ReactNode;
   className?: string;
@@ -10,26 +10,26 @@ export interface BadgeProps {
 
 // Renders styled status badges and tag labels.
 export const Badge: React.FC<BadgeProps> = ({
-  variant = 'pill',
+  variant = "pill",
   icon,
   children,
-  className = '',
+  className = "",
   id,
 }) => {
   const getBadgeClass = (): string => {
     switch (variant) {
-      case 'dev-locked':
-        return 'badge-dev-locked';
-      case 'status':
-        return 'badge-status';
-      case 'count':
-        return 'badge-count';
-      case 'pill':
-        return 'status-pill';
-      case 'nav':
-        return 'nav-badge';
+      case "dev-locked":
+        return "badge-dev-locked";
+      case "status":
+        return "badge-status";
+      case "count":
+        return "badge-count";
+      case "pill":
+        return "status-pill";
+      case "nav":
+        return "nav-badge";
       default:
-        return '';
+        return "";
     }
   };
 

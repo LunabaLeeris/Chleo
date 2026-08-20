@@ -1,10 +1,17 @@
-import React from 'react';
+import React from "react";
 
 export interface PanelSectionProps {
   id?: string;
   title?: string;
   icon?: React.ReactNode;
-  bgVariant?: 'actions' | 'speech' | 'mapped' | 'activity' | 'tuning' | 'marketplace' | 'discussions';
+  bgVariant?:
+    | "actions"
+    | "speech"
+    | "mapped"
+    | "activity"
+    | "tuning"
+    | "marketplace"
+    | "discussions";
   extraHeader?: React.ReactNode;
   children: React.ReactNode;
   className?: string;
@@ -16,10 +23,10 @@ export const PanelSection: React.FC<PanelSectionProps> = ({
   id,
   title,
   icon,
-  bgVariant = 'actions',
+  bgVariant = "actions",
   extraHeader,
   children,
-  className = '',
+  className = "",
   style,
 }) => {
   const bgClass = `panel-bg-${bgVariant}`;

@@ -1,6 +1,6 @@
-import type { PrimaryEmotion } from '../avatar/emotions/emotion-types';
+import type { PrimaryEmotion } from "../avatar/emotions/emotion-types";
 
-export type SiteType = 'blocked' | 'avoid' | 'productive' | 'neutral';
+export type SiteType = "blocked" | "avoid" | "productive" | "neutral";
 
 export interface SiteRule {
   domain: string;

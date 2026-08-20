@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState } from "react";
 
 interface ContentToggleProps {
   title: string;
@@ -18,11 +18,11 @@ export const ContentToggle: React.FC<ContentToggleProps> = ({
   const [isOpen, setIsOpen] = useState(defaultOpen);
 
   return (
-    <div className={`cb-toggle ${isOpen ? 'cb-toggle--open' : ''}`}>
+    <div className={`cb-toggle ${isOpen ? "cb-toggle--open" : ""}`}>
       <button
         type="button"
         className="cb-toggle__header"
-        onClick={() => setIsOpen(prev => !prev)}
+        onClick={() => setIsOpen((prev) => !prev)}
         aria-expanded={isOpen}
       >
         <span className="cb-toggle__arrow">▶</span>

@@ -1,14 +1,14 @@
-import React from 'react';
-import { Header } from '../components/Header';
-import { Footer } from '../components/Footer';
-import ICON_MOUTH from '../../assets/mouth.png';
+import React from "react";
+import { Header } from "../components/Header";
+import { Footer } from "../components/Footer";
+import ICON_MOUTH from "../../assets/mouth.png";
 
-import SpeechFeatureContent from '../content-pages/SpeechFeatureContent'
+import SpeechFeatureContent from "../content-pages/SpeechFeatureContent";
 import {
   ContentHeader,
   ContentCallout,
   ContentDivider,
-} from '../components/content-blocks';
+} from "../components/content-blocks";
 
 interface FeatureDetailPageProps {
   featureId: string;
@@ -43,7 +43,7 @@ export const FeatureDetailPage: React.FC<FeatureDetailPageProps> = ({
 
         {/* Feature detail content area */}
         <div className="feature-detail-page panel-section panel-bg-discussions">
-          {featureId === 'speech' ? (
+          {featureId === "speech" ? (
             <SpeechFeatureContent icon={featureIcon} />
           ) : (
             <ComingSoonContent title={featureTitle} icon={featureIcon} />
@@ -76,8 +76,8 @@ const ComingSoonContent: React.FC<{ title: string; icon: string }> = ({
     <ContentDivider />
 
     <ContentCallout variant="note">
-      The detailed breakdown for <strong>{title}</strong> is coming soon.
-      Check back later for a full explanation of how this module works!
+      The detailed breakdown for <strong>{title}</strong> is coming soon. Check
+      back later for a full explanation of how this module works!
     </ContentCallout>
   </div>
 );

@@ -1,4 +1,4 @@
-import React from 'react';
+import React from "react";
 
 export interface SelectOption {
   value: string;
@@ -22,7 +22,7 @@ export const Select: React.FC<SelectProps> = ({
   value,
   options,
   onChange,
-  className = '',
+  className = "",
   style,
 }) => {
   return (
@@ -31,11 +31,11 @@ export const Select: React.FC<SelectProps> = ({
         <label
           htmlFor={id}
           style={{
-            fontSize: '12px',
+            fontSize: "12px",
             fontWeight: 600,
-            color: '#cbd5e1',
-            marginBottom: '4px',
-            display: 'block',
+            color: "#cbd5e1",
+            marginBottom: "4px",
+            display: "block",
           }}
         >
           {label}
@@ -44,7 +44,12 @@ export const Select: React.FC<SelectProps> = ({
       <select
         id={id}
         className={`text-input ${className}`.trim()}
-        style={{ padding: '6px 10px', cursor: 'pointer', width: '100%', ...style }}
+        style={{
+          padding: "6px 10px",
+          cursor: "pointer",
+          width: "100%",
+          ...style,
+        }}
         value={value}
         onChange={(e) => onChange(e.target.value)}
       >

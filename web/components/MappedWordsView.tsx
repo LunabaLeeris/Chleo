@@ -1,6 +1,6 @@
-import React, { useMemo, useState } from 'react';
-import { WORD_FRAME_MAP } from '../../src/avatar';
-import { PanelSection, TextInput, Button, Badge } from './ui';
+import React, { useMemo, useState } from "react";
+import { WORD_FRAME_MAP } from "../../src/avatar";
+import { PanelSection, TextInput, Button, Badge } from "./ui";
 
 interface MappedWordsViewProps {
   onSelectWord: (word: string) => void;
@@ -12,7 +12,7 @@ export const MappedWordsView: React.FC<MappedWordsViewProps> = ({
   onSelectWord,
   onBack,
 }) => {
-  const [filterQuery, setFilterQuery] = useState<string>('');
+  const [filterQuery, setFilterQuery] = useState<string>("");
 
   const allWords = useMemo(() => {
     return Object.keys(WORD_FRAME_MAP).sort();
@@ -28,17 +28,16 @@ export const MappedWordsView: React.FC<MappedWordsViewProps> = ({
     <PanelSection
       id="section-mapped-words"
       bgVariant="mapped"
-      style={{ display: 'flex' }}
+      style={{ display: "flex" }}
     >
       <div className="mapped-words-top">
         <h2 className="section-title">
-          Mapped Words <Badge variant="count" id="mapped-words-count">({filteredWords.length})</Badge>
+          Mapped Words{" "}
+          <Badge variant="count" id="mapped-words-count">
+            ({filteredWords.length})
+          </Badge>
         </h2>
-        <Button
-          id="btn-back-mapped"
-          variant="back"
-          onClick={onBack}
-        >
+        <Button id="btn-back-mapped" variant="back" onClick={onBack}>
           Back
         </Button>
       </div>

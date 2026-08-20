@@ -51,5 +51,13 @@
     "react": "^19.2.8",
     "react-dom": "^19.2.8",
     "ws": "^8.21.1"
+  },
+  "overrides": {
+    "@electron/rebuild": "4.2.0",
+    "extract-zip": "npm:@electron-internal/extract-zip@1.0.5",
+    "tmp": "0.2.7"
+  },
+  "allowScripts": {
+    "electron-winstaller": false
   }
 }

@@ -1,16 +1,16 @@
-import React from 'react';
+import React from "react";
 
 interface ContentCalloutProps {
   children: React.ReactNode;
   icon?: React.ReactNode;
-  variant?: 'info' | 'tip' | 'warning' | 'note';
+  variant?: "info" | "tip" | "warning" | "note";
 }
 
 const CALLOUT_ICONS: Record<string, string> = {
-  info: '☝️',
-  tip: '💡',
-  warning: '⚠️',
-  note: '📝',
+  info: "☝️",
+  tip: "💡",
+  warning: "⚠️",
+  note: "📝",
 };
 
 /**
@@ -20,7 +20,7 @@ const CALLOUT_ICONS: Record<string, string> = {
 export const ContentCallout: React.FC<ContentCalloutProps> = ({
   children,
   icon,
-  variant = 'info',
+  variant = "info",
 }) => {
   const fallbackIcon = CALLOUT_ICONS[variant];
 

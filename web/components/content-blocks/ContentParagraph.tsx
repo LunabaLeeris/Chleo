@@ -1,8 +1,8 @@
-import React from 'react';
+import React from "react";
 
 interface ContentParagraphProps {
   children: React.ReactNode;
-  variant?: 'default' | 'lead' | 'muted';
+  variant?: "default" | "lead" | "muted";
 }
 
 /**
@@ -10,7 +10,7 @@ interface ContentParagraphProps {
  */
 export const ContentParagraph: React.FC<ContentParagraphProps> = ({
   children,
-  variant = 'default',
+  variant = "default",
 }) => {
   return <p className={`cb-paragraph cb-paragraph--${variant}`}>{children}</p>;
 };

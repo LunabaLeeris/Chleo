@@ -1,6 +1,10 @@
-import type { PrimaryEmotion, EmotionalState } from '../avatar/emotions/emotion-types';
+import type {
+  PrimaryEmotion,
+  EmotionalState,
+} from "../avatar/emotions/emotion-types";
 
-export type MemoryConsolidationReason = 'threshold' | 'day_change' | 'memorable_event';
+export type MemoryConsolidationReason =
+  "threshold" | "day_change" | "memorable_event";
 
 export interface ShortTermMemoryEvent {
   id: string;
@@ -34,4 +38,3 @@ export interface LongTermMemoryData {
     waketime?: string;
   };
 }
-

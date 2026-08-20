@@ -1,6 +1,10 @@
-import type { ShortTermMemoryEvent, ActiveWarningState, MemoryConsolidationReason } from './memory-types';
-import { LongTermMemory } from './long-term-memory';
-import type { PrimaryEmotion } from '../avatar/emotions/emotion-types';
+import type {
+  ShortTermMemoryEvent,
+  ActiveWarningState,
+  MemoryConsolidationReason,
+} from "./memory-types";
+import { LongTermMemory } from "./long-term-memory";
+import type { PrimaryEmotion } from "../avatar/emotions/emotion-types";
 
 export const MAX_EVENT_HISTORY = 50;
 export const MAX_RECENT_SPEECH_PHRASES = 10;
@@ -17,21 +21,21 @@ export class ShortTermMemory {
   private currentDomainStartTime: number = Date.now();
   private maxEventHistory: number = MAX_EVENT_HISTORY;
   private maxRecentSpeechPhrases: number = MAX_RECENT_SPEECH_PHRASES;
-  private storageKey: string = 'chleo_short_term_memory_v1';
+  private storageKey: string = "chleo_short_term_memory_v1";
 
   // Easy-to-modify event template string for LLM feeding
-  private eventTemplate: string = '[{time}] [{type}] {domain} - {details}';
+  private eventTemplate: string = "[{time}] [{type}] {domain} - {details}";
 
   // Configurable list of memorable event types that trigger consolidation into LongTermMemory
   private memorableEventTypes: string[] = [
-    'limit_exceeded',
-    'blocked_attempt',
-    'blocked_site_attempt',
-    'puzzle_unblock',
-    'puzzle_unblock_penalty',
-    'site_blocked',
-    'site_marked_productive',
-    'site_unmarked_productive',
+    "limit_exceeded",
+    "blocked_attempt",
+    "blocked_site_attempt",
+    "puzzle_unblock",
+    "puzzle_unblock_penalty",
+    "site_blocked",
+    "site_marked_productive",
+    "site_unmarked_productive",
   ];
 
   private longTermMemory: LongTermMemory;
@@ -88,16 +92,22 @@ export class ShortTermMemory {
       const jsonStr = JSON.stringify(payload, null, 2);
 
       // Desktop Native (Electron IPC) save check
-      if (typeof window !== 'undefined' && (window as any).electronAPI?.saveMemoryFile) {
-        (window as any).electronAPI.saveMemoryFile('short_term_memory.json', jsonStr);
+      if (
+        typeof window !== "undefined" &&
+        (window as any).electronAPI?.saveMemoryFile
+      ) {
+        (window as any).electronAPI.saveMemoryFile(
+          "short_term_memory.json",
+          jsonStr,
+        );
       }
 
       // Browser localStorage backup/fallback
-      if (typeof window !== 'undefined' && window.localStorage) {
+      if (typeof window !== "undefined" && window.localStorage) {
         window.localStorage.setItem(this.storageKey, jsonStr);
       }
     } catch (e) {
-      console.warn('[ShortTermMemory] Failed to save to storage:', e);
+      console.warn("[ShortTermMemory] Failed to save to storage:", e);
     }
   }
 
@@ -109,35 +119,43 @@ export class ShortTermMemory {
       const applyData = (raw: string) => {
         const parsed = JSON.parse(raw);
         if (Array.isArray(parsed.events)) this.events = parsed.events;
-        if (Array.isArray(parsed.recentSpeechPhrases)) this.recentSpeechPhrases = parsed.recentSpeechPhrases;
+        if (Array.isArray(parsed.recentSpeechPhrases))
+          this.recentSpeechPhrases = parsed.recentSpeechPhrases;
         if (Array.isArray(parsed.activeWarnings)) {
           this.activeWarnings = new Map(parsed.activeWarnings);
         }
-        if (parsed.currentActiveDomain) this.currentActiveDomain = parsed.currentActiveDomain;
+        if (parsed.currentActiveDomain)
+          this.currentActiveDomain = parsed.currentActiveDomain;
         if (parsed.eventTemplate) this.eventTemplate = parsed.eventTemplate;
-        if (Array.isArray(parsed.memorableEventTypes)) this.memorableEventTypes = parsed.memorableEventTypes;
+        if (Array.isArray(parsed.memorableEventTypes))
+          this.memorableEventTypes = parsed.memorableEventTypes;
       };
 
       // Desktop Native (Electron IPC) check
-      if (typeof window !== 'undefined' && (window as any).electronAPI?.readMemoryFile) {
-        (window as any).electronAPI.readMemoryFile('short_term_memory.json').then((raw: string | null) => {
-          if (raw) {
-            applyData(raw);
-          } else if (window.localStorage) {
-            const localRaw = window.localStorage.getItem(this.storageKey);
-            if (localRaw) applyData(localRaw);
-          }
-        });
+      if (
+        typeof window !== "undefined" &&
+        (window as any).electronAPI?.readMemoryFile
+      ) {
+        (window as any).electronAPI
+          .readMemoryFile("short_term_memory.json")
+          .then((raw: string | null) => {
+            if (raw) {
+              applyData(raw);
+            } else if (window.localStorage) {
+              const localRaw = window.localStorage.getItem(this.storageKey);
+              if (localRaw) applyData(localRaw);
+            }
+          });
         return;
       }
 
       // Browser localStorage fallback
-      if (typeof window !== 'undefined' && window.localStorage) {
+      if (typeof window !== "undefined" && window.localStorage) {
         const raw = window.localStorage.getItem(this.storageKey);
         if (raw) applyData(raw);
       }
     } catch (e) {
-      console.warn('[ShortTermMemory] Failed to load from storage:', e);
+      console.warn("[ShortTermMemory] Failed to load from storage:", e);
     }
   }
 
@@ -151,7 +169,7 @@ export class ShortTermMemory {
       .replace(/\{time\}/g, timeStr)
       .replace(/\{timestamp\}/g, event.timestamp.toString())
       .replace(/\{type\}/g, event.type.toUpperCase())
-      .replace(/\{domain\}/g, event.domain || 'general')
+      .replace(/\{domain\}/g, event.domain || "general")
       .replace(/\{details\}/g, event.details);
   }
 
@@ -159,7 +177,7 @@ export class ShortTermMemory {
    * Record a short-term activity event.
    */
   recordEvent(
-    event: Omit<ShortTermMemoryEvent, 'id' | 'timestamp'>
+    event: Omit<ShortTermMemoryEvent, "id" | "timestamp">,
   ): ShortTermMemoryEvent {
     const timestamp = Date.now();
     const tempEvent: ShortTermMemoryEvent = {
@@ -193,7 +211,9 @@ export class ShortTermMemory {
     const text = event.formattedText || this.formatEvent(event);
     const markedSummary = `[MEMORABLE] ${text}`;
     this.longTermMemory.ingestConsolidatedBatch([markedSummary]);
-    console.log(`[ShortTermMemory] Logged memorable event to LongTermMemory without resetting STM: ${markedSummary}`);
+    console.log(
+      `[ShortTermMemory] Logged memorable event to LongTermMemory without resetting STM: ${markedSummary}`,
+    );
   }
 
   /**
@@ -202,10 +222,14 @@ export class ShortTermMemory {
   consolidateToLongTermMemory(reason: MemoryConsolidationReason): void {
     if (this.events.length === 0) return;
 
-    const summaries = this.events.map((e) => e.formattedText || this.formatEvent(e));
+    const summaries = this.events.map(
+      (e) => e.formattedText || this.formatEvent(e),
+    );
     this.longTermMemory.ingestConsolidatedBatch(summaries);
 
-    console.log(`[ShortTermMemory] Consolidated ${summaries.length} events to LongTermMemory (Reason: ${reason})`);
+    console.log(
+      `[ShortTermMemory] Consolidated ${summaries.length} events to LongTermMemory (Reason: ${reason})`,
+    );
 
     // Reset/clear active event log after consolidation to prevent duplication
     this.events = [];
@@ -226,7 +250,7 @@ export class ShortTermMemory {
         memorableEventTypes: this.memorableEventTypes,
       },
       null,
-      2
+      2,
     );
   }
 
@@ -237,17 +261,20 @@ export class ShortTermMemory {
     try {
       const parsed = JSON.parse(jsonString);
       if (Array.isArray(parsed.events)) this.events = parsed.events;
-      if (Array.isArray(parsed.recentSpeechPhrases)) this.recentSpeechPhrases = parsed.recentSpeechPhrases;
+      if (Array.isArray(parsed.recentSpeechPhrases))
+        this.recentSpeechPhrases = parsed.recentSpeechPhrases;
       if (Array.isArray(parsed.activeWarnings)) {
         this.activeWarnings = new Map(parsed.activeWarnings);
       }
-      if (parsed.currentActiveDomain) this.currentActiveDomain = parsed.currentActiveDomain;
+      if (parsed.currentActiveDomain)
+        this.currentActiveDomain = parsed.currentActiveDomain;
       if (parsed.eventTemplate) this.eventTemplate = parsed.eventTemplate;
-      if (Array.isArray(parsed.memorableEventTypes)) this.memorableEventTypes = parsed.memorableEventTypes;
+      if (Array.isArray(parsed.memorableEventTypes))
+        this.memorableEventTypes = parsed.memorableEventTypes;
       this.save();
       return true;
     } catch (e) {
-      console.error('[ShortTermMemory] Failed to import JSON:', e);
+      console.error("[ShortTermMemory] Failed to import JSON:", e);
       return false;
     }
   }
@@ -255,12 +282,12 @@ export class ShortTermMemory {
   /**
    * Trigger browser file download of short-term memory state.
    */
-  downloadJSON(filename: string = 'short_term_memory.json'): void {
-    if (typeof window === 'undefined') return;
+  downloadJSON(filename: string = "short_term_memory.json"): void {
+    if (typeof window === "undefined") return;
     const jsonStr = this.exportJSON();
-    const blob = new Blob([jsonStr], { type: 'application/json' });
+    const blob = new Blob([jsonStr], { type: "application/json" });
     const url = URL.createObjectURL(blob);
-    const link = document.createElement('a');
+    const link = document.createElement("a");
     link.href = url;
     link.download = filename;
     document.body.appendChild(link);
@@ -286,7 +313,10 @@ export class ShortTermMemory {
   /**
    * Update active domain and return time spent on previous domain in ms.
    */
-  setActiveDomain(domain: string): { previousDomain: string | null; timeSpentMs: number } {
+  setActiveDomain(domain: string): {
+    previousDomain: string | null;
+    timeSpentMs: number;
+  } {
     const now = Date.now();
     const previousDomain = this.currentActiveDomain;
     const timeSpentMs = previousDomain ? now - this.currentDomainStartTime : 0;
@@ -348,4 +378,3 @@ export class ShortTermMemory {
     this.save();
   }
 }
-

@@ -1,5 +1,5 @@
-import React, { useEffect, useRef, useState } from 'react';
-import { inject as injectVercelAnalytics } from '@vercel/analytics';
+import React, { useEffect, useRef, useState } from "react";
+import { inject as injectVercelAnalytics } from "@vercel/analytics";
 import {
   AvatarCompositor,
   EmotionsOrchestrator,
@@ -7,45 +7,50 @@ import {
   ResponseType,
   EmotionFrameConfig,
   getAvatarEmotionFrames,
-} from '../../src/avatar';
+} from "../../src/avatar";
 
-import { Header } from '../components/Header';
-import { Footer } from '../components/Footer';
-import { AvatarStage } from '../components/AvatarStage';
-import { EmotionControls } from '../components/EmotionControls';
-import { EmotionsWheelVisualizer } from '../components/EmotionsWheelVisualizer';
-import { SpeechSimulator } from '../components/SpeechSimulator';
-import { MappedWordsView } from '../components/MappedWordsView';
-import { ActivitySimulator } from '../components/ActivitySimulator';
-import { EngineTuningControls } from '../components/EngineTuningControls';
-import { VoiceModulationControls } from '../components/VoiceModulationControls';
-import { MonitoringSimulator } from '../components/MonitoringSimulator';
-import { MemoryPanel } from '../components/MemoryPanel';
-import { MarketplaceSection } from '../components/MarketplaceSection';
-import { ProjectOverview } from '../components/ProjectOverview';
+import { Header } from "../components/Header";
+import { Footer } from "../components/Footer";
+import { AvatarStage } from "../components/AvatarStage";
+import { EmotionControls } from "../components/EmotionControls";
+import { EmotionsWheelVisualizer } from "../components/EmotionsWheelVisualizer";
+import { SpeechSimulator } from "../components/SpeechSimulator";
+import { MappedWordsView } from "../components/MappedWordsView";
+import { ActivitySimulator } from "../components/ActivitySimulator";
+import { EngineTuningControls } from "../components/EngineTuningControls";
+import { VoiceModulationControls } from "../components/VoiceModulationControls";
+import { MonitoringSimulator } from "../components/MonitoringSimulator";
+import { MemoryPanel } from "../components/MemoryPanel";
+import { MarketplaceSection } from "../components/MarketplaceSection";
+import { ProjectOverview } from "../components/ProjectOverview";
 
-import { Button } from '../components/ui';
+import { Button } from "../components/ui";
 
 // Initialize Vercel Analytics tracking.
 injectVercelAnalytics();
 
 // Main interactive playground page view.
 export const PlaygroundPage: React.FC = () => {
-  const emotionEngineRef = useRef<EmotionsOrchestrator>(new EmotionsOrchestrator());
+  const emotionEngineRef = useRef<EmotionsOrchestrator>(
+    new EmotionsOrchestrator(),
+  );
   const compositorRef = useRef<AvatarCompositor | null>(null);
 
-  const [theme, setTheme] = useState<'cream' | 'grid'>('cream');
+  const [theme, setTheme] = useState<"cream" | "grid">("cream");
   const [isDrawerOpen, setIsDrawerOpen] = useState<boolean>(false);
   const [showMappedWords, setShowMappedWords] = useState<boolean>(false);
-  const [activeTabPanel, setActiveTabPanel] = useState<'modulation' | 'monitoring' | 'memory'>('modulation');
+  const [activeTabPanel, setActiveTabPanel] = useState<
+    "modulation" | "monitoring" | "memory"
+  >("modulation");
 
   const [speechBubbleText, setSpeechBubbleText] = useState<string>(
-    'Hello! I am CHLEO. Click any action below to test my reactions!'
+    "Hello! I am CHLEO. Click any action below to test my reactions!",
   );
   const [isBubbleVisible, setIsBubbleVisible] = useState<boolean>(false);
-  const [activeExpressionLabel, setActiveExpressionLabel] = useState<string>('Idle');
+  const [activeExpressionLabel, setActiveExpressionLabel] =
+    useState<string>("Idle");
   const [speechInputText, setSpeechInputText] = useState<string>(
-    'Hello! Type anything here and watch me talk!'
+    "Hello! Type anything here and watch me talk!",
   );
 
   const [cycleSpeed, setCycleSpeed] = useState<number>(1000);
@@ -57,9 +62,9 @@ export const PlaygroundPage: React.FC = () => {
     responseType: ResponseType;
     emotionFrames: EmotionFrameConfig;
   }>({
-    overallEmotion: 'Love',
-    responseType: 'declarative',
-    emotionFrames: getAvatarEmotionFrames('Love', 'declarative'),
+    overallEmotion: "Love",
+    responseType: "declarative",
+    emotionFrames: getAvatarEmotionFrames("Love", "declarative"),
   });
 
   const speechTimerRef = useRef<number | null>(null);
@@ -67,17 +72,26 @@ export const PlaygroundPage: React.FC = () => {
 
   // Sync theme class to document body.
   useEffect(() => {
-    document.body.className = theme === 'cream' ? 'theme-light-pixel' : 'theme-pixel-grid';
+    document.body.className =
+      theme === "cream" ? "theme-light-pixel" : "theme-pixel-grid";
   }, [theme]);
 
   // Display speech bubble text and synthesize speech audio.
-  const speakText = async (text: string, customEmotionFrames?: EmotionFrameConfig) => {
+  const speakText = async (
+    text: string,
+    customEmotionFrames?: EmotionFrameConfig,
+  ) => {
     if (speechTimerRef.current) clearTimeout(speechTimerRef.current);
     if (bubbleTimerRef.current) clearTimeout(bubbleTimerRef.current);
 
     // Query real-time overall emotion directly from engine instance to avoid stale React closure state
     const realTimeOverall = emotionEngineRef.current.getOverallEmotion();
-    const emotionFrames = customEmotionFrames ?? getAvatarEmotionFrames(realTimeOverall, currentEmotionState.responseType || 'declarative');
+    const emotionFrames =
+      customEmotionFrames ??
+      getAvatarEmotionFrames(
+        realTimeOverall,
+        currentEmotionState.responseType || "declarative",
+      );
     const compositor = compositorRef.current;
 
     setSpeechBubbleText(text);
@@ -85,12 +99,16 @@ export const PlaygroundPage: React.FC = () => {
     setActiveExpressionLabel(`Speaking (${realTimeOverall})`);
 
     if (compositor) {
-      const packet = await compositor.speakWithEmotionConfig(text, emotionFrames, {
-        onComplete: () => {
-          compositorRef.current?.resetAll();
-          setActiveExpressionLabel('Idle');
+      const packet = await compositor.speakWithEmotionConfig(
+        text,
+        emotionFrames,
+        {
+          onComplete: () => {
+            compositorRef.current?.resetAll();
+            setActiveExpressionLabel("Idle");
+          },
         },
-      });
+      );
 
       const speakDuration = Math.max(1200, packet.totalDurationMs);
       const bubbleDuration = speakDuration + 1500;
@@ -120,7 +138,7 @@ export const PlaygroundPage: React.FC = () => {
       {/* Drawer Backdrop */}
       <div
         id="drawer-backdrop"
-        className={`drawer-backdrop ${isDrawerOpen ? 'active' : ''}`}
+        className={`drawer-backdrop ${isDrawerOpen ? "active" : ""}`}
         onClick={() => setIsDrawerOpen(false)}
       />
 
@@ -142,12 +160,12 @@ export const PlaygroundPage: React.FC = () => {
           onCompositorInit={(compositor) => {
             compositorRef.current = compositor;
           }}
-          onBlink={() => setActiveExpressionLabel('Blinking')}
+          onBlink={() => setActiveExpressionLabel("Blinking")}
         />
 
         {/* Collapsible Control Side-Drawer */}
         <aside
-          className={`controls-panel ${isDrawerOpen ? 'drawer-active open' : ''}`}
+          className={`controls-panel ${isDrawerOpen ? "drawer-active open" : ""}`}
           id="controls-panel"
         >
           <div className="drawer-header">
@@ -165,7 +183,9 @@ export const PlaygroundPage: React.FC = () => {
           </div>
           <EmotionsWheelVisualizer
             emotionEngine={emotionEngineRef.current}
-            onChangeEmotionState={(newState) => setCurrentEmotionState(newState)}
+            onChangeEmotionState={(newState) =>
+              setCurrentEmotionState(newState)
+            }
             refreshKey={emotionRefreshKey}
           />
 
@@ -194,49 +214,64 @@ export const PlaygroundPage: React.FC = () => {
           />
 
           {/* Sub-panel Tabs for Voice Modulation, Monitoring Simulator & Memory */}
-          <div style={{ display: 'flex', gap: '6px', marginTop: '12px', marginBottom: '8px' }}>
+          <div
+            style={{
+              display: "flex",
+              flexWrap: "wrap",
+              gap: "6px",
+              marginTop: "12px",
+              marginBottom: "8px",
+            }}
+          >
             <Button
-              variant={activeTabPanel === 'modulation' ? 'primary' : 'secondary'}
-              onClick={() => setActiveTabPanel('modulation')}
-              style={{ flex: 1, padding: '8px 6px', fontSize: '0.8rem' }}
+              variant={
+                activeTabPanel === "modulation" ? "primary" : "secondary"
+              }
+              onClick={() => setActiveTabPanel("modulation")}
+              style={{ flex: 1, padding: "8px 6px", fontSize: "0.8rem" }}
             >
               Voice
             </Button>
             <Button
-              variant={activeTabPanel === 'monitoring' ? 'primary' : 'secondary'}
-              onClick={() => setActiveTabPanel('monitoring')}
-              style={{ flex: 1, padding: '8px 6px', fontSize: '0.8rem' }}
+              variant={
+                activeTabPanel === "monitoring" ? "primary" : "secondary"
+              }
+              onClick={() => setActiveTabPanel("monitoring")}
+              style={{ flex: 1, padding: "8px 6px", fontSize: "0.8rem" }}
             >
               Monitoring
             </Button>
             <Button
-              variant={activeTabPanel === 'memory' ? 'primary' : 'secondary'}
-              onClick={() => setActiveTabPanel('memory')}
-              style={{ flex: 1, padding: '8px 6px', fontSize: '0.8rem' }}
+              variant={activeTabPanel === "memory" ? "primary" : "secondary"}
+              onClick={() => setActiveTabPanel("memory")}
+              style={{ flex: 1, padding: "8px 6px", fontSize: "0.8rem" }}
             >
               Memory
             </Button>
           </div>
 
-          {activeTabPanel === 'modulation' && (
+          {activeTabPanel === "modulation" && (
             <VoiceModulationControls
               onTestVoice={() => {
-                const testText = speechInputText.trim() || 'get me some water';
+                const testText = speechInputText.trim() || "get me some water";
                 speakText(testText);
               }}
             />
           )}
 
-          {activeTabPanel === 'monitoring' && (
+          {activeTabPanel === "monitoring" && (
             <MonitoringSimulator
               emotionEngine={emotionEngineRef.current}
               onSpeakText={(text) => speakText(text)}
               onRefreshEmotionState={() => {
                 const overall = emotionEngineRef.current.getOverallEmotion();
-                const newFrames = getAvatarEmotionFrames(overall, 'declarative');
+                const newFrames = getAvatarEmotionFrames(
+                  overall,
+                  "declarative",
+                );
                 setCurrentEmotionState({
                   overallEmotion: overall,
-                  responseType: 'declarative',
+                  responseType: "declarative",
                   emotionFrames: newFrames,
                 });
                 // Update the values of the tuners to reflect the new values in emotionEngineRef
@@ -245,9 +280,7 @@ export const PlaygroundPage: React.FC = () => {
             />
           )}
 
-          {activeTabPanel === 'memory' && (
-            <MemoryPanel />
-          )}
+          {activeTabPanel === "memory" && <MemoryPanel />}
         </aside>
       </main>
       <Footer />

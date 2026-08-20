@@ -1,9 +1,9 @@
-import { EmotionsOrchestrator } from '../avatar/emotions/emotions-orchestrator';
-import { ResponseGenerator } from './response-generator';
-import type { ResponseResult } from './response-generator';
-import type { PrimaryEmotion } from '../avatar/emotions/emotion-types';
-import type { MonitoringEventPayload } from './monitoring-types';
-import defaultBehavioralRules from './config/behavioral-rules.json';
+import { EmotionsOrchestrator } from "../avatar/emotions/emotions-orchestrator";
+import { ResponseGenerator } from "./response-generator";
+import type { ResponseResult } from "./response-generator";
+import type { PrimaryEmotion } from "../avatar/emotions/emotion-types";
+import type { MonitoringEventPayload } from "./monitoring-types";
+import defaultBehavioralRules from "./config/behavioral-rules.json";
 
 // Behavioral types co-located with the engine that owns them
 export interface BehavioralRule {
@@ -29,9 +29,9 @@ export interface BehavioralConfig {
 export interface BehavioralReactionResult {
   rule: BehavioralRule;
   speechText: string;
-  responseType: ResponseResult['responseType'];
-  emotionDeltas: BehavioralRule['emotionDeltas'];
-  rewards?: BehavioralRule['rewards'];
+  responseType: ResponseResult["responseType"];
+  emotionDeltas: BehavioralRule["emotionDeltas"];
+  rewards?: BehavioralRule["rewards"];
 }
 
 /**
@@ -43,11 +43,11 @@ export class BehavioralEngine {
   private emotionOrchestrator: EmotionsOrchestrator;
   private responseGenerator: ResponseGenerator;
   private behavioralConfig: BehavioralConfig;
-  private storageKeyBehavioral = 'chleo_behavioral_rules_v1';
+  private storageKeyBehavioral = "chleo_behavioral_rules_v1";
 
   constructor(
     emotionOrchestrator: EmotionsOrchestrator,
-    responseGenerator: ResponseGenerator
+    responseGenerator: ResponseGenerator,
   ) {
     this.emotionOrchestrator = emotionOrchestrator;
     this.responseGenerator = responseGenerator;
@@ -55,9 +55,11 @@ export class BehavioralEngine {
   }
 
   private loadBehavioralConfig(): BehavioralConfig {
-    const defaults = JSON.parse(JSON.stringify(defaultBehavioralRules)) as BehavioralConfig;
+    const defaults = JSON.parse(
+      JSON.stringify(defaultBehavioralRules),
+    ) as BehavioralConfig;
     try {
-      if (typeof window !== 'undefined' && window.localStorage) {
+      if (typeof window !== "undefined" && window.localStorage) {
         const raw = window.localStorage.getItem(this.storageKeyBehavioral);
         if (raw) {
           const parsed = JSON.parse(raw) as BehavioralConfig;
@@ -74,18 +76,24 @@ export class BehavioralEngine {
         }
       }
     } catch (e) {
-      console.warn('[BehavioralEngine] Failed to load behavioral rules from storage:', e);
+      console.warn(
+        "[BehavioralEngine] Failed to load behavioral rules from storage:",
+        e,
+      );
     }
     return defaults;
   }
 
   saveBehavioralConfig(): void {
     try {
-      if (typeof window !== 'undefined' && window.localStorage) {
-        window.localStorage.setItem(this.storageKeyBehavioral, JSON.stringify(this.behavioralConfig));
+      if (typeof window !== "undefined" && window.localStorage) {
+        window.localStorage.setItem(
+          this.storageKeyBehavioral,
+          JSON.stringify(this.behavioralConfig),
+        );
       }
     } catch (e) {
-      console.warn('[BehavioralEngine] Failed to save behavioral rules:', e);
+      console.warn("[BehavioralEngine] Failed to save behavioral rules:", e);
     }
   }
 
@@ -99,12 +107,21 @@ export class BehavioralEngine {
     return this.behavioralConfig.rules.find((r) => r.id === id);
   }
 
-  updateBehavioralRule(id: string, updates: Partial<BehavioralRule>): BehavioralRule | undefined {
+  updateBehavioralRule(
+    id: string,
+    updates: Partial<BehavioralRule>,
+  ): BehavioralRule | undefined {
     const rule = this.getBehavioralRule(id);
     if (rule) {
-      if (updates.emotionDeltas) rule.emotionDeltas = { ...rule.emotionDeltas, ...updates.emotionDeltas };
-      if (updates.rewards) rule.rewards = { ...rule.rewards, ...updates.rewards };
-      if (updates.heuristicTemplates) rule.heuristicTemplates = [...updates.heuristicTemplates];
+      if (updates.emotionDeltas)
+        rule.emotionDeltas = {
+          ...rule.emotionDeltas,
+          ...updates.emotionDeltas,
+        };
+      if (updates.rewards)
+        rule.rewards = { ...rule.rewards, ...updates.rewards };
+      if (updates.heuristicTemplates)
+        rule.heuristicTemplates = [...updates.heuristicTemplates];
       if (updates.llmDirective) rule.llmDirective = updates.llmDirective;
       this.saveBehavioralConfig();
     }
@@ -117,16 +134,21 @@ export class BehavioralEngine {
    * Match an event to a behavioral rule, apply emotion deltas,
    * and delegate speech generation + memory recording to ResponseGenerator.
    */
-  async processEvent(event: MonitoringEventPayload): Promise<BehavioralReactionResult | null> {
+  async processEvent(
+    event: MonitoringEventPayload,
+  ): Promise<BehavioralReactionResult | null> {
     const matchingRule = this.behavioralConfig.rules.find(
       (r) =>
         r.conditions.event === event.eventId ||
         r.id === event.eventId ||
-        (event.eventId === 'SITE_BLOCKED_VISIT' && r.conditions.event === 'BLOCKED_SITE_ATTEMPT')
+        (event.eventId === "SITE_BLOCKED_VISIT" &&
+          r.conditions.event === "BLOCKED_SITE_ATTEMPT"),
     );
 
     if (!matchingRule) {
-      console.warn(`[BehavioralEngine] No behavioral rule defined for event: ${event.eventId}`);
+      console.warn(
+        `[BehavioralEngine] No behavioral rule defined for event: ${event.eventId}`,
+      );
       return null;
     }
 
@@ -134,7 +156,8 @@ export class BehavioralEngine {
     this.emotionOrchestrator.applyBehavioralData(matchingRule.emotionDeltas);
 
     // Delegate speech generation + memory recording to ResponseGenerator
-    const response: ResponseResult = await this.responseGenerator.generateResponse(event, matchingRule);
+    const response: ResponseResult =
+      await this.responseGenerator.generateResponse(event, matchingRule);
 
     return {
       rule: matchingRule,

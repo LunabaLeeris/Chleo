@@ -1,36 +1,51 @@
-import { BrowserWindow } from 'electron';
-import { WebSocketServer, WebSocket } from 'ws';
+import { BrowserWindow } from "electron";
+import { WebSocketServer, WebSocket } from "ws";
+import {
+  isSpriteApplyPayload,
+  isSpriteResetPayload,
+  mergeClipApply,
+  mergeClipReset,
+} from "./avatar/clip-store";
+import { loadSpriteClipStore, saveSpriteClipStore } from "./clip-persist";
 
 const startWebSocketServer = (mainWindow: BrowserWindow) => {
-    // [TODO] Change port to an ENV variable
-    const wss = new WebSocketServer({ port: 8080 });
+  const wss = new WebSocketServer({ host: "127.0.0.1", port: 8080 });
 
-    // [TODO] Forward Logs to avatar 
-    console.log('WebSocket Server running on ws://localhost:8080');
+  console.log("WebSocket Server running on ws://127.0.0.1:8080");
 
-    wss.on('connection', (ws: WebSocket) => {
-        console.log('Chrome Extension connected.');
+  wss.on("connection", (ws: WebSocket) => {
+    ws.on("message", (raw: Buffer | string) => {
+      try {
+        const data = JSON.parse(raw.toString());
 
-        ws.on('message', (message: string) => {
-            try {
-                const data = JSON.parse(message);
-                console.log('Received from browser:', data);
+        if (isSpriteApplyPayload(data)) {
+          const store = mergeClipApply(loadSpriteClipStore(), data);
+          saveSpriteClipStore(store);
+          if (mainWindow && !mainWindow.isDestroyed()) {
+            mainWindow.webContents.send("sprite-apply", data);
+          }
+          return;
+        }
 
-                // Forward the tab data directly to the Frontend Avatar
-                if (mainWindow && !mainWindow.isDestroyed()) {
-                    mainWindow.webContents.send('browser-activity', data);
-                }
+        if (isSpriteResetPayload(data)) {
+          const store = mergeClipReset(loadSpriteClipStore(), data);
+          saveSpriteClipStore(store);
+          if (mainWindow && !mainWindow.isDestroyed()) {
+            mainWindow.webContents.send("sprite-reset", data);
+          }
+          return;
+        }
 
-                // [TODO] somewhere right here we call a model back to the backend
-                // [TODO] somewhere right here we send a signal back to the extension to 
-                // perform actions in the front end (not on the avatar)
-            } catch (err) {
-                console.error('Failed to parse WebSocket message:', err);
-            }
-        });
-
-        ws.on('close', () => console.log('Chrome Extension disconnected.'));
+        if (typeof data?.url === "string") {
+          if (mainWindow && !mainWindow.isDestroyed()) {
+            mainWindow.webContents.send("browser-activity", data);
+          }
+        }
+      } catch (err) {
+        console.error("Failed to parse WebSocket message:", err);
+      }
     });
+  });
 };
 
-export { startWebSocketServer }
+export { startWebSocketServer };

@@ -1,4 +1,4 @@
-import React from 'react';
+import React from "react";
 
 export interface TextInputProps {
   id?: string;
@@ -17,7 +17,7 @@ export const TextInput: React.FC<TextInputProps> = ({
   placeholder,
   onChange,
   onKeyDown,
-  className = '',
+  className = "",
   style,
 }) => {
   return (

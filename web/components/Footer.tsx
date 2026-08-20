@@ -1,4 +1,4 @@
-import React from 'react';
+import React from "react";
 
 // Renders the page footer with author credits.
 export const Footer: React.FC = () => {

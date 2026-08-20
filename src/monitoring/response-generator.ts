@@ -1,8 +1,8 @@
-import { ShortTermMemory } from '../memory/short-term-memory';
-import { LLMService } from './llm-service';
-import type { MonitoringEventPayload } from './monitoring-types';
-import type { BehavioralRule } from './behavioral-engine';
-import type { ResponseType } from '../avatar/emotions/emotion-types';
+import { ShortTermMemory } from "../memory/short-term-memory";
+import { LLMService } from "./llm-service";
+import type { MonitoringEventPayload } from "./monitoring-types";
+import type { BehavioralRule } from "./behavioral-engine";
+import type { ResponseType } from "../avatar/emotions/emotion-types";
 
 export interface ResponseResult {
   speechText: string;
@@ -29,12 +29,16 @@ export class ResponseGenerator {
    */
   async generateResponse(
     event: MonitoringEventPayload,
-    rule: BehavioralRule
+    rule: BehavioralRule,
   ): Promise<ResponseResult> {
     // Try LLM first
-    // COMPOSE memory context and place it in memory context 
+    // COMPOSE memory context and place it in memory context
     const memoryContext: string = "";
-    const llmResult = await this.llmService.generate(event, rule.llmDirective, memoryContext);
+    const llmResult = await this.llmService.generate(
+      event,
+      rule.llmDirective,
+      memoryContext,
+    );
 
     let speechText: string;
     let responseType: ResponseType;
@@ -45,7 +49,7 @@ export class ResponseGenerator {
     } else {
       // Fallback to heuristic template interpolation
       speechText = this.interpolateTemplate(rule.heuristicTemplates, event);
-      responseType = 'exclamatory';
+      responseType = "exclamatory";
     }
 
     // Record in Short-Term Memory
@@ -60,7 +64,10 @@ export class ResponseGenerator {
     return { speechText, responseType };
   }
 
-  private interpolateTemplate(templates: string[], event: MonitoringEventPayload): string {
+  private interpolateTemplate(
+    templates: string[],
+    event: MonitoringEventPayload,
+  ): string {
     if (!templates || templates.length === 0) {
       return event.message || `Activity event on ${event.domain}`;
     }
@@ -75,11 +82,14 @@ export class ResponseGenerator {
         : `${event.timeSpentSeconds}s`;
 
     return template
-      .replace(/\{domain\}/g, event.domain || 'this site')
+      .replace(/\{domain\}/g, event.domain || "this site")
       .replace(/\{percent\}/g, Math.round(event.percentSpent).toString())
-      .replace(/\{remainingSeconds\}/g, Math.round(event.remainingSeconds).toString())
+      .replace(
+        /\{remainingSeconds\}/g,
+        Math.round(event.remainingSeconds).toString(),
+      )
       .replace(/\{limit\}/g, Math.round(event.limitSeconds / 60).toString())
       .replace(/\{timeSpent\}/g, timeSpentFormatted)
-      .replace(/\{coins\}/g, '50');
+      .replace(/\{coins\}/g, "50");
   }
 }

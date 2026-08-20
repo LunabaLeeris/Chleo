@@ -1,5 +1,5 @@
-import type { LongTermMemoryData } from './memory-types';
-import type { EmotionalState } from '../avatar/emotions/emotion-types';
+import type { LongTermMemoryData } from "./memory-types";
+import type { EmotionalState } from "../avatar/emotions/emotion-types";
 
 export const VIOLATION_CAP = 20;
 export const REWARD_CAP = 20;
@@ -11,7 +11,7 @@ export const MS_PER_DAY = 1000 * 60 * 60 * 24;
  */
 export class LongTermMemory {
   private data: LongTermMemoryData;
-  private storageKey: string = 'chleo_long_term_memory';
+  private storageKey: string = "chleo_long_term_memory";
   private violationCap: number = VIOLATION_CAP;
   private rewardCap: number = REWARD_CAP;
 
@@ -65,32 +65,37 @@ export class LongTermMemory {
     try {
       const applyData = (raw: string) => {
         const parsed = JSON.parse(raw);
-        if (parsed && typeof parsed === 'object') {
+        if (parsed && typeof parsed === "object") {
           this.data = { ...this.getDefaultData(), ...parsed };
           this.updateDaysKnown();
         }
       };
 
       // Desktop Native (Electron IPC) load check
-      if (typeof window !== 'undefined' && (window as any).electronAPI?.readMemoryFile) {
-        (window as any).electronAPI.readMemoryFile('long_term_memory.json').then((raw: string | null) => {
-          if (raw) {
-            applyData(raw);
-          } else if (window.localStorage) {
-            const localRaw = window.localStorage.getItem(this.storageKey);
-            if (localRaw) applyData(localRaw);
-          }
-        });
+      if (
+        typeof window !== "undefined" &&
+        (window as any).electronAPI?.readMemoryFile
+      ) {
+        (window as any).electronAPI
+          .readMemoryFile("long_term_memory.json")
+          .then((raw: string | null) => {
+            if (raw) {
+              applyData(raw);
+            } else if (window.localStorage) {
+              const localRaw = window.localStorage.getItem(this.storageKey);
+              if (localRaw) applyData(localRaw);
+            }
+          });
         return;
       }
 
       // Browser localStorage fallback
-      if (typeof window !== 'undefined' && window.localStorage) {
+      if (typeof window !== "undefined" && window.localStorage) {
         const raw = window.localStorage.getItem(this.storageKey);
         if (raw) applyData(raw);
       }
     } catch (e) {
-      console.warn('[LongTermMemory] Failed to load long-term memory:', e);
+      console.warn("[LongTermMemory] Failed to load long-term memory:", e);
     }
   }
 
@@ -100,16 +105,22 @@ export class LongTermMemory {
       const jsonStr = JSON.stringify(this.data, null, 2);
 
       // Desktop Native (Electron IPC) save check
-      if (typeof window !== 'undefined' && (window as any).electronAPI?.saveMemoryFile) {
-        (window as any).electronAPI.saveMemoryFile('long_term_memory.json', jsonStr);
+      if (
+        typeof window !== "undefined" &&
+        (window as any).electronAPI?.saveMemoryFile
+      ) {
+        (window as any).electronAPI.saveMemoryFile(
+          "long_term_memory.json",
+          jsonStr,
+        );
       }
 
       // Browser localStorage fallback
-      if (typeof window !== 'undefined' && window.localStorage) {
+      if (typeof window !== "undefined" && window.localStorage) {
         window.localStorage.setItem(this.storageKey, jsonStr);
       }
     } catch (e) {
-      console.warn('[LongTermMemory] Failed to save to storage:', e);
+      console.warn("[LongTermMemory] Failed to save to storage:", e);
     }
   }
 
@@ -124,7 +135,9 @@ export class LongTermMemory {
 
   recordViolation(description: string): void {
     this.data.totalViolationsCount += 1;
-    this.data.pastMistakes.unshift(`[${new Date().toLocaleDateString()}] ${description}`);
+    this.data.pastMistakes.unshift(
+      `[${new Date().toLocaleDateString()}] ${description}`,
+    );
     if (this.data.pastMistakes.length > this.violationCap) {
       this.data.pastMistakes.pop();
     }
@@ -134,7 +147,9 @@ export class LongTermMemory {
 
   recordReward(description: string): void {
     this.data.totalRewardsEarned += 1;
-    this.data.pastAchievements.unshift(`[${new Date().toLocaleDateString()}] ${description}`);
+    this.data.pastAchievements.unshift(
+      `[${new Date().toLocaleDateString()}] ${description}`,
+    );
     if (this.data.pastAchievements.length > this.rewardCap) {
       this.data.pastAchievements.pop();
     }
@@ -158,9 +173,15 @@ export class LongTermMemory {
   ingestConsolidatedBatch(summaries: string[]): void {
     if (!summaries || summaries.length === 0) return;
     summaries.forEach((summary) => {
-      if (summary.toLowerCase().includes('exceeded') || summary.toLowerCase().includes('blocked')) {
+      if (
+        summary.toLowerCase().includes("exceeded") ||
+        summary.toLowerCase().includes("blocked")
+      ) {
         this.recordViolation(summary);
-      } else if (summary.toLowerCase().includes('productive') || summary.toLowerCase().includes('milestone')) {
+      } else if (
+        summary.toLowerCase().includes("productive") ||
+        summary.toLowerCase().includes("milestone")
+      ) {
         this.recordReward(summary);
       }
     });
@@ -179,7 +200,7 @@ export class LongTermMemory {
   importJSON(jsonString: string): boolean {
     try {
       const parsed = JSON.parse(jsonString);
-      if (parsed && typeof parsed === 'object') {
+      if (parsed && typeof parsed === "object") {
         this.data = { ...this.getDefaultData(), ...parsed };
         this.updateDaysKnown();
         this.save();
@@ -187,7 +208,7 @@ export class LongTermMemory {
       }
       return false;
     } catch (e) {
-      console.error('[LongTermMemory] Failed to import JSON:', e);
+      console.error("[LongTermMemory] Failed to import JSON:", e);
       return false;
     }
   }
@@ -195,12 +216,12 @@ export class LongTermMemory {
   /**
    * Trigger browser file download of long-term memory state.
    */
-  downloadJSON(filename: string = 'long_term_memory.json'): void {
-    if (typeof window === 'undefined') return;
+  downloadJSON(filename: string = "long_term_memory.json"): void {
+    if (typeof window === "undefined") return;
     const jsonStr = this.exportJSON();
-    const blob = new Blob([jsonStr], { type: 'application/json' });
+    const blob = new Blob([jsonStr], { type: "application/json" });
     const url = URL.createObjectURL(blob);
-    const link = document.createElement('a');
+    const link = document.createElement("a");
     link.href = url;
     link.download = filename;
     document.body.appendChild(link);

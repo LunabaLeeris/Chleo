@@ -3,8 +3,8 @@ import type {
   EmotionalState,
   BehavioralData,
   PlutchikEmotion,
-} from './emotion-types';
-import { PRIMARY_EMOTIONS } from './emotion-types';
+} from "./emotion-types";
+import { PRIMARY_EMOTIONS } from "./emotion-types";
 
 /**
  * Canonical dyad mapping dictionary for Plutchik's Wheel of Emotions.
@@ -12,54 +12,54 @@ import { PRIMARY_EMOTIONS } from './emotion-types';
  */
 const PLUTCHIK_DYAD_MAP: Record<string, PlutchikEmotion> = {
   // --- Primary Dyads (Adjacent on wheel) ---
-  'joy+trust': 'Love',
-  'fear+trust': 'Submission',
-  'fear+surprise': 'Awe',
-  'sadness+surprise': 'Disapproval',
-  'disgust+sadness': 'Remorse',
-  'anger+disgust': 'Contempt',
-  'anger+anticipation': 'Aggression',
-  'anticipation+joy': 'Optimism',
+  "joy+trust": "Love",
+  "fear+trust": "Submission",
+  "fear+surprise": "Awe",
+  "sadness+surprise": "Disapproval",
+  "disgust+sadness": "Remorse",
+  "anger+disgust": "Contempt",
+  "anger+anticipation": "Aggression",
+  "anticipation+joy": "Optimism",
 
   // --- Secondary Dyads (One apart on wheel) ---
-  'fear+joy': 'Guilt',
-  ['surprise+trust' as string]: 'Curiosity',
-  'fear+sadness': 'Despair',
-  'disgust+surprise': 'Unbelief',
-  'anger+sadness': 'Disappointment',
-  'anticipation+disgust': 'Cynicism',
-  'anger+joy': 'Pride',
-  'anticipation+trust': 'Hope',
+  "fear+joy": "Guilt",
+  ["surprise+trust" as string]: "Curiosity",
+  "fear+sadness": "Despair",
+  "disgust+surprise": "Unbelief",
+  "anger+sadness": "Disappointment",
+  "anticipation+disgust": "Cynicism",
+  "anger+joy": "Pride",
+  "anticipation+trust": "Hope",
 
   // --- Tertiary Dyads (Two apart on wheel) ---
-  'joy+surprise': 'Delight',
-  'sadness+trust': 'Sentimentality',
-  'disgust+fear': 'Shame',
-  'anger+surprise': 'Outrage',
-  'anticipation+sadness': 'Pessimism',
-  'disgust+joy': 'Morbidness',
-  'anger+trust': 'Dominance',
-  'anticipation+fear': 'Anxiety',
+  "joy+surprise": "Delight",
+  "sadness+trust": "Sentimentality",
+  "disgust+fear": "Shame",
+  "anger+surprise": "Outrage",
+  "anticipation+sadness": "Pessimism",
+  "disgust+joy": "Morbidness",
+  "anger+trust": "Dominance",
+  "anticipation+fear": "Anxiety",
 
   // --- Opposite Dyads (Across from each other on wheel) ---
-  'joy+sadness': 'Bittersweet',
-  'disgust+trust': 'Ambivalence',
-  'anger+fear': 'Conflict',
-  'anticipation+surprise': 'Confusion',
+  "joy+sadness": "Bittersweet",
+  "disgust+trust": "Ambivalence",
+  "anger+fear": "Conflict",
+  "anticipation+surprise": "Confusion",
 };
 
 /**
  * Single dominant primary emotion fallbacks when second dyad emotion is negligible.
  */
 const PRIMARY_SINGLE_FALLBACK: Record<PrimaryEmotion, PlutchikEmotion> = {
-  joy: 'Joyful',
-  trust: 'Trusting',
-  fear: 'Fearful',
-  surprise: 'Surprised',
-  sadness: 'Sad',
-  disgust: 'Disgusted',
-  anger: 'Angry',
-  anticipation: 'Expectant',
+  joy: "Joyful",
+  trust: "Trusting",
+  fear: "Fearful",
+  surprise: "Surprised",
+  sadness: "Sad",
+  disgust: "Disgusted",
+  anger: "Angry",
+  anticipation: "Expectant",
 };
 
 /**
@@ -75,7 +75,7 @@ export class EmotionsOrchestrator {
   constructor(
     initialState?: Partial<EmotionalState>,
     idleDecayDelayMs: number = 10000, // 10 seconds of idle before decay starts
-    decayRatePerSec: number = 0.05    // 5% decay per second when idle
+    decayRatePerSec: number = 0.05, // 5% decay per second when idle
   ) {
     this.state = {
       joy: 0,
@@ -105,7 +105,7 @@ export class EmotionsOrchestrator {
    */
   setState(newState: Partial<EmotionalState>): void {
     for (const [emotion, val] of Object.entries(newState)) {
-      if (emotion in this.state && typeof val === 'number') {
+      if (emotion in this.state && typeof val === "number") {
         this.state[emotion as PrimaryEmotion] = Math.max(0, Math.min(1, val));
       }
     }
@@ -117,9 +117,12 @@ export class EmotionsOrchestrator {
    */
   applyBehavioralData(deltas: BehavioralData): void {
     for (const [emotion, delta] of Object.entries(deltas)) {
-      if (emotion in this.state && typeof delta === 'number') {
+      if (emotion in this.state && typeof delta === "number") {
         const current = this.state[emotion as PrimaryEmotion];
-        this.state[emotion as PrimaryEmotion] = Math.max(0, Math.min(1, current + delta));
+        this.state[emotion as PrimaryEmotion] = Math.max(
+          0,
+          Math.min(1, current + delta),
+        );
       }
     }
     this.touchActivity();
@@ -159,7 +162,9 @@ export class EmotionsOrchestrator {
   /**
    * Returns the top N primary emotions sorted by intensity descending.
    */
-  getTopEmotions(count: number = 2): Array<{ emotion: PrimaryEmotion; intensity: number }> {
+  getTopEmotions(
+    count: number = 2,
+  ): Array<{ emotion: PrimaryEmotion; intensity: number }> {
     return PRIMARY_EMOTIONS.map((e) => ({
       emotion: e,
       intensity: this.state[e],
@@ -175,7 +180,7 @@ export class EmotionsOrchestrator {
     if (e1 === e2) {
       return PRIMARY_SINGLE_FALLBACK[e1];
     }
-    const key = [e1, e2].sort().join('+');
+    const key = [e1, e2].sort().join("+");
     return PLUTCHIK_DYAD_MAP[key] ?? PRIMARY_SINGLE_FALLBACK[e1];
   }
 
@@ -189,11 +194,15 @@ export class EmotionsOrchestrator {
 
     // Thresholds for emotion detection
     if (!primary || primary.intensity < 0.05) {
-      return 'Neutral';
+      return "Neutral";
     }
 
     // If secondary emotion is non-existent or < 20% of primary intensity, fallback to single primary
-    if (!secondary || secondary.intensity < 0.05 || secondary.intensity / primary.intensity < 0.2) {
+    if (
+      !secondary ||
+      secondary.intensity < 0.05 ||
+      secondary.intensity / primary.intensity < 0.2
+    ) {
       return PRIMARY_SINGLE_FALLBACK[primary.emotion];
     }
 

@@ -1,10 +1,10 @@
-import React from 'react';
+import React from "react";
 
 interface ContentImageProps {
   src: string;
   alt: string;
   caption?: string;
-  variant?: 'full' | 'inline' | 'framed';
+  variant?: "full" | "inline" | "framed";
 }
 
 /**
@@ -15,14 +15,16 @@ export const ContentImage: React.FC<ContentImageProps> = ({
   src,
   alt,
   caption,
-  variant = 'framed',
+  variant = "framed",
 }) => {
   return (
     <figure className={`cb-image cb-image--${variant}`}>
       <div className="cb-image__frame">
         <img src={src} alt={alt} className="cb-image__img" />
       </div>
-      {caption && <figcaption className="cb-image__caption">{caption}</figcaption>}
+      {caption && (
+        <figcaption className="cb-image__caption">{caption}</figcaption>
+      )}
     </figure>
   );
 };

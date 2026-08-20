@@ -1,22 +1,21 @@
-import React, { useEffect, useRef, useState, useCallback } from 'react';
-import { Header } from '../components/Header';
-import { Footer } from '../components/Footer';
-import { ProjectOverview } from '../components/ProjectOverview';
+import React, { useEffect, useRef, useState, useCallback } from "react";
+import { Header } from "../components/Header";
+import { Footer } from "../components/Footer";
+import { ProjectOverview } from "../components/ProjectOverview";
 import {
   AvatarCompositor,
   defaultAvatarConfig,
   defaultTTSModulator,
   defaultSpeechOrchestrator,
-} from '../../src/avatar';
-import type { CleoExpression } from '../../src/avatar';
+} from "../../src/avatar";
+import type { CleoExpression } from "../../src/avatar";
 
 // Icon imports from root assets folder
-import ICON_EYES from '../../assets/eyes.png';
-import ICON_MOUTH from '../../assets/mouth.png';
-import ICON_BRAIN from '../../assets/brain.png';
-import ICON_HEART from '../../assets/heart.png';
-import { MarketplaceSection } from '../components/MarketplaceSection';
-
+import ICON_EYES from "../../assets/eyes.png";
+import ICON_MOUTH from "../../assets/mouth.png";
+import ICON_BRAIN from "../../assets/brain.png";
+import ICON_HEART from "../../assets/heart.png";
+import { MarketplaceSection } from "../components/MarketplaceSection";
 
 export interface HoverMessage {
   text: string;
@@ -34,7 +33,7 @@ interface FocusPanelConfig {
   /** Path to icon PNG/SVG or imported asset module */
   iconSrc: string;
   /** Which side of the avatar this panel sits on */
-  side: 'left' | 'right';
+  side: "left" | "right";
   /** Default avatar expression to play when user hovers this panel if message has no explicit expression */
   expression?: CleoExpression;
   /** List of speech bubble messages (string or object with custom expression) that CHLEO speaks when user hovers over this panel */
@@ -47,64 +46,77 @@ interface FocusPanelConfig {
 
 const FOCUS_PANELS: FocusPanelConfig[] = [
   {
-    id: 'intelligence',
-    title: 'Intelligence',
-    description: 'Various behaviors and customizable rules powered by LLMs for realism.',
+    id: "intelligence",
+    title: "Intelligence",
+    description:
+      "Various behaviors and customizable rules powered by LLMs for realism.",
     iconSrc: ICON_BRAIN,
-    side: 'left',
-    expression: 'happy',
+    side: "left",
+    expression: "happy",
     hoverMessages: [
-      { text: 'Yes. I can think and reason', expression: 'happy' },
-      { text: 'Hmm........', expression: 'question' },
-      { text: 'I remember things', expression: 'idle' },
+      { text: "Yes. I can think and reason", expression: "happy" },
+      { text: "Hmm........", expression: "question" },
+      { text: "I remember things", expression: "idle" },
     ],
-    blogAnchor: 'intelligence',
-    boxStyle: { top: '15%', left: '37%', width: '26%', height: '14%' },
+    blogAnchor: "intelligence",
+    boxStyle: { top: "15%", left: "37%", width: "26%", height: "14%" },
   },
   {
-    id: 'monitoring',
-    title: 'Monitoring',
-    description: 'Monitors your activity and guides you to be productive.',
+    id: "monitoring",
+    title: "Monitoring",
+    description: "Monitors your activity and guides you to be productive.",
     iconSrc: ICON_EYES,
-    side: 'right',
-    expression: 'focused',
+    side: "right",
+    expression: "focused",
     hoverMessages: [
-      { text: "I'm always watching you...", expression: 'focused' },
-      { text: 'I track your focus time so you stay on target!', expression: 'blink' },
-      { text: "Don't get distracted on my watch.", expression: 'focused' },
+      { text: "I'm always watching you...", expression: "focused" },
+      {
+        text: "I track your focus time so you stay on target!",
+        expression: "blink",
+      },
+      { text: "Don't get distracted on my watch.", expression: "focused" },
     ],
-    blogAnchor: 'monitoring',
-    boxStyle: { top: '43%', left: '55%', width: '15%', height: '12%' },
+    blogAnchor: "monitoring",
+    boxStyle: { top: "43%", left: "55%", width: "15%", height: "12%" },
   },
   {
-    id: 'speech',
-    title: 'Speech',
-    description: 'Nuanced and realistic speech animation by using visemes.',
+    id: "speech",
+    title: "Speech",
+    description: "Nuanced and realistic speech animation by using visemes.",
     iconSrc: ICON_MOUTH,
-    side: 'left',
-    expression: 'speak',
+    side: "left",
+    expression: "speak",
     hoverMessages: [
-      { text: 'I can talk with viseme-synced mouth animation!', expression: 'speak' },
-      { text: 'My mouth moves in lockstep with my robotic voice!', expression: 'speak' },
-      { text: 'Listen closely—every syllable is synthesized live!', expression: 'happy' },
+      {
+        text: "I can talk with viseme-synced mouth animation!",
+        expression: "speak",
+      },
+      {
+        text: "My mouth moves in lockstep with my robotic voice!",
+        expression: "speak",
+      },
+      {
+        text: "Listen closely—every syllable is synthesized live!",
+        expression: "happy",
+      },
     ],
-    blogAnchor: 'speech',
-    boxStyle: { top: '67%', left: '41%', width: '20%', height: '13%' },
+    blogAnchor: "speech",
+    boxStyle: { top: "67%", left: "41%", width: "20%", height: "13%" },
   },
   {
-    id: 'emotions',
-    title: 'Emotions',
+    id: "emotions",
+    title: "Emotions",
     description: "Have various emotions using Plutchik's wheel.",
     iconSrc: ICON_HEART,
-    side: 'right',
-    expression: 'question',
+    side: "right",
+    expression: "question",
     hoverMessages: [
-      { text: 'I feel things deeply. Just like you', expression: 'angry' },
-      { text: 'Dont even try to make me upset', expression: 'question' },
-      { text: 'Do great and I will be happy', expression: 'happy' },
+      { text: "I feel things deeply. Just like you", expression: "angry" },
+      { text: "Dont even try to make me upset", expression: "question" },
+      { text: "Do great and I will be happy", expression: "happy" },
     ],
-    blogAnchor: 'emotions',
-    boxStyle: { top: '90%', left: '45%', width: '20%', height: '10%' },
+    blogAnchor: "emotions",
+    boxStyle: { top: "90%", left: "45%", width: "20%", height: "10%" },
   },
 ];
 
@@ -114,13 +126,16 @@ interface IdleMessage {
 }
 
 const IDLE_MESSAGES: IdleMessage[] = [
-  { text: "What are you doing?", expression: 'question' },
-  { text: "I can monitor your browsing habits~", expression: 'focused' },
-  { text: "Try hovering over my features!", expression: 'happy' },
-  { text: "I have real emotions, you know!", expression: 'angry' },
-  { text: "I like gifts", expression: 'speak' },
-  { text: "hmmm... what should we do today?", expression: 'question' },
-  { text: "Want to see me in action? Go to the Playground!", expression: 'happy' },
+  { text: "What are you doing?", expression: "question" },
+  { text: "I can monitor your browsing habits~", expression: "focused" },
+  { text: "Try hovering over my features!", expression: "happy" },
+  { text: "I have real emotions, you know!", expression: "angry" },
+  { text: "I like gifts", expression: "speak" },
+  { text: "hmmm... what should we do today?", expression: "question" },
+  {
+    text: "Want to see me in action? Go to the Playground!",
+    expression: "happy",
+  },
 ];
 
 const IDLE_DISPLAY_DURATION = 5000;
@@ -147,11 +162,14 @@ export const HomePage: React.FC = () => {
   const avatarBoxRefs = useRef<Record<string, HTMLDivElement | null>>({});
   const panelRefs = useRef<Record<string, HTMLAnchorElement | null>>({});
 
-  const [bubbleText, setBubbleText] = useState('');
+  const [bubbleText, setBubbleText] = useState("");
   const [isBubbleVisible, setIsBubbleVisible] = useState(false);
   const [hoveredPanel, setHoveredPanel] = useState<string | null>(null);
   const [lines, setLines] = useState<LineCoord[]>([]);
-  const [showcaseDimensions, setShowcaseDimensions] = useState({ width: 1000, height: 500 });
+  const [showcaseDimensions, setShowcaseDimensions] = useState({
+    width: 1000,
+    height: 500,
+  });
 
   const idleTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const idleIndexRef = useRef(0);
@@ -167,7 +185,7 @@ export const HomePage: React.FC = () => {
       const delay = Math.floor(Math.random() * 4000) + 2500;
       blinkTimeout = setTimeout(() => {
         if (compositorRef.current) {
-          compositorRef.current.setExpression('blink');
+          compositorRef.current.setExpression("blink");
         }
         scheduleNextBlink();
       }, delay);
@@ -188,7 +206,7 @@ export const HomePage: React.FC = () => {
 
     const computedLines: LineCoord[] = [];
 
-    FOCUS_PANELS.forEach(panel => {
+    FOCUS_PANELS.forEach((panel) => {
       const boxEl = avatarBoxRefs.current[panel.id];
       const panelEl = panelRefs.current[panel.id];
       if (!boxEl || !panelEl) return;
@@ -197,7 +215,7 @@ export const HomePage: React.FC = () => {
       const pRect = panelEl.getBoundingClientRect();
 
       let x1 = 0;
-      if (panel.side === 'left') {
+      if (panel.side === "left") {
         x1 = bRect.left - sRect.left;
       } else {
         x1 = bRect.right - sRect.left;
@@ -205,7 +223,7 @@ export const HomePage: React.FC = () => {
       const y1 = bRect.top + bRect.height / 2 - sRect.top;
 
       let x2 = 0;
-      if (panel.side === 'left') {
+      if (panel.side === "left") {
         x2 = pRect.right - sRect.left;
       } else {
         x2 = pRect.left - sRect.left;
@@ -221,10 +239,10 @@ export const HomePage: React.FC = () => {
   useEffect(() => {
     updateLines();
     const timer = setTimeout(updateLines, 200);
-    window.addEventListener('resize', updateLines);
+    window.addEventListener("resize", updateLines);
     return () => {
       clearTimeout(timer);
-      window.removeEventListener('resize', updateLines);
+      window.removeEventListener("resize", updateLines);
     };
   }, [updateLines]);
 
@@ -240,8 +258,8 @@ export const HomePage: React.FC = () => {
     setIsBubbleVisible(true);
 
     if (compositorRef.current) {
-      compositorRef.current.setExpression(msg.expression || 'happy');
-      compositorRef.current.setExpression('speak', msg.text);
+      compositorRef.current.setExpression(msg.expression || "happy");
+      compositorRef.current.setExpression("speak", msg.text);
     }
 
     idleIndexRef.current++;
@@ -250,7 +268,7 @@ export const HomePage: React.FC = () => {
       if (isHoveringRef.current) return;
       setIsBubbleVisible(false);
       if (compositorRef.current) {
-        compositorRef.current.setExpression('idle');
+        compositorRef.current.setExpression("idle");
       }
 
       // After finishing all idle messages in the list, wait 1 minute before repeating cycle
@@ -280,55 +298,73 @@ export const HomePage: React.FC = () => {
     let isSubscribed = true;
 
     const runReadinessCheckAndGreeting = async () => {
-      console.log('[HomePage] Starting Chleo load readiness tests...');
+      console.log("[HomePage] Starting Chleo load readiness tests...");
 
       // Load Avatar sprite sheet assets
-      console.log('[HomePage Test 1/3] Preloading Avatar sprite assets...');
+      console.log("[HomePage Test 1/3] Preloading Avatar sprite assets...");
       await compositor.init();
       if (!isSubscribed) return;
-      console.log('[HomePage Test 1/3 Passed] Avatar assets preloaded.');
+      console.log("[HomePage Test 1/3 Passed] Avatar assets preloaded.");
 
       compositor.start();
-      compositor.setExpression('idle');
+      compositor.setExpression("idle");
 
       // Check TTS engine & Web Speech API voices readiness
-      console.log('[HomePage Test 2/3] Checking TTS engine & voices...');
+      console.log("[HomePage Test 2/3] Checking TTS engine & voices...");
       const ttsReady = await defaultTTSModulator.ensureVoicesLoaded();
       if (!isSubscribed) return;
       console.log(`[HomePage Test 2/3 Passed] TTS engine ready: ${ttsReady}`);
 
       // Mic test speech verification ("mic test")
-      console.log('[HomePage Test 3/3] Performing mic test speech verification...');
+      console.log(
+        "[HomePage Test 3/3] Performing mic test speech verification...",
+      );
       if (!isHoveringRef.current) {
         setBubbleText(MIC_TEST_MESSAGE);
         setIsBubbleVisible(true);
-        compositor.setExpression('speak', MIC_TEST_MESSAGE);
+        compositor.setExpression("speak", MIC_TEST_MESSAGE);
       }
 
-      const tickMs = (defaultAvatarConfig.cycleDurationMs ?? 1000) / defaultAvatarConfig.masterFrameCount;
-      const micTestPacket = await defaultSpeechOrchestrator.preRenderSpeech(MIC_TEST_MESSAGE, tickMs);
-      const micTestDuration = Math.max(MIC_TEST_DURATION, micTestPacket.totalDurationMs + 400);
+      const tickMs =
+        (defaultAvatarConfig.cycleDurationMs ?? 1000) /
+        defaultAvatarConfig.masterFrameCount;
+      const micTestPacket = await defaultSpeechOrchestrator.preRenderSpeech(
+        MIC_TEST_MESSAGE,
+        tickMs,
+      );
+      const micTestDuration = Math.max(
+        MIC_TEST_DURATION,
+        micTestPacket.totalDurationMs + 400,
+      );
 
-      await new Promise(resolve => setTimeout(resolve, micTestDuration));
+      await new Promise((resolve) => setTimeout(resolve, micTestDuration));
       if (!isSubscribed) return;
 
       // All tests passed! Perform greeting ("Hi there! I am Chleo!")
-      console.log('[HomePage] All readiness tests passed! Performing greeting speech...');
+      console.log(
+        "[HomePage] All readiness tests passed! Performing greeting speech...",
+      );
       if (!isHoveringRef.current) {
         setBubbleText(GREETING_MESSAGE);
         setIsBubbleVisible(true);
-        compositor.setExpression('happy');
-        compositor.setExpression('speak', GREETING_MESSAGE);
+        compositor.setExpression("happy");
+        compositor.setExpression("speak", GREETING_MESSAGE);
       }
 
-      const greetingPacket = await defaultSpeechOrchestrator.preRenderSpeech(GREETING_MESSAGE, tickMs);
-      const greetingDuration = Math.max(GREETING_DURATION, greetingPacket.totalDurationMs + 500);
+      const greetingPacket = await defaultSpeechOrchestrator.preRenderSpeech(
+        GREETING_MESSAGE,
+        tickMs,
+      );
+      const greetingDuration = Math.max(
+        GREETING_DURATION,
+        greetingPacket.totalDurationMs + 500,
+      );
 
       idleTimerRef.current = setTimeout(() => {
         if (!isSubscribed) return;
         if (!isHoveringRef.current) {
           setIsBubbleVisible(false);
-          compositor.setExpression('idle');
+          compositor.setExpression("idle");
         }
 
         idleTimerRef.current = setTimeout(() => {
@@ -347,7 +383,6 @@ export const HomePage: React.FC = () => {
     };
   }, [startIdleCycle]);
 
-
   // Hover handlers
   const handlePanelEnter = (panel: FocusPanelConfig) => {
     isHoveringRef.current = true;
@@ -356,20 +391,23 @@ export const HomePage: React.FC = () => {
 
     // Get current message index for this panel and circulate
     const currentIndex = panelMessageIndicesRef.current[panel.id] ?? 0;
-    const rawMsg = panel.hoverMessages[currentIndex % panel.hoverMessages.length];
-    panelMessageIndicesRef.current[panel.id] = (currentIndex + 1) % panel.hoverMessages.length;
+    const rawMsg =
+      panel.hoverMessages[currentIndex % panel.hoverMessages.length];
+    panelMessageIndicesRef.current[panel.id] =
+      (currentIndex + 1) % panel.hoverMessages.length;
 
-    const messageText = typeof rawMsg === 'string' ? rawMsg : rawMsg.text;
-    const messageExpression = (typeof rawMsg === 'object' && rawMsg.expression)
-      ? rawMsg.expression
-      : (panel.expression || 'happy');
+    const messageText = typeof rawMsg === "string" ? rawMsg : rawMsg.text;
+    const messageExpression =
+      typeof rawMsg === "object" && rawMsg.expression
+        ? rawMsg.expression
+        : panel.expression || "happy";
 
     setBubbleText(messageText);
     setIsBubbleVisible(true);
 
     if (compositorRef.current) {
       compositorRef.current.setExpression(messageExpression);
-      compositorRef.current.setExpression('speak', messageText);
+      compositorRef.current.setExpression("speak", messageText);
     }
   };
 
@@ -379,7 +417,7 @@ export const HomePage: React.FC = () => {
     setIsBubbleVisible(false);
 
     if (compositorRef.current) {
-      compositorRef.current.setExpression('idle');
+      compositorRef.current.setExpression("idle");
     }
 
     idleTimerRef.current = setTimeout(() => {
@@ -389,8 +427,8 @@ export const HomePage: React.FC = () => {
     }, IDLE_INTERVAL);
   };
 
-  const leftPanels = FOCUS_PANELS.filter(p => p.side === 'left');
-  const rightPanels = FOCUS_PANELS.filter(p => p.side === 'right');
+  const leftPanels = FOCUS_PANELS.filter((p) => p.side === "left");
+  const rightPanels = FOCUS_PANELS.filter((p) => p.side === "right");
 
   return (
     <div className="app-layout">
@@ -402,9 +440,12 @@ export const HomePage: React.FC = () => {
           {/* Header Title Section */}
           <div className="hero-content">
             <h1 className="hero-title">CHLEO</h1>
-            <p className="hero-subtitle">Interactive Desktop &amp; Browser Companion</p>
+            <p className="hero-subtitle">
+              Interactive Desktop &amp; Browser Companion
+            </p>
             <p className="hero-description">
-              She monitors your digital activity, guides you toward better focus habits, and adds life to your workspace.
+              She monitors your digital activity, guides you toward better focus
+              habits, and adds life to your workspace.
             </p>
           </div>
 
@@ -417,7 +458,7 @@ export const HomePage: React.FC = () => {
               height={showcaseDimensions.height}
               viewBox={`0 0 ${showcaseDimensions.width} ${showcaseDimensions.height}`}
             >
-              {lines.map(line => {
+              {lines.map((line) => {
                 const isActive = hoveredPanel === line.id;
                 return (
                   <line
@@ -426,10 +467,10 @@ export const HomePage: React.FC = () => {
                     y1={line.y1}
                     x2={line.x2}
                     y2={line.y2}
-                    stroke={isActive ? '#dc2626' : '#ef4444'}
+                    stroke={isActive ? "#dc2626" : "#ef4444"}
                     strokeWidth={isActive ? 3 : 2}
-                    strokeDasharray={isActive ? 'none' : '4 4'}
-                    style={{ transition: 'all 0.2s ease' }}
+                    strokeDasharray={isActive ? "none" : "4 4"}
+                    style={{ transition: "all 0.2s ease" }}
                   />
                 );
               })}
@@ -437,14 +478,14 @@ export const HomePage: React.FC = () => {
 
             {/* Left Panels */}
             <div className="focus-panels-column focus-panels-left">
-              {leftPanels.map(panel => (
+              {leftPanels.map((panel) => (
                 <a
                   key={panel.id}
-                  ref={el => {
+                  ref={(el) => {
                     panelRefs.current[panel.id] = el;
                   }}
                   href={`./blog.html#${panel.blogAnchor}`}
-                  className={`focus-panel ${hoveredPanel === panel.id ? 'focus-panel-active' : ''}`}
+                  className={`focus-panel ${hoveredPanel === panel.id ? "focus-panel-active" : ""}`}
                   onMouseEnter={() => handlePanelEnter(panel)}
                   onMouseLeave={handlePanelLeave}
                 >
@@ -452,8 +493,8 @@ export const HomePage: React.FC = () => {
                     <img
                       src={panel.iconSrc}
                       alt={panel.title}
-                      onError={e => {
-                        (e.target as HTMLElement).style.display = 'none';
+                      onError={(e) => {
+                        (e.target as HTMLElement).style.display = "none";
                       }}
                     />
                   </div>
@@ -468,20 +509,22 @@ export const HomePage: React.FC = () => {
             {/* Center: Avatar Canvas with Speech Bubble & Red Highlight Boxes */}
             <div className="home-avatar-center">
               <div className="home-avatar-wrap">
-                <div className={`speech-bubble ${isBubbleVisible ? 'visible' : ''}`}>
+                <div
+                  className={`speech-bubble ${isBubbleVisible ? "visible" : ""}`}
+                >
                   {bubbleText}
                 </div>
                 <div className="avatar-canvas-box">
                   <canvas ref={canvasRef} className="home-avatar-canvas" />
 
                   {/* Red Target Bounding Boxes on Avatar Parts */}
-                  {FOCUS_PANELS.map(panel => (
+                  {FOCUS_PANELS.map((panel) => (
                     <div
                       key={`box-${panel.id}`}
-                      ref={el => {
+                      ref={(el) => {
                         avatarBoxRefs.current[panel.id] = el;
                       }}
-                      className={`avatar-red-box ${hoveredPanel === panel.id ? 'active' : ''}`}
+                      className={`avatar-red-box ${hoveredPanel === panel.id ? "active" : ""}`}
                       style={panel.boxStyle}
                     />
                   ))}
@@ -491,14 +534,14 @@ export const HomePage: React.FC = () => {
 
             {/* Right Panels */}
             <div className="focus-panels-column focus-panels-right">
-              {rightPanels.map(panel => (
+              {rightPanels.map((panel) => (
                 <a
                   key={panel.id}
-                  ref={el => {
+                  ref={(el) => {
                     panelRefs.current[panel.id] = el;
                   }}
                   href={`./blog.html#${panel.blogAnchor}`}
-                  className={`focus-panel ${hoveredPanel === panel.id ? 'focus-panel-active' : ''}`}
+                  className={`focus-panel ${hoveredPanel === panel.id ? "focus-panel-active" : ""}`}
                   onMouseEnter={() => handlePanelEnter(panel)}
                   onMouseLeave={handlePanelLeave}
                 >
@@ -506,8 +549,8 @@ export const HomePage: React.FC = () => {
                     <img
                       src={panel.iconSrc}
                       alt={panel.title}
-                      onError={e => {
-                        (e.target as HTMLElement).style.display = 'none';
+                      onError={(e) => {
+                        (e.target as HTMLElement).style.display = "none";
                       }}
                     />
                   </div>

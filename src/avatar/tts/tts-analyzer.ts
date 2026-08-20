@@ -6,8 +6,8 @@
  * All comments follow ASD-STE100 rules (imperative and simple present tense).
  */
 
-import { tokenizeText, SpeechToken } from '../speak-frame-map';
-import { defaultTTSModulator } from './robotic-tts-modulator';
+import { tokenizeText, SpeechToken } from "../speak-frame-map";
+import { defaultTTSModulator } from "./robotic-tts-modulator";
 
 /** Measured timing data for a single spoken word token. */
 export interface TTSWordTiming {
@@ -52,7 +52,10 @@ export class TTSAnalyzer {
     }
 
     const config = defaultTTSModulator.getConfig();
-    const baseMsPerWord = Math.max(80, Math.round(160 / Math.max(0.4, config.speechRate)));
+    const baseMsPerWord = Math.max(
+      80,
+      Math.round(160 / Math.max(0.4, config.speechRate)),
+    );
     const wordTimings: TTSWordTiming[] = [];
 
     let totalDurationMs = 0;
@@ -64,16 +67,16 @@ export class TTSAnalyzer {
       // Word duration scales proportionally with character length
       const wordDurationMs = Math.max(
         90,
-        Math.round(baseMsPerWord * (0.60 + Math.min(1.2, length * 0.09)))
+        Math.round(baseMsPerWord * (0.6 + Math.min(1.2, length * 0.09))),
       );
 
       let pauseMs = 0; // 0ms pause for seamless word-to-word animation flow
       if (token.trailingPunctuation) {
-        if (token.trailingPunctuation === '...') pauseMs = 280;
-        else if (token.trailingPunctuation === '.') pauseMs = 160;
-        else if (token.trailingPunctuation === '?') pauseMs = 180;
-        else if (token.trailingPunctuation === '!') pauseMs = 160;
-        else if (token.trailingPunctuation === ',') pauseMs = 90;
+        if (token.trailingPunctuation === "...") pauseMs = 280;
+        else if (token.trailingPunctuation === ".") pauseMs = 160;
+        else if (token.trailingPunctuation === "?") pauseMs = 180;
+        else if (token.trailingPunctuation === "!") pauseMs = 160;
+        else if (token.trailingPunctuation === ",") pauseMs = 90;
       }
 
       wordTimings.push({
@@ -85,7 +88,9 @@ export class TTSAnalyzer {
       totalDurationMs += wordDurationMs + pauseMs;
     }
 
-    console.log(`[TTSAnalyzer] Mapped phrase "${text}": ${totalDurationMs}ms total duration (${wordTimings.length} words).`);
+    console.log(
+      `[TTSAnalyzer] Mapped phrase "${text}": ${totalDurationMs}ms total duration (${wordTimings.length} words).`,
+    );
 
     return {
       text,

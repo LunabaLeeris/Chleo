@@ -7,11 +7,15 @@
  * All comments follow ASD-STE100 rules (imperative and simple present tense).
  */
 
-import { ComposedSpeakResult, AvatarCompositor, WordStartAnchor } from '../avatar-compositor';
-import { getWordFrames, MOUTH_FRAMES } from '../speak-frame-map';
-import { defaultTTSAnalyzer, TTSPhraseAnalysis } from './tts-analyzer';
-import { defaultTTSModulator } from './robotic-tts-modulator';
-import type { EmotionFrameConfig } from '../emotions/emotion-types';
+import {
+  ComposedSpeakResult,
+  AvatarCompositor,
+  WordStartAnchor,
+} from "../avatar-compositor";
+import { getWordFrames, MOUTH_FRAMES } from "../speak-frame-map";
+import { defaultTTSAnalyzer, TTSPhraseAnalysis } from "./tts-analyzer";
+import { defaultTTSModulator } from "./robotic-tts-modulator";
+import type { EmotionFrameConfig } from "../emotions/emotion-types";
 
 /** Pre-rendered speech packet containing TTS-driven animation and timing data. */
 export interface PreRenderedSpeechPacket {
@@ -41,14 +45,18 @@ export class SpeechOrchestrator {
   async preRenderSpeech(
     text: string,
     tickMs: number,
-    emotionFrames?: EmotionFrameConfig
+    emotionFrames?: EmotionFrameConfig,
   ): Promise<PreRenderedSpeechPacket> {
-    console.log('[SpeechOrchestrator] Pre-rendering speech packet for:', `"${text}"`);
+    console.log(
+      "[SpeechOrchestrator] Pre-rendering speech packet for:",
+      `"${text}"`,
+    );
 
     // Pre-warm Web Audio and TTS subsystem
     defaultTTSModulator.preWarm();
 
-    const analysis: TTSPhraseAnalysis = await defaultTTSAnalyzer.analyzePhrase(text);
+    const analysis: TTSPhraseAnalysis =
+      await defaultTTSAnalyzer.analyzePhrase(text);
 
     const composedMouthFrames: string[] = [];
     const composedHoldTicks: number[] = [];
@@ -71,7 +79,10 @@ export class SpeechOrchestrator {
 
       // Derive viseme hold ticks directly from measured TTS word duration
       const totalWordTicks = Math.max(1, Math.round(item.durationMs / tickMs));
-      const ticksPerFrame = Math.max(1, Math.round(totalWordTicks / frameCount));
+      const ticksPerFrame = Math.max(
+        1,
+        Math.round(totalWordTicks / frameCount),
+      );
 
       // Append mouth frames and calculated hold ticks
       for (let f = 0; f < frameCount; f++) {
@@ -103,7 +114,9 @@ export class SpeechOrchestrator {
     if (emotionFrames) {
       const count = composedMouthFrames.length;
       if (emotionFrames.eyebrows) {
-        animationResult.frames.eyebrows = Array(count).fill(emotionFrames.eyebrows);
+        animationResult.frames.eyebrows = Array(count).fill(
+          emotionFrames.eyebrows,
+        );
         animationResult.holdTicks.eyebrows = [...composedHoldTicks];
       }
       if (emotionFrames.eyes) {
@@ -117,7 +130,7 @@ export class SpeechOrchestrator {
     }
 
     console.log(
-      `[SpeechOrchestrator] Speech packet ready: ${totalTicks} ticks, ${totalDurationMs}ms total duration (${wordAnchors.length} word anchors).`
+      `[SpeechOrchestrator] Speech packet ready: ${totalTicks} ticks, ${totalDurationMs}ms total duration (${wordAnchors.length} word anchors).`,
     );
 
     return {
@@ -133,7 +146,10 @@ export class SpeechOrchestrator {
    * @param packet     - Pre-rendered speech packet from preRenderSpeech().
    * @param compositor - Active AvatarCompositor instance.
    */
-  playPreRenderedSpeech(packet: PreRenderedSpeechPacket, compositor: AvatarCompositor): void {
+  playPreRenderedSpeech(
+    packet: PreRenderedSpeechPacket,
+    compositor: AvatarCompositor,
+  ): void {
     //  Cancel any active speech output
     defaultTTSModulator.stopSpeech();
 
@@ -143,9 +159,11 @@ export class SpeechOrchestrator {
     // Set word boundary callback: fires when animation advances to a word start frame
     compositor.setOnWordStartCallback((wordIndex, word) => {
       const anchors = packet.animationResult.wordAnchors;
-      const anchor = anchors?.find(a => a.wordIndex === wordIndex);
+      const anchor = anchors?.find((a) => a.wordIndex === wordIndex);
       const durMs = anchor?.durationMs ?? 250;
-      console.log(`[SpeechOrchestrator] Sync trigger: playing word "${word}" (index ${wordIndex}, ${durMs}ms)`);
+      console.log(
+        `[SpeechOrchestrator] Sync trigger: playing word "${word}" (index ${wordIndex}, ${durMs}ms)`,
+      );
       defaultTTSModulator.speakWord(word, durMs);
     });
 

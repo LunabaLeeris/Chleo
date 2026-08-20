@@ -1,10 +1,10 @@
-import React from 'react';
+import React from "react";
 
 export interface ColumnDef {
   /** Column header text or node */
   header: React.ReactNode;
   /** Text alignment for this column */
-  align?: 'left' | 'center' | 'right';
+  align?: "left" | "center" | "right";
   /** Fixed or minimum width (e.g. '80px', '25%') */
   width?: string | number;
   /** Optional custom class for the column th */
@@ -37,7 +37,7 @@ export interface ContentTableProps {
 }
 
 function isColumnDef(col: ColumnItem): col is ColumnDef {
-  return typeof col === 'object' && col !== null && 'header' in col;
+  return typeof col === "object" && col !== null && "header" in col;
 }
 
 /**
@@ -51,20 +51,26 @@ export const ContentTable: React.FC<ContentTableProps> = ({
   columns,
   data,
   scrollable = false,
-  maxHeight = '320px',
+  maxHeight = "320px",
   badge,
-  className = '',
-  tableClassName = '',
+  className = "",
+  tableClassName = "",
   footer,
 }) => {
   const normalizedColumns: ColumnDef[] = columns.map((col) => {
     if (isColumnDef(col)) {
       return col;
     }
-    return { header: col, align: undefined, width: undefined, className: undefined };
+    return {
+      header: col,
+      align: undefined,
+      width: undefined,
+      className: undefined,
+    };
   });
 
-  const parsedMaxHeight = typeof maxHeight === 'number' ? `${maxHeight}px` : maxHeight;
+  const parsedMaxHeight =
+    typeof maxHeight === "number" ? `${maxHeight}px` : maxHeight;
 
   return (
     <div className={`cb-table-container ${className}`.trim()}>
@@ -81,7 +87,7 @@ export const ContentTable: React.FC<ContentTableProps> = ({
       )}
 
       <div
-        className={`cb-table-wrapper ${scrollable ? 'cb-table-wrapper--scrollable' : ''}`}
+        className={`cb-table-wrapper ${scrollable ? "cb-table-wrapper--scrollable" : ""}`}
         style={scrollable ? { maxHeight: parsedMaxHeight } : undefined}
       >
         <table className={`cb-table ${tableClassName}`.trim()}>
@@ -90,7 +96,7 @@ export const ContentTable: React.FC<ContentTableProps> = ({
               {normalizedColumns.map((col, i) => (
                 <th
                   key={i}
-                  className={`cb-table__th ${col.className || ''}`.trim()}
+                  className={`cb-table__th ${col.className || ""}`.trim()}
                   style={{
                     textAlign: col.align,
                     width: col.width,
@@ -122,7 +128,7 @@ export const ContentTable: React.FC<ContentTableProps> = ({
                         className="cb-table__td"
                         style={{ textAlign: colDef?.align }}
                       >
-                        {cell ?? ''}
+                        {cell ?? ""}
                       </td>
                     );
                   })}

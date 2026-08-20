@@ -1,5 +1,5 @@
-import type { LLMEmotionOutput } from '../avatar/emotions/emotion-types';
-import type { MonitoringEventPayload } from './monitoring-types';
+import type { LLMEmotionOutput } from "../avatar/emotions/emotion-types";
+import type { MonitoringEventPayload } from "./monitoring-types";
 
 /**
  * LLMService is a scaffolded stub for future LLM API integration (Gemini, OpenAI, etc).
@@ -18,7 +18,7 @@ export class LLMService {
   async generate(
     _event: MonitoringEventPayload,
     _directive: string,
-    _memoryContext?: string
+    _memoryContext?: string,
   ): Promise<LLMEmotionOutput | null> {
     // TODO: Implement LLM API call here
     // Example future implementation:

@@ -1,24 +1,26 @@
-import React, { useState } from 'react';
-import { defaultTTSModulator, TTSModulatorConfig } from '../../src/avatar';
-import { PanelSection, Slider, Button } from './ui';
+import React, { useState } from "react";
+import { defaultTTSModulator, TTSModulatorConfig } from "../../src/avatar";
+import { PanelSection, Slider, Button } from "./ui";
 
 interface VoiceModulationControlsProps {
   onTestVoice: () => void;
 }
 
 // Renders robotic voice synthesis sliders and configuration controls.
-export const VoiceModulationControls: React.FC<VoiceModulationControlsProps> = ({
-  onTestVoice,
-}) => {
-  const [config, setConfig] = useState<TTSModulatorConfig>(defaultTTSModulator.getConfig());
-  const [statusMessage, setStatusMessage] = useState<string>('');
+export const VoiceModulationControls: React.FC<
+  VoiceModulationControlsProps
+> = ({ onTestVoice }) => {
+  const [config, setConfig] = useState<TTSModulatorConfig>(
+    defaultTTSModulator.getConfig(),
+  );
+  const [statusMessage, setStatusMessage] = useState<string>("");
 
   const isProd = import.meta.env.PROD;
 
   const showStatus = (msg: string) => {
     setStatusMessage(msg);
     setTimeout(() => {
-      setStatusMessage('');
+      setStatusMessage("");
     }, 3000);
   };
 
@@ -29,13 +31,13 @@ export const VoiceModulationControls: React.FC<VoiceModulationControlsProps> = (
 
   const handleSave = () => {
     defaultTTSModulator.saveConfig();
-    showStatus('Modulation settings saved as default!');
+    showStatus("Modulation settings saved as default!");
   };
 
   const handleReset = () => {
     defaultTTSModulator.resetToDefault();
     setConfig({ ...defaultTTSModulator.getConfig() });
-    showStatus('Reset to default voice settings.');
+    showStatus("Reset to default voice settings.");
   };
 
   return (
@@ -149,16 +151,16 @@ export const VoiceModulationControls: React.FC<VoiceModulationControlsProps> = (
         min={0.0}
         max={1.0}
         step={0.05}
-        value={config.distortion ?? 0.20}
-        displayValue={(config.distortion ?? 0.20).toFixed(2)}
+        value={config.distortion ?? 0.2}
+        displayValue={(config.distortion ?? 0.2).toFixed(2)}
         onChange={(val) => updateParam({ distortion: val })}
       />
 
       <div
         className="button-grid"
         style={{
-          marginTop: '12px',
-          gridTemplateColumns: isProd ? '1fr 1fr' : '1fr 1fr 1fr',
+          marginTop: "12px",
+          gridTemplateColumns: isProd ? "1fr 1fr" : "1fr 1fr 1fr",
         }}
       >
         <Button
@@ -193,12 +195,12 @@ export const VoiceModulationControls: React.FC<VoiceModulationControlsProps> = (
         <div
           id="voice-config-status"
           style={{
-            fontFamily: 'var(--font-pixel)',
-            fontSize: '0.75rem',
-            color: 'var(--accent-primary)',
-            marginTop: '8px',
-            textAlign: 'center',
-            display: 'block',
+            fontFamily: "var(--font-pixel)",
+            fontSize: "0.75rem",
+            color: "var(--accent-primary)",
+            marginTop: "8px",
+            textAlign: "center",
+            display: "block",
           }}
         >
           {statusMessage}

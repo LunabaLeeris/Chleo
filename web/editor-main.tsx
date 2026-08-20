@@ -1,6 +1,6 @@
 import React from "react";
 import { createRoot } from "react-dom/client";
-import { HomePage } from "./pages/HomePage";
+import { EditorPage } from "./pages/EditorPage";
 
 const container = document.getElementById("root");
 
@@ -8,7 +8,7 @@ if (container) {
   const root = createRoot(container);
   root.render(
     <React.StrictMode>
-      <HomePage />
+      <EditorPage />
     </React.StrictMode>,
   );
 }

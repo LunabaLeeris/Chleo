@@ -6,12 +6,46 @@ import type {
   FrameArrayDef,
   LoopMode,
   CleoExpression,
-} from './sprite-types';
-import { PART_RENDER_ORDER } from './sprite-types';
-import { preloadAvatarSprites, ensureImagesLoaded } from './sprite-loader';
-import type { EmotionFrameConfig, PlutchikEmotion, ResponseType } from './emotions/emotion-types';
-import { getAvatarEmotionFrames } from './emotions/response-frame-map';
-import { defaultSpeechOrchestrator, type PreRenderedSpeechPacket } from './tts/speech-orchestrator';
+} from "./sprite-types";
+import { PART_RENDER_ORDER } from "./sprite-types";
+import { preloadAvatarSprites, ensureImagesLoaded } from "./sprite-loader";
+import type {
+  EmotionFrameConfig,
+  PlutchikEmotion,
+  ResponseType,
+} from "./emotions/emotion-types";
+import { getAvatarEmotionFrames } from "./emotions/response-frame-map";
+import {
+  defaultSpeechOrchestrator,
+  type PreRenderedSpeechPacket,
+} from "./tts/speech-orchestrator";
+
+function clonePartAnimations(
+  config: AvatarConfig,
+): Record<PartName, Record<string, AnimationDef>> {
+  const out = {} as Record<PartName, Record<string, AnimationDef>>;
+  for (const part of PART_RENDER_ORDER) {
+    out[part] = { ...config.parts[part].animations };
+  }
+  return out;
+}
+
+function cloneAvatarConfig(config: AvatarConfig): AvatarConfig {
+  return {
+    ...config,
+    parts: PART_RENDER_ORDER.reduce(
+      (acc, part) => {
+        const src = config.parts[part];
+        acc[part] = {
+          ...src,
+          animations: { ...src.animations },
+        };
+        return acc;
+      },
+      {} as AvatarConfig["parts"],
+    ),
+  };
+}
 
 /** Options for speakWithEmotion and speakWithEmotionConfig methods. */
 export interface SpeakOptions {
@@ -38,6 +72,8 @@ interface PartAnimationState {
   /** Hold-tick counter for frame-array animations. Tracks how many
    *  ticks the current frame has been displayed. */
   holdCounter: number;
+
+  fpsAccumMs: number;
 }
 
 /**
@@ -48,6 +84,8 @@ export class AvatarCompositor {
   private canvas: HTMLCanvasElement;
   private ctx: CanvasRenderingContext2D;
   private config: AvatarConfig;
+
+  private stockAnimations: Record<PartName, Record<string, AnimationDef>>;
 
   /** Global master frame counter. */
   private globalFrame: number = 0;
@@ -74,7 +112,8 @@ export class AvatarCompositor {
   private activeWordAnchors: WordStartAnchor[] = [];
 
   /** Callback triggered when mouth animation reaches a word start frame. */
-  private onWordStartCallback: ((wordIndex: number, word: string) => void) | null = null;
+  private onWordStartCallback:
+    ((wordIndex: number, word: string) => void) | null = null;
 
   /**
    * Blink interval range in ticks. A random value between min and
@@ -85,11 +124,12 @@ export class AvatarCompositor {
 
   constructor(canvas: HTMLCanvasElement, config: AvatarConfig) {
     this.canvas = canvas;
-    this.config = config;
+    this.config = cloneAvatarConfig(config);
+    this.stockAnimations = clonePartAnimations(config);
 
-    const ctx = canvas.getContext('2d');
+    const ctx = canvas.getContext("2d");
     if (!ctx) {
-      throw new Error('Failed to obtain 2D context from canvas.');
+      throw new Error("Failed to obtain 2D context from canvas.");
     }
 
     this.ctx = ctx;
@@ -105,8 +145,9 @@ export class AvatarCompositor {
         currentAnim: defaultAnim,
         localFrame: 0,
         completedCycles: 0,
-        loopMode: animDef?.loop ?? 'infinite',
+        loopMode: animDef?.loop ?? "infinite",
         holdCounter: 0,
+        fpsAccumMs: 0,
       };
     }
   }
@@ -180,7 +221,6 @@ export class AvatarCompositor {
   }
 
   /**
-  /**
    * Inject composed frame arrays and hold ticks as transient 'speak'
    * animation definitions into the runtime config. Play them once per
    * affected part.
@@ -208,22 +248,136 @@ export class AvatarCompositor {
     this.activeWordAnchors = result.wordAnchors ? [...result.wordAnchors] : [];
 
     // Inject transient FrameArrayDef for each affected part and play.
-    for (const [part, srcArray] of Object.entries(composed) as [PartName, string[]][]) {
+    for (const [part, srcArray] of Object.entries(composed) as [
+      PartName,
+      string[],
+    ][]) {
       if (!srcArray || srcArray.length === 0) continue;
 
       const speakDef: FrameArrayDef = {
-        type: 'framearray',
+        type: "framearray",
         srcArray,
         holdTicks: composedHolds[part] ?? undefined,
-        loop: 'once',
+        loop: "once",
       };
 
       // Inject into the runtime config animations map.
-      this.config.parts[part].animations['speak'] = speakDef;
+      this.config.parts[part].animations["speak"] = speakDef;
 
       // Play the composed speak animation once.
-      this.playAnimation(part, 'speak', 'once');
+      this.playAnimation(part, "speak", "once");
     }
+  }
+
+  async applyPartClip(
+    part: PartName,
+    animName: string,
+    srcArray: string[],
+    fps: number = 12,
+  ): Promise<void> {
+    if (!srcArray.length) return;
+
+    await ensureImagesLoaded(srcArray, this.images);
+
+    const { width: targetW, height: targetH } = this.getPartSpriteSize(part);
+    const scaledSrcs: string[] = [];
+    for (const src of srcArray) {
+      const img = this.images.get(src);
+      if (!img) continue;
+      if (img.width === targetW && img.height === targetH) {
+        scaledSrcs.push(src);
+        continue;
+      }
+      const scaled = scaleImageNearest(img, targetW, targetH);
+      scaledSrcs.push(scaled);
+    }
+    if (!scaledSrcs.length) return;
+
+    await ensureImagesLoaded(scaledSrcs, this.images);
+
+    const clipDef: FrameArrayDef = {
+      type: "framearray",
+      srcArray: scaledSrcs,
+      fps,
+      loop: "infinite",
+    };
+    this.config.parts[part].animations[animName] = clipDef;
+    this.playAnimation(part, animName, "infinite");
+  }
+
+  async playCustomClip(
+    part: PartName,
+    srcArray: string[],
+    fps: number = 12,
+  ): Promise<void> {
+    return this.applyPartClip(part, "custom", srcArray, fps);
+  }
+
+  restorePartClip(part: PartName, animName: string): void {
+    const stock = this.stockAnimations[part][animName];
+    if (stock) {
+      this.config.parts[part].animations[animName] = stock;
+    } else {
+      delete this.config.parts[part].animations[animName];
+    }
+    if (this.config.parts[part].animations[animName]) {
+      this.playAnimation(part, animName, "infinite");
+    } else {
+      this.resetPart(part);
+    }
+  }
+
+  clearCustomClip(part: PartName): void {
+    this.restorePartClip(part, "custom");
+  }
+
+  previewExpression(expression: CleoExpression): void {
+    switch (expression) {
+      case "idle":
+        this.resetAll();
+        break;
+      case "blink":
+        this.playAnimation("eyes", "blink", "infinite");
+        break;
+      case "speak":
+        this.playAnimation("mouth", "speak", "infinite");
+        break;
+      case "sleep":
+        this.playAnimation("body", "sleep", "infinite");
+        this.playAnimation("eyes", "sleep", "infinite");
+        break;
+      case "close_eyes":
+        this.playAnimation("eyes", "close_eyes", "infinite");
+        break;
+      case "angry":
+        this.playAnimation("eyebrows", "angry", "infinite");
+        break;
+      case "focused":
+        this.playAnimation("eyebrows", "focused", "infinite");
+        this.playAnimation("eyes", "focused", "infinite");
+        break;
+      case "happy":
+        this.playAnimation("eyebrows", "happy", "infinite");
+        this.playAnimation("eyes", "happy", "infinite");
+        break;
+      case "yawn":
+        this.playAnimation("mouth", "yawn", "infinite");
+        this.playAnimation("eyes", "blink", "infinite");
+        break;
+      case "question":
+        this.playAnimation("eyebrows", "question", "infinite");
+        this.playAnimation("eyes", "question", "infinite");
+        break;
+    }
+  }
+
+  getPartSpriteSize(part: PartName): { width: number; height: number } {
+    const partConfig = this.config.parts[part];
+    const def = partConfig.animations[partConfig.defaultAnimation];
+    if (def?.type === "spritesheet") {
+      return { width: def.frameWidth, height: def.frameHeight };
+    }
+    return { width: this.config.canvasWidth, height: this.config.canvasHeight };
   }
 
   /**
@@ -233,7 +387,7 @@ export class AvatarCompositor {
     text: string,
     overallEmotion: PlutchikEmotion,
     responseType: ResponseType,
-    options?: SpeakOptions
+    options?: SpeakOptions,
   ): Promise<PreRenderedSpeechPacket> {
     const emotionFrames = getAvatarEmotionFrames(overallEmotion, responseType);
     return this.speakWithEmotionConfig(text, emotionFrames, options);
@@ -245,10 +399,15 @@ export class AvatarCompositor {
   async speakWithEmotionConfig(
     text: string,
     emotionFrames: EmotionFrameConfig,
-    options?: SpeakOptions
+    options?: SpeakOptions,
   ): Promise<PreRenderedSpeechPacket> {
-    const tickMs = (this.config.cycleDurationMs ?? 1000) / this.config.masterFrameCount;
-    const packet = await defaultSpeechOrchestrator.preRenderSpeech(text, tickMs, emotionFrames);
+    const tickMs =
+      (this.config.cycleDurationMs ?? 1000) / this.config.masterFrameCount;
+    const packet = await defaultSpeechOrchestrator.preRenderSpeech(
+      text,
+      tickMs,
+      emotionFrames,
+    );
     defaultSpeechOrchestrator.playPreRenderedSpeech(packet, this);
 
     if (options?.onComplete) {
@@ -260,25 +419,31 @@ export class AvatarCompositor {
     return packet;
   }
 
-
-
   /**
    * Registers a callback fired when the mouth animation reaches a word start frame.
    *
    * @param cb - Callback receiving wordIndex and word string.
    */
-  setOnWordStartCallback(cb: ((wordIndex: number, word: string) => void) | null): void {
+  setOnWordStartCallback(
+    cb: ((wordIndex: number, word: string) => void) | null,
+  ): void {
     this.onWordStartCallback = cb;
   }
 
   /**
    * Play a named animation sequence on a specific avatar part.
    */
-  playAnimation(part: PartName, animName: string, loopOverride?: LoopMode): void {
+  playAnimation(
+    part: PartName,
+    animName: string,
+    loopOverride?: LoopMode,
+  ): void {
     const partConfig = this.config.parts[part];
     const animDef = partConfig?.animations?.[animName];
     if (!animDef) {
-      console.warn(`[AvatarCompositor] Animation "${animName}" missing for part "${part}".`);
+      console.warn(
+        `[AvatarCompositor] Animation "${animName}" missing for part "${part}".`,
+      );
       return;
     }
 
@@ -287,12 +452,15 @@ export class AvatarCompositor {
     state.localFrame = 0;
     state.completedCycles = 0;
     state.holdCounter = 0;
-    state.loopMode = loopOverride ?? animDef.loop ?? 'infinite';
+    state.fpsAccumMs = 0;
+    state.loopMode = loopOverride ?? animDef.loop ?? "infinite";
 
-    console.log(`[AvatarCompositor] Part "${part}" playing animation "${animName}" (loopMode: ${state.loopMode})`);
+    console.log(
+      `[AvatarCompositor] Part "${part}" playing animation "${animName}" (loopMode: ${state.loopMode})`,
+    );
 
     // Reset master clock to 0 when body animation starts or restarts.
-    if (part === 'body') {
+    if (part === "body") {
       this.globalFrame = 0;
     }
   }
@@ -302,44 +470,52 @@ export class AvatarCompositor {
    */
   setExpression(expression: CleoExpression, text?: string): void {
     switch (expression) {
-      case 'idle':
+      case "idle":
         this.resetAll();
         break;
-      case 'blink':
-        this.playAnimation('eyes', 'blink', 'once');
+      case "blink":
+        this.playAnimation("eyes", "blink", "once");
         break;
-      case 'speak': {
+      case "speak": {
         if (text && text.trim().length > 0) {
-          const tickMs = (this.config.cycleDurationMs ?? 1000) / this.config.masterFrameCount;
-          defaultSpeechOrchestrator.preRenderSpeech(text, tickMs).then(packet => {
-            defaultSpeechOrchestrator.playPreRenderedSpeech(packet, this);
-          });
+          const tickMs =
+            (this.config.cycleDurationMs ?? 1000) /
+            this.config.masterFrameCount;
+          defaultSpeechOrchestrator
+            .preRenderSpeech(text, tickMs)
+            .then((packet) => {
+              defaultSpeechOrchestrator.playPreRenderedSpeech(packet, this);
+            });
         } else {
-          this.playAnimation('mouth', 'speak', 'once');
+          this.playAnimation("mouth", "speak", "once");
         }
         break;
       }
-      case 'close_eyes':
-        this.playAnimation('eyes', 'close_eyes', 'infinite');
+      case "sleep":
+        this.playAnimation("body", "sleep", "infinite");
+        this.playAnimation("eyes", "sleep", "infinite");
         break;
-      case 'angry':
-        this.playAnimation('eyebrows', 'angry', 'infinite');
+      case "close_eyes":
+        this.playAnimation("eyes", "close_eyes", "infinite");
         break;
-      case 'focused':
-        this.playAnimation('eyebrows', 'focused', 'infinite');
-        this.playAnimation('eyes', 'focused', 'infinite');
+      case "angry":
+        this.playAnimation("eyebrows", "angry", "infinite");
         break;
-      case 'happy':
-        this.playAnimation('eyebrows', 'happy', 'infinite');
-        this.playAnimation('eyes', 'happy', 'infinite');
+      case "focused":
+        this.playAnimation("eyebrows", "focused", "infinite");
+        this.playAnimation("eyes", "focused", "infinite");
         break;
-      case 'yawn':
-        this.playAnimation('mouth', 'yawn', 'once');
-        this.playAnimation('eyes', 'blink', 'once');
+      case "happy":
+        this.playAnimation("eyebrows", "happy", "infinite");
+        this.playAnimation("eyes", "happy", "infinite");
         break;
-      case 'question':
-        this.playAnimation('eyebrows', 'question', 'once');
-        this.playAnimation('eyes', 'question', 'once');
+      case "yawn":
+        this.playAnimation("mouth", "yawn", "once");
+        this.playAnimation("eyes", "blink", "once");
+        break;
+      case "question":
+        this.playAnimation("eyebrows", "question", "once");
+        this.playAnimation("eyes", "question", "once");
         break;
     }
   }
@@ -349,7 +525,7 @@ export class AvatarCompositor {
    */
   resetPart(part: PartName): void {
     const defaultAnim = this.config.parts[part].defaultAnimation;
-    this.playAnimation(part, defaultAnim, 'infinite');
+    this.playAnimation(part, defaultAnim, "infinite");
   }
 
   /**
@@ -403,16 +579,24 @@ export class AvatarCompositor {
   private drawPart(part: PartName): void {
     const partConfig = this.config.parts[part];
     const state = this.partStates[part];
-    const animDef: AnimationDef | undefined = partConfig.animations[state.currentAnim];
+    const animDef: AnimationDef | undefined =
+      partConfig.animations[state.currentAnim];
 
     if (!animDef) {
-      console.warn(`[AvatarCompositor] Missing animation definition "${state.currentAnim}" for part "${part}".`);
+      console.warn(
+        `[AvatarCompositor] Missing animation definition "${state.currentAnim}" for part "${part}".`,
+      );
       return;
     }
 
-    if ((animDef.type === 'spritesheet' && !animDef.src)
-      || (animDef.type === 'framearray' && (!animDef.srcArray || animDef.srcArray.length === 0))) {
-      console.warn(`[AvatarCompositor] Empty source in animation "${state.currentAnim}" for part "${part}".`);
+    if (
+      (animDef.type === "spritesheet" && !animDef.src) ||
+      (animDef.type === "framearray" &&
+        (!animDef.srcArray || animDef.srcArray.length === 0))
+    ) {
+      console.warn(
+        `[AvatarCompositor] Empty source in animation "${state.currentAnim}" for part "${part}".`,
+      );
       return;
     }
 
@@ -422,7 +606,7 @@ export class AvatarCompositor {
     let drawHeight = 0;
     let sourceX = 0;
 
-    if (animDef.type === 'spritesheet' && animDef.src) {
+    if (animDef.type === "spritesheet" && animDef.src) {
       image = this.images.get(animDef.src);
       const frameCount = Math.max(1, animDef.frameCount);
       animFrame = state.localFrame % frameCount;
@@ -430,7 +614,11 @@ export class AvatarCompositor {
       drawWidth = animDef.frameWidth;
       drawHeight = animDef.frameHeight;
       sourceX = animFrame * animDef.frameWidth;
-    } else if (animDef.type === 'framearray' && animDef.srcArray && animDef.srcArray.length > 0) {
+    } else if (
+      animDef.type === "framearray" &&
+      animDef.srcArray &&
+      animDef.srcArray.length > 0
+    ) {
       const frameCount = animDef.srcArray.length;
       animFrame = state.localFrame % frameCount;
       const src = animDef.srcArray[animFrame];
@@ -446,8 +634,13 @@ export class AvatarCompositor {
     }
 
     if (!image) {
-      const targetSrc = animDef.type === 'spritesheet' ? animDef.src : animDef.srcArray?.[animFrame];
-      console.warn(`[AvatarCompositor] Image not found in cache for part "${part}" (anim: "${state.currentAnim}", frame: ${animFrame}, src: "${targetSrc}")`);
+      const targetSrc =
+        animDef.type === "spritesheet"
+          ? animDef.src
+          : animDef.srcArray?.[animFrame];
+      console.warn(
+        `[AvatarCompositor] Image not found in cache for part "${part}" (anim: "${state.currentAnim}", frame: ${animFrame}, src: "${targetSrc}")`,
+      );
       return;
     }
 
@@ -470,7 +663,7 @@ export class AvatarCompositor {
       finalX * scale,
       finalY * scale,
       drawWidth * scale,
-      drawHeight * scale
+      drawHeight * scale,
     );
   }
 
@@ -492,13 +685,13 @@ export class AvatarCompositor {
 
     // Increment blink counter during active speak animations.
     const mouthState = this.partStates.mouth;
-    if (mouthState.currentAnim === 'speak') {
+    if (mouthState.currentAnim === "speak") {
       this.blinkTickCounter++;
       if (this.blinkTickCounter >= this.nextBlinkAt) {
         // Only blink if eyes are not already in a speak animation.
         const eyeState = this.partStates.eyes;
-        if (eyeState.currentAnim !== 'speak') {
-          this.playAnimation('eyes', 'blink', 'once');
+        if (eyeState.currentAnim !== "speak") {
+          this.playAnimation("eyes", "blink", "once");
         }
         this.blinkTickCounter = 0;
         this.nextBlinkAt = this.randomBlinkInterval();
@@ -510,9 +703,10 @@ export class AvatarCompositor {
       const animDef = this.config.parts[part].animations[state.currentAnim];
       if (!animDef) continue;
 
-      const frameCount = animDef.type === 'spritesheet'
-        ? animDef.frameCount
-        : (animDef.srcArray?.length ?? 0);
+      const frameCount =
+        animDef.type === "spritesheet"
+          ? animDef.frameCount
+          : (animDef.srcArray?.length ?? 0);
 
       if (frameCount <= 1) {
         state.localFrame = 0;
@@ -520,37 +714,52 @@ export class AvatarCompositor {
       }
 
       // --- Trigger word start callback when mouth animation reaches word frame ---
-      if (part === 'mouth' && state.currentAnim === 'speak' && state.holdCounter === 0) {
-        const anchor = this.activeWordAnchors.find(a => a.frameIndex === state.localFrame);
+      if (
+        part === "mouth" &&
+        state.currentAnim === "speak" &&
+        state.holdCounter === 0
+      ) {
+        const anchor = this.activeWordAnchors.find(
+          (a) => a.frameIndex === state.localFrame,
+        );
         if (anchor && this.onWordStartCallback) {
           this.onWordStartCallback(anchor.wordIndex, anchor.word);
         }
       }
 
-      // --- Hold-tick logic for frame-array animations ---
-      if (animDef.type === 'framearray' && animDef.holdTicks && animDef.holdTicks.length > 0) {
+      let steps = 1;
+      if (animDef.type === "framearray" && animDef.fps && animDef.fps > 0) {
+        const tickMs =
+          (this.config.cycleDurationMs ?? 1000) / this.config.masterFrameCount;
+        state.fpsAccumMs += tickMs;
+        const frameMs = 1000 / animDef.fps;
+        steps = 0;
+        while (state.fpsAccumMs >= frameMs) {
+          state.fpsAccumMs -= frameMs;
+          steps++;
+        }
+      } else if (
+        animDef.type === "framearray" &&
+        animDef.holdTicks &&
+        animDef.holdTicks.length > 0
+      ) {
         state.holdCounter++;
         const holdNeeded = animDef.holdTicks[state.localFrame] ?? 1;
-
         if (state.holdCounter < holdNeeded) {
-          // Still holding this frame — do not advance.
           continue;
         }
-
-        // Hold complete — reset counter and advance.
         state.holdCounter = 0;
-        state.localFrame++;
-      } else {
-        // Default: advance 1 frame per tick (spritesheet or no holdTicks).
-        state.localFrame++;
+        steps = 1;
       }
 
-      if (state.localFrame >= frameCount) {
-        state.completedCycles++;
-
-        if (this.shouldRevertToDefault(state)) {
-          this.resetPart(part);
-        } else {
+      for (let i = 0; i < steps; i++) {
+        state.localFrame++;
+        if (state.localFrame >= frameCount) {
+          state.completedCycles++;
+          if (this.shouldRevertToDefault(state)) {
+            this.resetPart(part);
+            break;
+          }
           state.localFrame = state.localFrame % frameCount;
         }
       }
@@ -563,9 +772,9 @@ export class AvatarCompositor {
   private shouldRevertToDefault(state: PartAnimationState): boolean {
     const { loopMode, completedCycles } = state;
 
-    if (loopMode === 'infinite') return false;
-    if (loopMode === 'once') return completedCycles >= 1;
-    if (typeof loopMode === 'number') return completedCycles >= loopMode;
+    if (loopMode === "infinite") return false;
+    if (loopMode === "once") return completedCycles >= 1;
+    if (typeof loopMode === "number") return completedCycles >= loopMode;
 
     return false;
   }
@@ -574,9 +783,26 @@ export class AvatarCompositor {
    * Generate a random blink interval between min and max tick values.
    */
   private randomBlinkInterval(): number {
-    return this.BLINK_MIN_TICKS +
-      Math.floor(Math.random() * (this.BLINK_MAX_TICKS - this.BLINK_MIN_TICKS));
+    return (
+      this.BLINK_MIN_TICKS +
+      Math.floor(Math.random() * (this.BLINK_MAX_TICKS - this.BLINK_MIN_TICKS))
+    );
   }
+}
+
+function scaleImageNearest(
+  img: HTMLImageElement,
+  width: number,
+  height: number,
+): string {
+  const canvas = document.createElement("canvas");
+  canvas.width = width;
+  canvas.height = height;
+  const ctx = canvas.getContext("2d");
+  if (!ctx) return img.src;
+  ctx.imageSmoothingEnabled = false;
+  ctx.drawImage(img, 0, 0, width, height);
+  return canvas.toDataURL("image/png");
 }
 
 /** Word boundary frame anchor for synchronized word playback. */
@@ -608,5 +834,3 @@ export interface ComposedSpeakResult {
   /** Word boundary frame anchors for sync. */
   wordAnchors?: WordStartAnchor[];
 }
-
-

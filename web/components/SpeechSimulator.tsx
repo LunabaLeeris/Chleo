@@ -1,5 +1,5 @@
-import React from 'react';
-import { PanelSection, TextInput, Button } from './ui';
+import React from "react";
+import { PanelSection, TextInput, Button } from "./ui";
 
 interface SpeechSimulatorProps {
   speechInputText: string;
@@ -16,7 +16,7 @@ export const SpeechSimulator: React.FC<SpeechSimulatorProps> = ({
   onToggleMappedWords,
 }) => {
   const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
-    if (e.key === 'Enter') {
+    if (e.key === "Enter") {
       const trimmed = speechInputText.trim();
       if (trimmed) {
         onSpeakText(trimmed);
@@ -25,10 +25,7 @@ export const SpeechSimulator: React.FC<SpeechSimulatorProps> = ({
   };
 
   return (
-    <PanelSection
-      title="Speech & TTS Simulator"
-      bgVariant="speech"
-    >
+    <PanelSection title="Speech & TTS Simulator" bgVariant="speech">
       <div className="speech-control-group">
         <TextInput
           id="speech-input"

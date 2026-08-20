@@ -1,6 +1,11 @@
-import React from 'react';
-import { EmotionsWheelVisualizer } from './EmotionsWheelVisualizer';
-import { EmotionsOrchestrator, ResponseType, PlutchikEmotion, EmotionFrameConfig } from '../../src/avatar';
+import React from "react";
+import { EmotionsWheelVisualizer } from "./EmotionsWheelVisualizer";
+import {
+  EmotionsOrchestrator,
+  ResponseType,
+  PlutchikEmotion,
+  EmotionFrameConfig,
+} from "../../src/avatar";
 
 interface EmotionControlsProps {
   emotionEngine: EmotionsOrchestrator;

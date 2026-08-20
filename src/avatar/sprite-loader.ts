@@ -1,4 +1,4 @@
-import type { AvatarConfig } from './sprite-types';
+import type { AvatarConfig } from "./sprite-types";
 
 /**
  * Cache of loaded images keyed by their src path.
@@ -38,7 +38,7 @@ export function loadImage(src: string): Promise<HTMLImageElement> {
  * @returns A Map of src → HTMLImageElement for all successfully loaded images.
  */
 export async function preloadAvatarSprites(
-  config: AvatarConfig
+  config: AvatarConfig,
 ): Promise<Map<string, HTMLImageElement>> {
   const loaded = new Map<string, HTMLImageElement>();
   const allSrcs = new Set<string>();
@@ -46,9 +46,9 @@ export async function preloadAvatarSprites(
   // Collect all unique image paths
   for (const partConfig of Object.values(config.parts)) {
     for (const animDef of Object.values(partConfig.animations)) {
-      if (animDef.type === 'spritesheet' && animDef.src) {
+      if (animDef.type === "spritesheet" && animDef.src) {
         allSrcs.add(animDef.src);
-      } else if (animDef.type === 'framearray' && animDef.srcArray) {
+      } else if (animDef.type === "framearray" && animDef.srcArray) {
         for (const src of animDef.srcArray) {
           if (src) {
             allSrcs.add(src);
@@ -63,11 +63,11 @@ export async function preloadAvatarSprites(
     Array.from(allSrcs).map(async (src) => {
       const img = await loadImage(src);
       return { src, img };
-    })
+    }),
   );
 
   for (const result of results) {
-    if (result.status === 'fulfilled') {
+    if (result.status === "fulfilled") {
       loaded.set(result.value.src, result.value.img);
     } else {
       console.warn(`[SpriteLoader] Failed to preload image: ${result.reason}`);
@@ -75,7 +75,7 @@ export async function preloadAvatarSprites(
   }
 
   console.log(
-    `[SpriteLoader] Preloaded ${loaded.size}/${allSrcs.size} sprite assets.`
+    `[SpriteLoader] Preloaded ${loaded.size}/${allSrcs.size} sprite assets.`,
   );
   return loaded;
 }
@@ -91,26 +91,30 @@ export async function preloadAvatarSprites(
  */
 export async function ensureImagesLoaded(
   srcs: string[],
-  targetMap: Map<string, HTMLImageElement>
+  targetMap: Map<string, HTMLImageElement>,
 ): Promise<void> {
-  const missing = srcs.filter(src => src && !targetMap.has(src));
+  const missing = srcs.filter((src) => src && !targetMap.has(src));
   if (missing.length === 0) return;
 
   const uniqueMissing = [...new Set(missing)];
-  console.log(`[SpriteLoader] Loading ${uniqueMissing.length} new frame image(s) on demand.`);
+  console.log(
+    `[SpriteLoader] Loading ${uniqueMissing.length} new frame image(s) on demand.`,
+  );
 
   const results = await Promise.allSettled(
     uniqueMissing.map(async (src) => {
       const img = await loadImage(src);
       return { src, img };
-    })
+    }),
   );
 
   for (const result of results) {
-    if (result.status === 'fulfilled') {
+    if (result.status === "fulfilled") {
       targetMap.set(result.value.src, result.value.img);
     } else {
-      console.warn(`[SpriteLoader] Failed to load on-demand image: ${result.reason}`);
+      console.warn(
+        `[SpriteLoader] Failed to load on-demand image: ${result.reason}`,
+      );
     }
   }
 }

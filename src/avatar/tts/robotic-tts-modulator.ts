@@ -67,7 +67,7 @@ export const DEFAULT_MODULATION_CONFIG: RoboticModulationConfig = {
   robotToneBlend: 0.25,
 };
 
-const STORAGE_KEY = 'cleo_robotic_voice_config';
+const STORAGE_KEY = "cleo_robotic_voice_config";
 
 export type ConfigChangeListener = (config: RoboticModulationConfig) => void;
 
@@ -84,7 +84,7 @@ export class RoboticTTSModulator {
 
   constructor() {
     this.config = this.loadSavedConfig();
-    if (typeof window !== 'undefined' && 'speechSynthesis' in window) {
+    if (typeof window !== "undefined" && "speechSynthesis" in window) {
       this.speechSynth = window.speechSynthesis;
       this.loadFemaleVoice();
       if (this.speechSynth) {
@@ -97,16 +97,17 @@ export class RoboticTTSModulator {
    * Pre-warms Web AudioContext and SpeechSynthesis engine to prevent latency.
    */
   preWarm(): void {
-    if (typeof window === 'undefined') return;
+    if (typeof window === "undefined") return;
 
     if (!this.audioCtx) {
-      const AudioCtx = window.AudioContext || (window as any).webkitAudioContext;
+      const AudioCtx =
+        window.AudioContext || (window as any).webkitAudioContext;
       if (AudioCtx) {
         this.audioCtx = new AudioCtx();
       }
     }
 
-    if (this.audioCtx && this.audioCtx.state === 'suspended') {
+    if (this.audioCtx && this.audioCtx.state === "suspended") {
       this.audioCtx.resume();
     }
 
@@ -123,7 +124,7 @@ export class RoboticTTSModulator {
    * @returns Promise resolving to boolean indicating readiness.
    */
   async ensureVoicesLoaded(timeoutMs: number = 2500): Promise<boolean> {
-    if (typeof window === 'undefined') return false;
+    if (typeof window === "undefined") return false;
 
     this.preWarm();
 
@@ -151,15 +152,20 @@ export class RoboticTTSModulator {
       if (this.speechSynth) {
         const handleVoicesChanged = () => {
           if (this.speechSynth) {
-            this.speechSynth.removeEventListener('voiceschanged', handleVoicesChanged);
+            this.speechSynth.removeEventListener(
+              "voiceschanged",
+              handleVoicesChanged,
+            );
           }
           finish(true);
         };
-        this.speechSynth.addEventListener('voiceschanged', handleVoicesChanged);
+        this.speechSynth.addEventListener("voiceschanged", handleVoicesChanged);
       }
 
       setTimeout(() => {
-        finish(this.speechSynth ? this.speechSynth.getVoices().length > 0 : false);
+        finish(
+          this.speechSynth ? this.speechSynth.getVoices().length > 0 : false,
+        );
       }, timeoutMs);
     });
   }
@@ -174,23 +180,46 @@ export class RoboticTTSModulator {
     if (voices.length === 0) return;
 
     // Exclusively lock default to Microsoft Zira
-    const ziraVoice = voices.find(v => v.name.toLowerCase().includes('zira'));
+    const ziraVoice = voices.find((v) => v.name.toLowerCase().includes("zira"));
     if (ziraVoice) {
       this.selectedVoice = ziraVoice;
     } else {
       const femaleIdentifiers = [
-        'zira', 'jenny', 'samantha', 'victoria', 'karen', 'fiona', 'moira',
-        'ava', 'aria', 'sara', 'michelle', 'catherine', 'hazel', 'susan',
-        'google us english', 'female', 'girl'
+        "zira",
+        "jenny",
+        "samantha",
+        "victoria",
+        "karen",
+        "fiona",
+        "moira",
+        "ava",
+        "aria",
+        "sara",
+        "michelle",
+        "catherine",
+        "hazel",
+        "susan",
+        "google us english",
+        "female",
+        "girl",
       ];
-      this.selectedVoice = voices.find(v => {
-        const nameLower = v.name.toLowerCase();
-        const langLower = v.lang.toLowerCase();
-        return langLower.startsWith('en') && femaleIdentifiers.some(id => nameLower.includes(id));
-      }) ?? voices.find(v => v.lang.toLowerCase().startsWith('en')) ?? voices[0];
+      this.selectedVoice =
+        voices.find((v) => {
+          const nameLower = v.name.toLowerCase();
+          const langLower = v.lang.toLowerCase();
+          return (
+            langLower.startsWith("en") &&
+            femaleIdentifiers.some((id) => nameLower.includes(id))
+          );
+        }) ??
+        voices.find((v) => v.lang.toLowerCase().startsWith("en")) ??
+        voices[0];
     }
 
-    console.log('[RoboticTTSModulator] Locked default voice:', this.selectedVoice?.name);
+    console.log(
+      "[RoboticTTSModulator] Locked default voice:",
+      this.selectedVoice?.name,
+    );
   }
 
   /**
@@ -248,7 +277,7 @@ export class RoboticTTSModulator {
       try {
         listener(this.getConfig());
       } catch (err) {
-        console.error('[RoboticTTSModulator] Error in config listener:', err);
+        console.error("[RoboticTTSModulator] Error in config listener:", err);
       }
     }
   }
@@ -258,12 +287,15 @@ export class RoboticTTSModulator {
    */
   saveConfig(): void {
     try {
-      if (typeof window !== 'undefined' && window.localStorage) {
+      if (typeof window !== "undefined" && window.localStorage) {
         window.localStorage.setItem(STORAGE_KEY, JSON.stringify(this.config));
-        console.log('[RoboticTTSModulator] Saved config to localStorage.');
+        console.log("[RoboticTTSModulator] Saved config to localStorage.");
       }
     } catch (err) {
-      console.warn('[RoboticTTSModulator] Failed to save config to localStorage:', err);
+      console.warn(
+        "[RoboticTTSModulator] Failed to save config to localStorage:",
+        err,
+      );
     }
   }
 
@@ -273,11 +305,11 @@ export class RoboticTTSModulator {
   resetToDefault(): void {
     this.config = { ...DEFAULT_MODULATION_CONFIG };
     try {
-      if (typeof window !== 'undefined' && window.localStorage) {
+      if (typeof window !== "undefined" && window.localStorage) {
         window.localStorage.removeItem(STORAGE_KEY);
       }
     } catch (err) {
-      console.warn('[RoboticTTSModulator] Failed to clear stored config:', err);
+      console.warn("[RoboticTTSModulator] Failed to clear stored config:", err);
     }
     this.notifyListeners();
   }
@@ -289,7 +321,7 @@ export class RoboticTTSModulator {
    */
   private loadSavedConfig(): RoboticModulationConfig {
     try {
-      if (typeof window !== 'undefined' && window.localStorage) {
+      if (typeof window !== "undefined" && window.localStorage) {
         const saved = window.localStorage.getItem(STORAGE_KEY);
         if (saved) {
           const parsed = JSON.parse(saved);
@@ -297,7 +329,7 @@ export class RoboticTTSModulator {
         }
       }
     } catch (err) {
-      console.warn('[RoboticTTSModulator] Failed to load saved config:', err);
+      console.warn("[RoboticTTSModulator] Failed to load saved config:", err);
     }
     return { ...DEFAULT_MODULATION_CONFIG };
   }
@@ -321,7 +353,8 @@ export class RoboticTTSModulator {
     }
 
     // 2. Play vocal TTS word enunciation via SpeechSynthesis (scaled inversely by robotToneBlend)
-    const vocalVolume = this.config.masterVolume * Math.max(0, 1 - this.config.robotToneBlend);
+    const vocalVolume =
+      this.config.masterVolume * Math.max(0, 1 - this.config.robotToneBlend);
     if (this.speechSynth && vocalVolume > 0.01) {
       this.speechSynth.cancel();
 
@@ -365,7 +398,7 @@ export class RoboticTTSModulator {
       const startFreq = this.config.f0;
       const endFreq = startFreq * 1.15;
 
-      osc.type = 'sawtooth';
+      osc.type = "sawtooth";
       osc.frequency.setValueAtTime(startFreq, now);
       osc.frequency.exponentialRampToValueAtTime(endFreq, now + durSec);
 
@@ -373,9 +406,12 @@ export class RoboticTTSModulator {
       if (this.config.vibratoRate > 0 && this.config.vibratoDepth > 0.01) {
         const lfo = ctx.createOscillator();
         const lfoGain = ctx.createGain();
-        lfo.type = 'sine';
+        lfo.type = "sine";
         lfo.frequency.setValueAtTime(this.config.vibratoRate, now);
-        lfoGain.gain.setValueAtTime(startFreq * this.config.vibratoDepth * 0.15, now);
+        lfoGain.gain.setValueAtTime(
+          startFreq * this.config.vibratoDepth * 0.15,
+          now,
+        );
         lfo.connect(lfoGain);
         lfoGain.connect(osc.frequency);
         lfo.start(now);
@@ -383,12 +419,12 @@ export class RoboticTTSModulator {
       }
 
       // Primary Formant Filter (F1)
-      filter1.type = 'bandpass';
+      filter1.type = "bandpass";
       filter1.frequency.setValueAtTime(this.config.f1, now);
       filter1.Q.setValueAtTime(4.0, now);
 
       // Secondary Formant Filter (F2)
-      filter2.type = 'bandpass';
+      filter2.type = "bandpass";
       filter2.frequency.setValueAtTime(this.config.f2, now);
       filter2.Q.setValueAtTime(3.0, now);
 
@@ -415,7 +451,10 @@ export class RoboticTTSModulator {
       }
 
       // Volume envelope aligned with robotToneBlend
-      const maxVol = 0.45 * this.config.masterVolume * Math.max(0.2, this.config.robotToneBlend);
+      const maxVol =
+        0.45 *
+        this.config.masterVolume *
+        Math.max(0.2, this.config.robotToneBlend);
       gain.gain.setValueAtTime(0, now);
       gain.gain.linearRampToValueAtTime(maxVol, now + 0.03);
       gain.gain.exponentialRampToValueAtTime(0.001, now + durSec);
@@ -432,7 +471,7 @@ export class RoboticTTSModulator {
       osc.start(now);
       osc.stop(now + durSec);
     } catch (err) {
-      console.warn('[RoboticTTSModulator] Web Audio synth error:', err);
+      console.warn("[RoboticTTSModulator] Web Audio synth error:", err);
     }
   }
 
@@ -442,7 +481,7 @@ export class RoboticTTSModulator {
   speakVocalPhrase(
     text: string,
     onBoundary?: (charIndex: number, charLength: number) => void,
-    onEnd?: () => void
+    onEnd?: () => void,
   ): void {
     if (!this.speechSynth || !text) return;
 
@@ -460,7 +499,7 @@ export class RoboticTTSModulator {
 
     if (onBoundary) {
       utterance.onboundary = (e) => {
-        if (e.name === 'word') {
+        if (e.name === "word") {
           onBoundary(e.charIndex, e.charLength || 0);
         }
       };

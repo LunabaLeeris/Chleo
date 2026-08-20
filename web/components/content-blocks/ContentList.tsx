@@ -1,14 +1,14 @@
-import React from 'react';
+import React from "react";
 
 interface ContentListProps {
   items: string[];
-  variant?: 'bullet' | 'numbered' | 'checklist';
+  variant?: "bullet" | "numbered" | "checklist";
 }
 
 const MARKERS: Record<string, (i: number) => string> = {
-  bullet: () => '•',
+  bullet: () => "•",
   numbered: (i) => `${i + 1}.`,
-  checklist: () => '☐',
+  checklist: () => "☐",
 };
 
 /**
@@ -17,7 +17,7 @@ const MARKERS: Record<string, (i: number) => string> = {
  */
 export const ContentList: React.FC<ContentListProps> = ({
   items,
-  variant = 'bullet',
+  variant = "bullet",
 }) => {
   const getMarker = MARKERS[variant];
 

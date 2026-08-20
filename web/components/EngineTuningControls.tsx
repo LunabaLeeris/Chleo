@@ -1,5 +1,5 @@
-import React from 'react';
-import { PanelSection, Slider } from './ui';
+import React from "react";
+import { PanelSection, Slider } from "./ui";
 
 interface EngineTuningControlsProps {
   cycleSpeed: number;
@@ -16,10 +16,7 @@ export const EngineTuningControls: React.FC<EngineTuningControlsProps> = ({
   onRenderScaleChange,
 }) => {
   return (
-    <PanelSection
-      title="Engine Tuning"
-      bgVariant="tuning"
-    >
+    <PanelSection title="Engine Tuning" bgVariant="tuning">
       <Slider
         id="speed-slider"
         label="Master Cycle Speed"

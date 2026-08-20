@@ -1,4 +1,4 @@
-import type { PartName } from './sprite-types';
+import type { PartName } from "./sprite-types";
 
 // ---------------------------------------------------------------------------
 // Viseme-based mouth frame imports
@@ -20,45 +20,45 @@ import type { PartName } from './sprite-types';
 //   o        — O as in "go", "boat"
 //   u        — U as in "you", "blue", OO as in "food"
 // ---------------------------------------------------------------------------
-import MOUTH_NEUTRAL from '../assets/frames/mouth/mouth_neutral.png';
-import MOUTH_PBM from '../assets/frames/mouth/mouth_pbm.png';
-import MOUTH_FV from '../assets/frames/mouth/mouth_fv.png';
-import MOUTH_TH from '../assets/frames/mouth/mouth_th.png';
-import MOUTH_TDKGN from '../assets/frames/mouth/mouth_tdkgn.png';
-import MOUTH_SS from '../assets/frames/mouth/mouth_ss.png';
-import MOUTH_CH from '../assets/frames/mouth/mouth_ch.png';
-import MOUTH_R from '../assets/frames/mouth/mouth_r.png';
-import MOUTH_AA from '../assets/frames/mouth/mouth_aa.png';
-import MOUTH_EH from '../assets/frames/mouth/mouth_eh.png';
-import MOUTH_I from '../assets/frames/mouth/mouth_i.png';
-import MOUTH_O from '../assets/frames/mouth/mouth_o.png';
-import MOUTH_U from '../assets/frames/mouth/mouth_u.png';
-import MOUTH_EY from '../assets/frames/mouth/mouth_ey.png';
-import MOUTH_EE from '../assets/frames/mouth/mouth_ee.png';
-import MOUTH_AAA from '../assets/frames/mouth/mouth_aaa.png';
-import MOUTH_OO from '../assets/frames/mouth/mouth_oo.png';
-import MOUTH_A from '../assets/frames/mouth/mouth_a.png';
+import MOUTH_NEUTRAL from "../assets/frames/mouth/mouth_neutral.png";
+import MOUTH_PBM from "../assets/frames/mouth/mouth_pbm.png";
+import MOUTH_FV from "../assets/frames/mouth/mouth_fv.png";
+import MOUTH_TH from "../assets/frames/mouth/mouth_th.png";
+import MOUTH_TDKGN from "../assets/frames/mouth/mouth_tdkgn.png";
+import MOUTH_SS from "../assets/frames/mouth/mouth_ss.png";
+import MOUTH_CH from "../assets/frames/mouth/mouth_ch.png";
+import MOUTH_R from "../assets/frames/mouth/mouth_r.png";
+import MOUTH_AA from "../assets/frames/mouth/mouth_aa.png";
+import MOUTH_EH from "../assets/frames/mouth/mouth_eh.png";
+import MOUTH_I from "../assets/frames/mouth/mouth_i.png";
+import MOUTH_O from "../assets/frames/mouth/mouth_o.png";
+import MOUTH_U from "../assets/frames/mouth/mouth_u.png";
+import MOUTH_EY from "../assets/frames/mouth/mouth_ey.png";
+import MOUTH_EE from "../assets/frames/mouth/mouth_ee.png";
+import MOUTH_AAA from "../assets/frames/mouth/mouth_aaa.png";
+import MOUTH_OO from "../assets/frames/mouth/mouth_oo.png";
+import MOUTH_A from "../assets/frames/mouth/mouth_a.png";
 
 // ---------------------------------------------------------------------------
 // Eyebrow frame imports
 // ---------------------------------------------------------------------------
-import BROWS_IDLE from '../assets/frames/brows/brows_idle.png';
-import BROWS_LU from '../assets/frames/brows/brows_lu.png';
-import BROWS_RU from '../assets/frames/brows/brows_ru.png';
-import BROWS_BU from '../assets/frames/brows/brows_bu.png';
-import BROWS_TG from '../assets/frames/brows/brows_tg.png';
+import BROWS_IDLE from "../assets/frames/brows/brows_idle.png";
+import BROWS_LU from "../assets/frames/brows/brows_lu.png";
+import BROWS_RU from "../assets/frames/brows/brows_ru.png";
+import BROWS_BU from "../assets/frames/brows/brows_bu.png";
+import BROWS_TG from "../assets/frames/brows/brows_tg.png";
 
 // ---------------------------------------------------------------------------
 // Eye frame imports
 // ---------------------------------------------------------------------------
-import EYES_IDLE from '../assets/frames/eyes/eyes_idle.png';
-import EYES_CLOSED from '../assets/frames/eyes/eyes_closed.png';
-import EYES_BHC from '../assets/frames/eyes/eyes_bhc.png';
-import EYES_LHC from '../assets/frames/eyes/eyes_lhc.png';
-import EYES_RHC from '../assets/frames/eyes/eyes_rhc.png';
-import EYES_FIRE from '../assets/frames/eyes/eyes_fire.png';
-import EYES_GOLDEN from '../assets/frames/eyes/eyes_golden.png';
-import EYES_WIDE from '../assets/frames/eyes/eyes_wide.png';
+import EYES_IDLE from "../assets/frames/eyes/eyes_idle.png";
+import EYES_CLOSED from "../assets/frames/eyes/eyes_closed.png";
+import EYES_BHC from "../assets/frames/eyes/eyes_bhc.png";
+import EYES_LHC from "../assets/frames/eyes/eyes_lhc.png";
+import EYES_RHC from "../assets/frames/eyes/eyes_rhc.png";
+import EYES_FIRE from "../assets/frames/eyes/eyes_fire.png";
+import EYES_GOLDEN from "../assets/frames/eyes/eyes_golden.png";
+import EYES_WIDE from "../assets/frames/eyes/eyes_wide.png";
 
 // --- Re-export frame assets for external use ---
 // "closed" is kept as an alias for neutral to maintain backward compatibility
@@ -85,7 +85,7 @@ export const MOUTH_FRAMES = {
   ee: MOUTH_EE,
   aaa: MOUTH_AAA,
   oo: MOUTH_OO,
-  a: MOUTH_A
+  a: MOUTH_A,
 } as const;
 
 export const BROW_FRAMES = {
@@ -120,13 +120,13 @@ export type WordFrames = Partial<Record<PartName, string[]>>;
  * to simulate a hold/pause after that word.
  */
 export const PUNCTUATION_PAUSE_FRAMES: Record<string, number> = {
-  '.': 3,   // Full stop — moderate pause
-  '!': 3,   // Exclamation — moderate pause
-  '?': 4,   // Question — slightly longer (suggests thinking)
-  ',': 2,   // Comma — short breath pause
-  ';': 2,   // Semicolon — short pause
-  ':': 2,   // Colon — short pause
-  '...': 5, // Ellipsis — long dramatic pause
+  ".": 3, // Full stop — moderate pause
+  "!": 3, // Exclamation — moderate pause
+  "?": 4, // Question — slightly longer (suggests thinking)
+  ",": 2, // Comma — short breath pause
+  ";": 2, // Semicolon — short pause
+  ":": 2, // Colon — short pause
+  "...": 5, // Ellipsis — long dramatic pause
 };
 
 /**
@@ -161,419 +161,420 @@ export const DEFAULT_WORD_FRAMES: WordFrames = {
 // ---------------------------------------------------------------------------
 export const WORD_FRAME_MAP: Record<string, WordFrames> = {
   // ── Greetings ──────────────────────────────────────────────────────────
-  'hello': {
+  hello: {
     // EH-lOH
     mouth: [MOUTH_EH, MOUTH_O],
   },
-  'hi': {
+  hi: {
     // AY
     mouth: [MOUTH_AA],
   },
-  'hey': {
-    // EY 
+  hey: {
+    // EY
     mouth: [MOUTH_EY],
   },
-  'bye': {
+  bye: {
     // b-AY → pbm, aa, i
     mouth: [MOUTH_PBM, MOUTH_EE],
   },
-  'welcome': {
+  welcome: {
     // w-EH-l-k-AH-m → u(w), el, k, aa, pbm(m)
     mouth: [MOUTH_U, MOUTH_EH, MOUTH_TDKGN, MOUTH_AA, MOUTH_PBM],
   },
-  'goodbye': {
+  goodbye: {
     // UH-d-b-AY → u, tdkgn(d)-pbm(b), ey
     mouth: [MOUTH_U, MOUTH_PBM, MOUTH_EY],
   },
 
   // ── Pronouns & determiners ─────────────────────────────────────────────
-  'i': {
+  i: {
     // AY → aa
     mouth: [MOUTH_EY],
   },
-  'a': {
+  a: {
     // AH → aa
     mouth: [MOUTH_AA],
   },
-  'the': {
+  the: {
     // DH-AH → th
     mouth: [MOUTH_TH],
   },
-  'this': {
+  this: {
     // DH-IH-S → th, i, ss
     mouth: [MOUTH_SS],
   },
-  'that': {
+  that: {
     // DH-AE-T → aa, tdkgn
     mouth: [MOUTH_AA, MOUTH_TDKGN],
   },
-  'you': {
+  you: {
     // Y-UW →  u
     mouth: [MOUTH_U],
   },
-  'your': {
+  your: {
     // Y-OR →  o, r
     mouth: [MOUTH_O, MOUTH_R],
   },
-  'my': {
+  my: {
     // M-AY → pbm, i
     mouth: [MOUTH_PBM, MOUTH_EY],
   },
-  'me': {
+  me: {
     // M-IY → pbm, ee
     mouth: [MOUTH_PBM, MOUTH_EE],
   },
-  'we': {
+  we: {
     // W-IY → u, ee
     mouth: [MOUTH_U, MOUTH_EE],
   },
-  'he': {
+  he: {
     // H-IY → ee
     mouth: [MOUTH_EE],
   },
-  'she': {
+  she: {
     // SH-IY → ch, ee
     mouth: [MOUTH_CH, MOUTH_EE],
   },
-  'it': {
+  it: {
     // IH-T → i
     mouth: [MOUTH_EE],
   },
-  'they': {
+  they: {
     // DH-EY → th, ey
     mouth: [MOUTH_TH, MOUTH_EY],
   },
-  'them': {
+  them: {
     // DH-EH-M → eh, pbm
     mouth: [MOUTH_EH, MOUTH_PBM],
   },
-  'their': {
+  their: {
     // DH-EH-R → eh, r
     mouth: [MOUTH_TH, MOUTH_R],
   },
-  'our': {
+  our: {
     // AW-R → aa, r
     mouth: [MOUTH_U, MOUTH_R],
   },
 
   // ── Common be / have / do ──────────────────────────────────────────────
-  'is': {
+  is: {
     // IH-Z → i, ss
     mouth: [MOUTH_EE, MOUTH_SS],
   },
-  'am': {
+  am: {
     // AE-M → aa, pbm
     mouth: [MOUTH_AA, MOUTH_PBM],
   },
-  'are': {
+  are: {
     // AA-R → aa, r
     mouth: [MOUTH_AA, MOUTH_R],
   },
-  'was': {
+  was: {
     // W-AH-Z → aa, ss
     mouth: [MOUTH_AA, MOUTH_SS],
   },
-  'were': {
+  were: {
     // W-ER → eh, r
     mouth: [MOUTH_EH, MOUTH_R],
   },
-  'be': {
+  be: {
     // B-IY → pbm, ee
     mouth: [MOUTH_PBM, MOUTH_EE],
   },
-  'been': {
+  been: {
     // B-IH-N → pbm, ee
     mouth: [MOUTH_PBM, MOUTH_EE],
   },
-  'have': {
+  have: {
     // H-AE-V → aa, fv
     mouth: [MOUTH_AA, MOUTH_FV],
   },
-  'has': {
+  has: {
     // H-AE-Z → aa, ss
     mouth: [MOUTH_AA, MOUTH_SS],
   },
-  'had': {
+  had: {
     // H-AE-D → aa, tdkgn
     mouth: [MOUTH_AA, MOUTH_TDKGN],
   },
-  'do': {
+  do: {
     // D-UW → u
     mouth: [MOUTH_U],
   },
-  'doing': {
+  doing: {
     // D-UW-ING → u - ee
     mouth: [MOUTH_U, MOUTH_EE],
   },
-  'does': {
+  does: {
     // D-AH-Z → aa, ss
     mouth: [MOUTH_AA, MOUTH_SS],
   },
-  'did': {
+  did: {
     // D-IH-D → tdkgn
     mouth: [MOUTH_TDKGN],
   },
 
   // ── Common short words ─────────────────────────────────────────────────
-  'to': {
+  to: {
     // T-UW → u
     mouth: [MOUTH_U],
   },
-  'of': {
+  of: {
     // AH-V → aa, fv
     mouth: [MOUTH_AA, MOUTH_FV],
   },
-  'in': {
+  in: {
     // IH-N → i
     mouth: [MOUTH_TDKGN],
   },
-  'on': {
+  on: {
     // AA-N → aa
     mouth: [MOUTH_O],
   },
-  'at': {
+  at: {
     // AE-T → aa
     mouth: [MOUTH_AA],
   },
-  'an': {
+  an: {
     // AE-N → aa
     mouth: [MOUTH_AA],
   },
-  'or': {
+  or: {
     // AO-R → o, r
     mouth: [MOUTH_O, MOUTH_R],
   },
-  'and': {
+  and: {
     // AE-N-D → aa, tdkgn
     mouth: [MOUTH_AA, MOUTH_TDKGN],
   },
-  'but': {
+  but: {
     // B-AH-T → pbm, aa
     mouth: [MOUTH_PBM, MOUTH_AA],
   },
-  'so': {
+  so: {
     // S-OW → ss, o
     mouth: [MOUTH_SS, MOUTH_O],
   },
-  'if': {
+  if: {
     // IH-F → fv
     mouth: [MOUTH_FV],
   },
-  'for': {
+  for: {
     // F-AO-R → fv, o
     mouth: [MOUTH_FV, MOUTH_O],
   },
-  'with': {
+  with: {
     // W-IH-TH → i, th
     mouth: [MOUTH_I, MOUTH_TH],
   },
-  'from': {
+  from: {
     // F-R-AH-M → fv, aa, pbm
     mouth: [MOUTH_FV, MOUTH_AA, MOUTH_PBM],
   },
-  'up': {
+  up: {
     // AH-P → aa, pbm
     mouth: [MOUTH_AA, MOUTH_PBM],
   },
-  'out': {
+  out: {
     // AW-T → aa, u
     mouth: [MOUTH_AA, MOUTH_U],
   },
-  'just': {
+  just: {
     // JH-AH-S-T → ch, aa, ss
     mouth: [MOUTH_AA, MOUTH_SS],
   },
-  'like': {
+  like: {
     // L-AY-K → aa, tdkgn
     mouth: [MOUTH_AA, MOUTH_TDKGN],
   },
-  'about': {
+  about: {
     // AH-B-AW-T → aa, pbm, aa
     mouth: [MOUTH_AA, MOUTH_PBM, MOUTH_AA],
   },
 
   // ── Affirmation / negation ─────────────────────────────────────────────
-  'yes': {
+  yes: {
     // Y-EH-S → eh, ss
     mouth: [MOUTH_EH, MOUTH_SS],
   },
-  'no': {
+  no: {
     // N-OW → o
     mouth: [MOUTH_O],
   },
-  'not': {
+  not: {
     // N-AA-T → aa, tdkgn
     mouth: [MOUTH_AA, MOUTH_TDKGN],
   },
-  'ok': {
+  ok: {
     // OW-K-EY → o, ey
     mouth: [MOUTH_O, MOUTH_EY],
   },
-  'okay': {
+  okay: {
     // OW-K-EY → o, tdkgn, ey
     mouth: [MOUTH_O, MOUTH_TDKGN, MOUTH_EY],
   },
-  'sure': {
+  sure: {
     // SH-UH-R →  u, r
     mouth: [MOUTH_U, MOUTH_R],
   },
 
   // ── Question / reaction words ──────────────────────────────────────────
-  'what': {
+  what: {
     // W-AH-T → aa, tdkgn
     mouth: [MOUTH_OO, MOUTH_TDKGN],
   },
-  'why': {
-    // W-AY → aa, ey 
+  why: {
+    // W-AY → aa, ey
     mouth: [MOUTH_U, MOUTH_EY],
   },
-  'how': {
+  how: {
     // H-AW → aa, u
     mouth: [MOUTH_AA, MOUTH_U],
   },
-  'when': {
+  when: {
     // W-EH-N → eh, tdkgn
     mouth: [MOUTH_U, MOUTH_TDKGN],
   },
-  'where': {
+  where: {
     // W-EH-R → eh, r
     mouth: [MOUTH_U, MOUTH_R],
   },
-  'who': {
+  who: {
     // H-UW → u
     mouth: [MOUTH_OO],
   },
-  'which': {
+  which: {
     // W-IH-CH → i, ch
     mouth: [MOUTH_U, MOUTH_CH],
   },
-  'huh': {
+  huh: {
     // H-AH → aa
     mouth: [MOUTH_AA],
   },
-  'hmm': {
+  hmm: {
     // M (sustained hum) → pbm held
     mouth: [MOUTH_PBM, MOUTH_PBM],
   },
-  'oh': {
+  oh: {
     // OW → o
     mouth: [MOUTH_O, MOUTH_O],
   },
-  'wow': {
+  wow: {
     // W-AW → aa, u
     mouth: [MOUTH_OO, MOUTH_AAA],
   },
-  'please': {
+  please: {
     // P-L-IY-Z → pbm, ee, ss
     mouth: [MOUTH_PBM, MOUTH_EE, MOUTH_SS],
   },
-  'thanks': {
+  thanks: {
     // TH-AE-NG-K-S → th, aa, ss
     mouth: [MOUTH_A, MOUTH_SS, MOUTH_SS],
   },
-  'thank': {
+  thank: {
     // TH-AE-NG-K → th, aa, tdkgn
     mouth: [MOUTH_A],
   },
-  'sorry': {
+  sorry: {
     // S-AA-R-IY → ss, aa, r, ee
     mouth: [MOUTH_U, MOUTH_R, MOUTH_EE],
   },
 
   // ── Action words ───────────────────────────────────────────────────────
-  'think': {
+  think: {
     // TH-IH-NG-K → th, i, tdkgn
     mouth: [MOUTH_TH, MOUTH_TDKGN],
   },
-  'know': {
+  know: {
     // N-OW → o
     mouth: [MOUTH_O],
   },
-  'see': {
+  see: {
     // S-IY → ss, ee
     mouth: [MOUTH_SS, MOUTH_EE],
   },
-  'look': {
+  look: {
     // L-UH-K → u, tdkgn
     mouth: [MOUTH_OO],
   },
-  'go': {
+  go: {
     // G-OW → o
     mouth: [MOUTH_OO],
   },
-  'come': {
+  come: {
     // K-AH-M → aa, pbm
     mouth: [MOUTH_AA, MOUTH_PBM],
   },
-  'stop': {
+  stop: {
     // S-T-AA-P → ss, aa, pbm
     mouth: [MOUTH_SS, MOUTH_AA, MOUTH_PBM],
   },
-  'start': {
+  start: {
     // S-T-AA-R-T → ss, aa, r
     mouth: [MOUTH_SS, MOUTH_AA, MOUTH_R],
   },
-  'want': {
+  want: {
     // W-AA-N-T → aa, tdkgn
     mouth: [MOUTH_AA, MOUTH_TDKGN],
   },
-  'need': {
+  need: {
     // N-IY-D → ee, tdkgn
     mouth: [MOUTH_EE, MOUTH_TDKGN],
   },
-  'get': {
+  get: {
     // G-EH-T → eh, tdkgn
     mouth: [MOUTH_TDKGN],
   },
-  'give': {
+  give: {
     // G-IH-V → i, fv
     mouth: [MOUTH_I, MOUTH_FV],
   },
-  'take': {
+  take: {
     // T-EY-K → ey, tdkgn
     mouth: [MOUTH_EY, MOUTH_TDKGN],
   },
-  'make': { // [HERE]
+  make: {
+    // [HERE]
     // M-EY-K → pbm, ey, tdkgn
     mouth: [MOUTH_PBM, MOUTH_EY, MOUTH_TDKGN],
   },
-  'say': {
+  say: {
     // S-EY → ss, ey
     mouth: [MOUTH_SS, MOUTH_EY],
   },
-  'said': {
+  said: {
     // S-EH-D → ss, eh
     mouth: [MOUTH_SS, MOUTH_EH],
   },
-  'tell': {
+  tell: {
     // T-EH-L → eh, tdkgn
     mouth: [MOUTH_EH, MOUTH_TDKGN],
   },
-  'help': {
+  help: {
     // HH-EH-L-P → eh, pbm
     mouth: [MOUTH_EH, MOUTH_PBM],
   },
-  'try': {
+  try: {
     // T-R-AY → r, ey
     mouth: [MOUTH_R, MOUTH_EY],
   },
-  'find': {
+  find: {
     // F-AY-N-D → fv, ey, tdkgn
     mouth: [MOUTH_FV, MOUTH_EY, MOUTH_TDKGN],
   },
-  'feel': {
+  feel: {
     // F-IY-L → fv, ee
     mouth: [MOUTH_FV, MOUTH_EE],
   },
-  'love': {
+  love: {
     // L-AH-V → aa, fv
     mouth: [MOUTH_AA, MOUTH_FV],
   },
-  'run': {
+  run: {
     // R-AH-N → r, aa
     mouth: [MOUTH_R, MOUTH_AA],
   },
-  'move': {
+  move: {
     // M-UW-V → pbm, u, fv
     mouth: [MOUTH_PBM, MOUTH_U, MOUTH_FV],
   },
@@ -621,331 +622,331 @@ export const WORD_FRAME_MAP: Record<string, WordFrames> = {
   },
 
   // ── Adjectives / descriptors ───────────────────────────────────────────
-  'good': {
+  good: {
     // G-UH-D → u, tdkgn
     mouth: [MOUTH_U, MOUTH_TDKGN],
   },
-  'great': {
+  great: {
     // G-R-EY-T → r, ey, tdkgn
     mouth: [MOUTH_R, MOUTH_EY, MOUTH_TDKGN],
   },
-  'bad': {
+  bad: {
     // B-AE-D → pbm, aa
     mouth: [MOUTH_PBM, MOUTH_AA],
   },
-  'big': {
+  big: {
     // B-IH-G → pbm, i
     mouth: [MOUTH_PBM, MOUTH_I],
   },
-  'small': {
+  small: {
     // S-M-AO-L → ss, pbm, aa
     mouth: [MOUTH_SS, MOUTH_PBM, MOUTH_AA],
   },
-  'new': {
+  new: {
     // N-UW → u
     mouth: [MOUTH_U],
   },
-  'old': {
+  old: {
     // OW-L-D → o, tdkgn
     mouth: [MOUTH_O, MOUTH_TDKGN],
   },
-  'right': {
+  right: {
     // R-AY-T → r, ey
     mouth: [MOUTH_R, MOUTH_EY],
   },
-  'wrong': {
+  wrong: {
     // R-AO-NG → r, o
     mouth: [MOUTH_R, MOUTH_O],
   },
-  'happy': {
+  happy: {
     // H-AE-P-IY → aa, pbm, ee
     mouth: [MOUTH_AA, MOUTH_PBM, MOUTH_EE],
   },
-  'sad': {
+  sad: {
     // S-AE-D → ss, aa
     mouth: [MOUTH_SS, MOUTH_AA],
   },
-  'fast': {
+  fast: {
     // F-AE-S-T → fv, aa, ss
     mouth: [MOUTH_FV, MOUTH_AA, MOUTH_SS],
   },
-  'slow': {
+  slow: {
     // S-L-OW → ss, o
     mouth: [MOUTH_SS, MOUTH_O],
   },
-  'very': {
+  very: {
     // V-EH-R-IY → fv, eh, r, ee
     mouth: [MOUTH_FV, MOUTH_EH, MOUTH_R, MOUTH_EE],
   },
-  'much': {
+  much: {
     // M-AH-CH → pbm, aa, ch
     mouth: [MOUTH_PBM, MOUTH_AA, MOUTH_CH],
   },
-  'more': {
+  more: {
     // M-AO-R → pbm, o, r
     mouth: [MOUTH_PBM, MOUTH_O, MOUTH_R],
   },
 
   // ── Nouns ──────────────────────────────────────────────────────────────
-  'name': {
+  name: {
     // N-EY-M → ey, pbm
     mouth: [MOUTH_EY, MOUTH_PBM],
   },
-  'time': {
+  time: {
     // T-AY-M → ey, pbm
     mouth: [MOUTH_EY, MOUTH_PBM],
   },
-  'thing': {
+  thing: {
     // TH-IH-NG → th, i
     mouth: [MOUTH_TH, MOUTH_I],
   },
-  'world': {
+  world: {
     // W-ER-L-D → eh, r, tdkgn
     mouth: [MOUTH_EH, MOUTH_R, MOUTH_TDKGN],
   },
-  'people': {
+  people: {
     // P-IY-P-AH-L → pbm, ee, pbm, aa
     mouth: [MOUTH_PBM, MOUTH_EE, MOUTH_PBM, MOUTH_AA],
   },
-  'friend': {
+  friend: {
     // F-R-EH-N-D → fv, r, eh, tdkgn
     mouth: [MOUTH_FV, MOUTH_R, MOUTH_EH, MOUTH_TDKGN],
   },
-  'here': {
+  here: {
     // H-IH-R → i, r
     mouth: [MOUTH_I, MOUTH_R],
   },
-  'there': {
+  there: {
     // DH-EH-R → th, eh, r
     mouth: [MOUTH_TH, MOUTH_EH, MOUTH_R],
   },
-  'now': {
+  now: {
     // N-AW → aa, u
     mouth: [MOUTH_AA, MOUTH_U],
   },
-  'way': {
+  way: {
     // W-EY → ey
     mouth: [MOUTH_EY],
   },
 
   // ── Modals / auxiliary ─────────────────────────────────────────────────
-  'can': {
+  can: {
     // K-AE-N → aa, tdkgn
     mouth: [MOUTH_AA, MOUTH_TDKGN],
   },
-  'will': {
+  will: {
     // W-IH-L → i, tdkgn
     mouth: [MOUTH_I, MOUTH_TDKGN],
   },
-  'would': {
+  would: {
     // W-UH-D → u, tdkgn
     mouth: [MOUTH_U, MOUTH_TDKGN],
   },
-  'could': {
+  could: {
     // K-UH-D → u, tdkgn
     mouth: [MOUTH_U, MOUTH_TDKGN],
   },
-  'should': {
+  should: {
     // SH-UH-D → ch, u, tdkgn
     mouth: [MOUTH_CH, MOUTH_U, MOUTH_TDKGN],
   },
-  'must': {
+  must: {
     // M-AH-S-T → pbm, aa, ss
     mouth: [MOUTH_PBM, MOUTH_AA, MOUTH_SS],
   },
-  'may': {
+  may: {
     // M-EY → pbm, ey
     mouth: [MOUTH_PBM, MOUTH_EY],
   },
-  'might': {
+  might: {
     // M-AY-T → pbm, ey
     mouth: [MOUTH_PBM, MOUTH_EY],
   },
-  'let': {
+  let: {
     // L-EH-T → eh, tdkgn
     mouth: [MOUTH_EH, MOUTH_TDKGN],
   },
 
   // ── Misc high-frequency words ──────────────────────────────────────────
-  'all': {
+  all: {
     // AO-L → aa
     mouth: [MOUTH_AA],
   },
-  'some': {
+  some: {
     // S-AH-M → ss, aa, pbm
     mouth: [MOUTH_SS, MOUTH_AA, MOUTH_PBM],
   },
-  'one': {
+  one: {
     // W-AH-N → aa
     mouth: [MOUTH_AA],
   },
-  'two': {
+  two: {
     // T-UW → u
     mouth: [MOUTH_U],
   },
-  'three': {
+  three: {
     // TH-R-IY → th, r, ee
     mouth: [MOUTH_TH, MOUTH_R, MOUTH_EE],
   },
-  'four': {
+  four: {
     // F-AO-R → fv, o, r
     mouth: [MOUTH_FV, MOUTH_O, MOUTH_R],
   },
-  'five': {
+  five: {
     // F-AY-V → fv, ey, fv
     mouth: [MOUTH_FV, MOUTH_EY, MOUTH_FV],
   },
-  'every': {
+  every: {
     // EH-V-R-IY → eh, fv, r, ee
     mouth: [MOUTH_EH, MOUTH_FV, MOUTH_R, MOUTH_EE],
   },
-  'never': {
+  never: {
     // N-EH-V-ER → eh, fv, r
     mouth: [MOUTH_EH, MOUTH_FV, MOUTH_R],
   },
-  'always': {
+  always: {
     // AO-L-W-EY-Z → aa, ey, ss
     mouth: [MOUTH_AA, MOUTH_EY, MOUTH_SS],
   },
-  'really': {
+  really: {
     // R-IY-L-IY → r, ee, tdkgn, ee
     mouth: [MOUTH_R, MOUTH_EE, MOUTH_TDKGN, MOUTH_EE],
   },
-  'maybe': {
+  maybe: {
     // M-EY-B-IY → pbm, ey, pbm, ee
     mouth: [MOUTH_PBM, MOUTH_EY, MOUTH_PBM, MOUTH_EE],
   },
-  'something': {
+  something: {
     // S-AH-M-TH-IH-NG → ss, aa, pbm, th, i
     mouth: [MOUTH_SS, MOUTH_AA, MOUTH_PBM, MOUTH_TH, MOUTH_I],
   },
-  'nothing': {
+  nothing: {
     // N-AH-TH-IH-NG → aa, th, i
     mouth: [MOUTH_AA, MOUTH_TH, MOUTH_I],
   },
-  'everything': {
+  everything: {
     // EH-V-R-IY-TH-IH-NG → eh, fv, r, ee, th, i
     mouth: [MOUTH_EH, MOUTH_FV, MOUTH_R, MOUTH_EE, MOUTH_TH, MOUTH_I],
   },
-  'because': {
+  because: {
     // B-IH-K-AH-Z → pbm, i, aa, ss
     mouth: [MOUTH_PBM, MOUTH_I, MOUTH_AA, MOUTH_SS],
   },
 
   // ── Test-sentence words (for exercising all visemes) ───────────────────
-  'car': {
+  car: {
     // K-AA-R → aa, r
     mouth: [MOUTH_AA, MOUTH_R],
   },
-  'chair': {
+  chair: {
     // CH-EH-R → ch, eh, r
     mouth: [MOUTH_CH, MOUTH_EH, MOUTH_R],
   },
-  'bed': {
+  bed: {
     // B-EH-D → pbm, eh
     mouth: [MOUTH_PBM, MOUTH_EH],
   },
-  'fat': {
+  fat: {
     // F-AE-T → fv, aa
     mouth: [MOUTH_FV, MOUTH_AA],
   },
-  'vat': {
+  vat: {
     // V-AE-T → fv, aa
     mouth: [MOUTH_FV, MOUTH_AA],
   },
-  'tip': {
+  tip: {
     // T-IH-P → i, pbm
     mouth: [MOUTH_I, MOUTH_PBM],
   },
-  'sit': {
+  sit: {
     // S-IH-T → ss, i
     mouth: [MOUTH_SS, MOUTH_I],
   },
-  'boat': {
+  boat: {
     // B-OW-T → pbm, o
     mouth: [MOUTH_PBM, MOUTH_O],
   },
-  'food': {
+  food: {
     // F-UW-D → fv, u
     mouth: [MOUTH_FV, MOUTH_U],
   },
-  'blue': {
+  blue: {
     // B-L-UW → pbm, u
     mouth: [MOUTH_PBM, MOUTH_U],
   },
-  'red': {
+  red: {
     // R-EH-D → r, eh
     mouth: [MOUTH_R, MOUTH_EH],
   },
-  'mother': {
+  mother: {
     // M-AH-DH-ER → pbm, aa, th, r
     mouth: [MOUTH_PBM, MOUTH_AA, MOUTH_TH, MOUTH_R],
   },
-  'father': {
+  father: {
     // F-AA-DH-ER → fv, aa, th, r
     mouth: [MOUTH_FV, MOUTH_AA, MOUTH_TH, MOUTH_R],
   },
-  'fish': {
+  fish: {
     // F-IH-SH → fv, i, ch
     mouth: [MOUTH_FV, MOUTH_I, MOUTH_CH],
   },
-  'ship': {
+  ship: {
     // SH-IH-P → ch, i, pbm
     mouth: [MOUTH_CH, MOUTH_I, MOUTH_PBM],
   },
-  'thin': {
+  thin: {
     // TH-IH-N → th, i
     mouth: [MOUTH_TH, MOUTH_I],
   },
-  'rain': {
+  rain: {
     // R-EY-N → r, ey
     mouth: [MOUTH_R, MOUTH_EY],
   },
-  'sun': {
+  sun: {
     // S-AH-N → ss, aa
     mouth: [MOUTH_SS, MOUTH_AA],
   },
-  'moon': {
+  moon: {
     // M-UW-N → pbm, u
     mouth: [MOUTH_PBM, MOUTH_U],
   },
-  'book': {
+  book: {
     // B-UH-K → pbm, u
     mouth: [MOUTH_PBM, MOUTH_U],
   },
-  'voice': {
+  voice: {
     // V-OY-S → fv, o, ss
     mouth: [MOUTH_FV, MOUTH_O, MOUTH_SS],
   },
-  'jump': {
+  jump: {
     // JH-AH-M-P → ch, aa, pbm
     mouth: [MOUTH_CH, MOUTH_AA, MOUTH_PBM],
   },
-  'quick': {
+  quick: {
     // K-W-IH-K → u, i, tdkgn
     mouth: [MOUTH_U, MOUTH_I, MOUTH_TDKGN],
   },
-  'brown': {
+  brown: {
     // B-R-AW-N → pbm, r, aa
     mouth: [MOUTH_PBM, MOUTH_R, MOUTH_AA],
   },
-  'fox': {
+  fox: {
     // F-AA-K-S → fv, aa, ss
     mouth: [MOUTH_FV, MOUTH_AA, MOUTH_SS],
   },
-  'lazy': {
+  lazy: {
     // L-EY-Z-IY → ey, ss, ee
     mouth: [MOUTH_EY, MOUTH_SS, MOUTH_EE],
   },
-  'dog': {
+  dog: {
     // D-AO-G → aa, tdkgn
     mouth: [MOUTH_AA, MOUTH_TDKGN],
   },
-  'over': {
+  over: {
     // OW-V-ER → o, fv, r
     mouth: [MOUTH_O, MOUTH_FV, MOUTH_R],
   },
-  'jumps': {
+  jumps: {
     // JH-AH-M-P-S → ch, aa, pbm, ss
     mouth: [MOUTH_CH, MOUTH_AA, MOUTH_PBM, MOUTH_SS],
   },
@@ -971,16 +972,19 @@ export interface SpeechToken {
  * Multi-character punctuation like "..." is detected first.
  */
 export function tokenizeText(text: string): SpeechToken[] {
-  const rawTokens = text.trim().split(/\s+/).filter(t => t.length > 0);
+  const rawTokens = text
+    .trim()
+    .split(/\s+/)
+    .filter((t) => t.length > 0);
   const tokens: SpeechToken[] = [];
 
   for (const raw of rawTokens) {
     // Check for multi-char punctuation first (e.g. "...")
-    let trailingPunctuation = '';
+    let trailingPunctuation = "";
     let word = raw;
 
-    if (word.endsWith('...')) {
-      trailingPunctuation = '...';
+    if (word.endsWith("...")) {
+      trailingPunctuation = "...";
       word = word.slice(0, -3);
     } else {
       const lastChar = word.charAt(word.length - 1);
@@ -991,7 +995,7 @@ export function tokenizeText(text: string): SpeechToken[] {
     }
 
     // Strip any remaining non-alphanumeric characters and lowercase
-    word = word.replace(/[^a-zA-Z0-9']/g, '').toLowerCase();
+    word = word.replace(/[^a-zA-Z0-9']/g, "").toLowerCase();
 
     if (word.length > 0) {
       tokens.push({ word, trailingPunctuation });

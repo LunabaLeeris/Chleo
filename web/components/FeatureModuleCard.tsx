@@ -1,4 +1,4 @@
-import React from 'react';
+import React from "react";
 
 interface FeatureModuleCardProps {
   id: string;
@@ -30,7 +30,7 @@ export const FeatureModuleCard: React.FC<FeatureModuleCardProps> = ({
   };
 
   const handleKeyDown = (e: React.KeyboardEvent) => {
-    if ((e.key === 'Enter' || e.key === ' ') && !locked && onClick) {
+    if ((e.key === "Enter" || e.key === " ") && !locked && onClick) {
       e.preventDefault();
       onClick();
     }
@@ -39,10 +39,10 @@ export const FeatureModuleCard: React.FC<FeatureModuleCardProps> = ({
   return (
     <div
       id={id}
-      className={`feature-module-card ${locked ? 'feature-module-card--locked' : 'feature-module-card--enabled'}`}
+      className={`feature-module-card ${locked ? "feature-module-card--locked" : "feature-module-card--enabled"}`}
       onClick={handleClick}
       onKeyDown={handleKeyDown}
-      role={locked ? undefined : 'button'}
+      role={locked ? undefined : "button"}
       tabIndex={locked ? undefined : 0}
       aria-disabled={locked}
     >
