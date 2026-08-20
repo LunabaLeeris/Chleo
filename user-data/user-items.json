@@ -1,9 +1,9 @@
 {
-  "coins": 7310,
+  "coins": 7010,
   "storage": [
     [
       "unblock_site",
-      29
+      39
     ],
     [
       "avoid_30m",

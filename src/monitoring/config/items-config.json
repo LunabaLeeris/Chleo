@@ -1,11 +1,15 @@
 {
+  "items_last_reset": 0,
+  "food_last_reset": 0,
   "items": {
     "unblock_site": {
       "title": "Unblock",
       "icon": "unblock",
       "status": "unblock",
       "details": "Unblocks a chosen site",
-      "cost": 30
+      "cost": 30,
+      "stock": 10,
+      "daily_stock": 10
     },
     "avoid_30m": {
       "title": "Avoid",
@@ -13,7 +17,9 @@
       "status": "avoid",
       "details": "Adds 30 minutes to a chosen site",
       "duration": 1800,
-      "cost": 30
+      "cost": 30,
+      "stock": 10,
+      "daily_stock": 10
     },
     "avoid_1m": {
       "title": "Blitz",
@@ -21,7 +27,9 @@
       "status": "avoid",
       "details": "Adds 1 minute to a chosen site",
       "duration": 60,
-      "cost": 30
+      "cost": 30,
+      "stock": 10,
+      "daily_stock": 10
     }
   },
   "wearables": {},
@@ -34,7 +42,9 @@
         "joy": 20,
         "anger": -15
       },
-      "cost": 50
+      "cost": 50,
+      "stock": 5,
+      "daily_stock": 10
     }
   }
 }

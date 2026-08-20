@@ -1,6 +1,42 @@
 {
   "events": [
     {
+      "type": "item_bought",
+      "domain": "store",
+      "details": "Let's hope you'll not need that",
+      "emotionDelta": {
+        "joy": 0,
+        "trust": 0,
+        "fear": 0,
+        "surprise": 0,
+        "sadness": 0,
+        "disgust": 0,
+        "anger": 0,
+        "anticipation": 0
+      },
+      "id": "stm_1787241025923_melnb",
+      "timestamp": 1787241025923,
+      "formattedText": "default"
+    },
+    {
+      "type": "item_bought",
+      "domain": "store",
+      "details": "Well well well...",
+      "emotionDelta": {
+        "joy": 0,
+        "trust": 0,
+        "fear": 0,
+        "surprise": 0,
+        "sadness": 0,
+        "disgust": 0,
+        "anger": 0,
+        "anticipation": 0
+      },
+      "id": "stm_1787241019086_b19vw",
+      "timestamp": 1787241019086,
+      "formattedText": "default"
+    },
+    {
       "type": "avoid_item_used",
       "domain": "youtube.com",
       "details": "Fine, I will be patient. ",
@@ -731,37 +767,11 @@
       "id": "stm_1786957635734_4eu3w",
       "timestamp": 1786957635734,
       "formattedText": "default"
-    },
-    {
-      "type": "site_blocked_visit",
-      "domain": "youtube.com",
-      "details": "Hey! youtube is completely blocked. Complete my puzzle to unblock it!",
-      "emotionDelta": {
-        "anger": 0.35,
-        "sadness": 0.25,
-        "joy": -0.25,
-        "trust": -0.23
-      },
-      "id": "stm_1786957615779_0clon",
-      "timestamp": 1786957615779,
-      "formattedText": "default"
-    },
-    {
-      "type": "site_blocked_visit",
-      "domain": "youtube.com",
-      "details": "Hey! youtube is completely blocked. Complete my puzzle to unblock it!",
-      "emotionDelta": {
-        "anger": 0.35,
-        "sadness": 0.25,
-        "joy": -0.25,
-        "trust": -0.23
-      },
-      "id": "stm_1786957048695_nau8t",
-      "timestamp": 1786957048695,
-      "formattedText": "default"
     }
   ],
   "recentSpeechPhrases": [
+    "Let's hope you'll not need that",
+    "Well well well...",
     "Fine, I will be patient. ",
     "Well. If that's what you want",
     "Again?",
@@ -769,9 +779,7 @@
     "What will that be for?",
     "Fine...",
     "Fine...",
-    "Ok, just a little bit more",
-    "Ok, just a little bit more",
-    "Fine, I will be patient. "
+    "Ok, just a little bit more"
   ],
   "activeWarnings": [],
   "currentActiveDomain": "github.com",

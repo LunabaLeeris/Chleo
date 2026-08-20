@@ -9,10 +9,14 @@ export interface ItemConfigEntry {
   duration?: number;
   cost?: number;
   deltas?: Record<string, number>;
+  stock?: number;
+  daily_stock?: number;
   [key: string]: any;
 }
 
 export interface ItemsConfig {
+  items_last_reset?: number | string;
+  food_last_reset?: number | string;
   items: Record<string, ItemConfigEntry>;
   wearables?: Record<string, ItemConfigEntry>;
   food?: Record<string, ItemConfigEntry>;

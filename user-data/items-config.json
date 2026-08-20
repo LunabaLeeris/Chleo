@@ -1,40 +1,50 @@
 {
-    "items": {
-        "unblock_site": {
-            "title": "Unblock",
-            "icon": "unblock",
-            "status": "unblock",
-            "details": "Unblocks a chosen site",
-            "cost": 30
-        },
-        "avoid_30m": {
-            "title": "Avoid",
-            "icon": "avoid",
-            "status": "avoid",
-            "details": "Adds 30 minutes to a chosen site",
-            "duration": 1800,
-            "cost": 30
-        },
-        "avoid_1m": {
-            "title": "Blitz",
-            "icon": "lightning",
-            "status": "avoid",
-            "details": "Adds 1 minute to a chosen site",
-            "duration": 60,
-            "cost": 30
-        }
+  "items_last_reset": 1787241012542,
+  "food_last_reset": 1787241012542,
+  "items": {
+    "unblock_site": {
+      "title": "Unblock",
+      "icon": "unblock",
+      "status": "unblock",
+      "details": "Unblocks a chosen site",
+      "cost": 30,
+      "stock": 0,
+      "daily_stock": 10
     },
-    "wearables": {},
-    "food": {
-        "chocolate": {
-            "title": "Chocolate",
-            "icon": "chocolate",
-            "details": "Sweet chocolate treat",
-            "deltas": {
-                "joy": 20,
-                "anger": -15
-            },
-            "cost": 50
-        }
+    "avoid_30m": {
+      "title": "Avoid",
+      "icon": "avoid",
+      "status": "avoid",
+      "details": "Adds 30 minutes to a chosen site",
+      "duration": 1800,
+      "cost": 30,
+      "stock": 10,
+      "daily_stock": 10
+    },
+    "avoid_1m": {
+      "title": "Blitz",
+      "icon": "lightning",
+      "status": "avoid",
+      "details": "Adds 1 minute to a chosen site",
+      "duration": 60,
+      "cost": 30,
+      "stock": 10,
+      "daily_stock": 10
     }
+  },
+  "wearables": {},
+  "food": {
+    "chocolate": {
+      "title": "Chocolate",
+      "icon": "chocolate",
+      "details": "Sweet chocolate treat",
+      "deltas": {
+        "joy": 20,
+        "anger": -15
+      },
+      "cost": 50,
+      "stock": 10,
+      "daily_stock": 10
+    }
+  }
 }

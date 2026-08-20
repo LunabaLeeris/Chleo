@@ -3356,7 +3356,6 @@ body {
   justify-content: flex-start;
   gap: 6px;
   padding-top: 2px;
-  margin-bottom: 6px;
 }
 
 .store-tabs-wrap {
@@ -3392,6 +3391,15 @@ body {
   color: #713f12;
   border-color: #854d0e;
   box-shadow: 1px 1px 0px #713f12;
+}
+
+.store-replenish-hint {
+  font-family: var(--font-pixel);
+  font-size: 0.53rem;
+  color: var(--text-muted);
+  text-align: center;
+  margin-top: 4px;
+  letter-spacing: 0.2px;
 }
 
 .store-items-container {
@@ -3476,6 +3484,24 @@ body {
   box-shadow: 3px 5px 0px var(--border-pixel), 0 4px 10px rgba(245, 158, 11, 0.15);
 }
 
+/* Out of Stock Card State */
+.store-item-card.out-of-stock {
+  opacity: 0.55;
+  filter: grayscale(85%);
+  cursor: not-allowed;
+  pointer-events: none;
+}
+
+.store-item-card.out-of-stock:hover {
+  transform: none !important;
+  border-color: var(--border-pixel) !important;
+  box-shadow: 2px 2px 0px var(--border-pixel) !important;
+}
+
+.store-item-card.out-of-stock:hover .store-card-icon-box {
+  transform: none !important;
+}
+
 /* Row 1: Big Icon (90x90) & Top-Right Cost */
 .store-card-row-icon {
   position: relative;
@@ -3491,6 +3517,33 @@ body {
   margin: 0 auto 5px auto;
   box-sizing: border-box;
   overflow: hidden;
+}
+
+.store-card-stock-badge {
+  position: absolute;
+  top: 3px;
+  left: 3px;
+  display: flex;
+  align-items: center;
+  gap: 2px;
+  background: #f0fdf4;
+  border: 1px solid #16a34a;
+  border-radius: 8px;
+  padding: 1px 4px;
+  font-family: var(--font-pixel);
+  font-size: 0.52rem;
+  font-weight: 700;
+  color: #15803d;
+  box-shadow: 1px 1px 0px #166534;
+  z-index: 3;
+}
+
+.store-card-stock-badge.out-of-stock {
+  background: #fee2e2;
+  border-color: #dc2626;
+  color: #991b1b;
+  box-shadow: 1px 1px 0px #7f1d1d;
+  font-size: 0.48rem;
 }
 
 .store-card-cost-badge {
@@ -3637,6 +3690,18 @@ body {
   border-color: #9ca3af;
 }
 
+.store-meta-badge.badge-out-of-stock {
+  background: #fee2e2;
+  color: #b91c1c;
+  border-color: #ef4444;
+}
+
+.store-meta-badge.badge-stock {
+  background: #f0fdf4;
+  color: #15803d;
+  border-color: #22c55e;
+}
+
 /* Purchase Modal & Overlay */
 .store-purchase-overlay {
   position: absolute;
@@ -3745,6 +3810,13 @@ body {
   font-family: var(--font-pixel);
   font-size: 0.62rem;
   color: var(--text-dark);
+}
+
+.store-modal-stock-hint {
+  font-family: var(--font-pixel);
+  font-size: 0.52rem;
+  color: var(--text-muted);
+  margin-left: 4px;
 }
 
 .store-stepper-controls {

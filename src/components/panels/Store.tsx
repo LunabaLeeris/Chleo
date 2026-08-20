@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { PanelContainer } from './PanelContainer';
 import { PanelProps } from './CalendarPanel';
-import { getItemsConfig, ItemConfigEntry, ItemsConfig } from '../../items/items-registry';
+import { getItemsConfig, setItemsConfig, ItemConfigEntry, ItemsConfig } from '../../items/items-registry';
 import { getIconSrc } from '../../assets/icon-loader';
 import { InventoryTarget } from '../../types/ipc';
 import { Particle, ParticlePosition } from '../effects/Particle';
@@ -24,6 +24,85 @@ export interface ActiveParticleData {
   delayMs?: number;
 }
 
+/**
+ * Check if the last reset timestamp/date was from a previous calendar day or older.
+ */
+export const shouldReplenish = (lastReset: number | string | undefined): boolean => {
+  if (!lastReset) return true;
+
+  let resetDate: Date;
+  if (typeof lastReset === 'number') {
+    // If it's a small number like 124 (dummy seed value), it's not today's timestamp
+    if (lastReset < 100000000000) {
+      return true;
+    }
+    resetDate = new Date(lastReset);
+  } else if (typeof lastReset === 'string') {
+    const parsed = Date.parse(lastReset);
+    if (isNaN(parsed)) return true;
+    resetDate = new Date(parsed);
+  } else {
+    return true;
+  }
+
+  const now = new Date();
+  const startOfToday = new Date(now.getFullYear(), now.getMonth(), now.getDate()).getTime();
+  return resetDate.getTime() < startOfToday;
+};
+
+/**
+ * Checks items/food categories for daily replenishment against daily_stock.
+ */
+export const checkAndReplenishStock = async (cfg: ItemsConfig): Promise<ItemsConfig> => {
+  let modified = false;
+  const updated: ItemsConfig = JSON.parse(JSON.stringify(cfg));
+  const now = Date.now();
+
+  // Replenish items category
+  if (shouldReplenish(updated.items_last_reset)) {
+    if (updated.items) {
+      for (const key of Object.keys(updated.items)) {
+        if (typeof updated.items[key].daily_stock === 'number') {
+          updated.items[key].stock = updated.items[key].daily_stock;
+          modified = true;
+        }
+      }
+    }
+    updated.items_last_reset = now;
+    modified = true;
+  }
+
+  // Replenish groceries / food category
+  if (shouldReplenish(updated.food_last_reset)) {
+    if (updated.food) {
+      for (const key of Object.keys(updated.food)) {
+        if (typeof updated.food[key].daily_stock === 'number') {
+          updated.food[key].stock = updated.food[key].daily_stock;
+          modified = true;
+        }
+      }
+    }
+    updated.food_last_reset = now;
+    modified = true;
+  }
+
+  if (modified) {
+    if (typeof window !== 'undefined' && (window as any).electronAPI?.saveMemoryFile) {
+      try {
+        await (window as any).electronAPI.saveMemoryFile(
+          'items-config.json',
+          JSON.stringify(updated, null, 2)
+        );
+      } catch (e) {
+        console.warn('[Store] Failed to save replenished items-config:', e);
+      }
+    }
+    setItemsConfig(updated);
+  }
+
+  return updated;
+};
+
 export const Store: React.FC<StoreProps> = ({ onClose }) => {
   const [activeTab, setActiveTab] = useState<StoreTab>('items');
   const [config, setConfig] = useState<ItemsConfig>(getItemsConfig());
@@ -32,9 +111,29 @@ export const Store: React.FC<StoreProps> = ({ onClose }) => {
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
   const [particles, setParticles] = useState<ActiveParticleData[]>([]);
 
-  // Fetch initial item config
+  // Load items config and check for daily stock replenishment
+  const loadStoreConfig = async () => {
+    try {
+      let currentCfg: ItemsConfig = getItemsConfig();
+      if (typeof window !== 'undefined' && (window as any).electronAPI?.readMemoryFile) {
+        const raw = await (window as any).electronAPI.readMemoryFile('items-config.json');
+        if (raw) {
+          try {
+            currentCfg = JSON.parse(raw);
+          } catch {
+            // fallback to current
+          }
+        }
+      }
+      const finalCfg = await checkAndReplenishStock(currentCfg);
+      setConfig(finalCfg);
+    } catch (err) {
+      console.warn('[Store] Failed to load items config:', err);
+    }
+  };
+
   useEffect(() => {
-    setConfig(getItemsConfig());
+    loadStoreConfig();
   }, []);
 
   // Format category items
@@ -60,6 +159,9 @@ export const Store: React.FC<StoreProps> = ({ onClose }) => {
   const coinIconSrc = getIconSrc('coin');
 
   const handleCardClick = (item: StoreItemEntry) => {
+    const stock = typeof item.stock === 'number' ? item.stock : (item.daily_stock ?? 0);
+    if (stock <= 0) return;
+
     setSelectedItem(item);
     setPurchaseAmount(1);
     setErrorMessage(null);
@@ -179,6 +281,35 @@ export const Store: React.FC<StoreProps> = ({ onClose }) => {
         }
       }
 
+      // Deduct stock in items-config
+      const nextConfig: ItemsConfig = JSON.parse(JSON.stringify(config));
+      let category: 'items' | 'food' | 'wearables' = 'items';
+      if (activeTab === 'groceries' || nextConfig.food?.[itemToAnimate.id]) {
+        category = 'food';
+      } else if (activeTab === 'clothing' || nextConfig.wearables?.[itemToAnimate.id]) {
+        category = 'wearables';
+      }
+
+      if (nextConfig[category] && nextConfig[category][itemToAnimate.id]) {
+        const curStock = typeof nextConfig[category][itemToAnimate.id].stock === 'number'
+          ? nextConfig[category][itemToAnimate.id].stock!
+          : (nextConfig[category][itemToAnimate.id].daily_stock ?? countToSpawn);
+        nextConfig[category][itemToAnimate.id].stock = Math.max(0, curStock - countToSpawn);
+
+        if (typeof window !== 'undefined' && (window as any).electronAPI?.saveMemoryFile) {
+          try {
+            await (window as any).electronAPI.saveMemoryFile(
+              'items-config.json',
+              JSON.stringify(nextConfig, null, 2)
+            );
+          } catch (saveErr) {
+            console.warn('[Store] Failed to save updated items-config:', saveErr);
+          }
+        }
+        setItemsConfig(nextConfig);
+        setConfig(nextConfig);
+      }
+
       // Determine behavioral monitoring event (FOOD_BOUGHT vs ITEM_BOUGHT)
       const isFood = activeTab === 'groceries' || target === 'fridge' || Boolean(config.food && config.food[itemToAnimate.id]);
       const eventId = isFood ? 'FOOD_BOUGHT' : 'ITEM_BOUGHT';
@@ -222,7 +353,11 @@ export const Store: React.FC<StoreProps> = ({ onClose }) => {
   };
 
   // Duration or Deltas or Status
-  const renderRow3Meta = (item: StoreItemEntry) => {
+  const renderRow3Meta = (item: StoreItemEntry, isOutOfStock: boolean) => {
+    if (isOutOfStock) {
+      return <span className="store-meta-badge badge-out-of-stock">Out of Stock</span>;
+    }
+
     if (item.duration) {
       const minutes = Math.round(item.duration / 60);
       const label = minutes >= 1 ? `+${minutes}m` : `+${item.duration}s`;
@@ -250,7 +385,7 @@ export const Store: React.FC<StoreProps> = ({ onClose }) => {
 
   return (
     <PanelContainer title="Store" icon="store" className="store-panel-card" onClose={onClose}>
-      {/* Top Header Controls: Coin Balance & Tabs */}
+      {/* Top Header Controls: Tabs & Daily Stock Notice */}
       <div className="store-top-bar">
         <div className="store-tabs-wrap">
           <button
@@ -275,9 +410,10 @@ export const Store: React.FC<StoreProps> = ({ onClose }) => {
             Clothing
           </button>
         </div>
-
       </div>
-
+      <div className="store-replenish-hint">
+        <span>Stock replenishes every day</span>
+      </div>
       {/* Item Card Grid */}
       <div className="store-items-container">
         {currentItems.length === 0 ? (
@@ -290,22 +426,28 @@ export const Store: React.FC<StoreProps> = ({ onClose }) => {
             {currentItems.map((item, index) => {
               const iconSrc = getIconSrc(item.icon) || (item.icon === 'avoid' ? getIconSrc('hourglass') : undefined);
               const cost = typeof item.cost === 'number' ? item.cost : 0;
+              const stock = typeof item.stock === 'number' ? item.stock : (item.daily_stock ?? 0);
+              const isOutOfStock = stock <= 0;
 
               return (
                 <div
                   key={item.id || index}
-                  className="store-item-card"
-                  onClick={() => handleCardClick(item)}
+                  className={`store-item-card ${isOutOfStock ? 'out-of-stock' : ''}`}
+                  onClick={isOutOfStock ? undefined : () => handleCardClick(item)}
                   role="button"
-                  tabIndex={0}
+                  tabIndex={isOutOfStock ? -1 : 0}
                   onKeyDown={(e) => {
-                    if (e.key === 'Enter' || e.key === ' ') {
+                    if (!isOutOfStock && (e.key === 'Enter' || e.key === ' ')) {
                       e.preventDefault();
                       handleCardClick(item);
                     }
                   }}
                 >
                   <div className="store-card-row-icon">
+                    <div className="store-card-stock-badge">
+                      <span>{stock} left</span>
+                    </div>
+
                     <div className="store-card-cost-badge">
                       {coinIconSrc && <img src={coinIconSrc} alt="coin" className="store-cost-coin-img" />}
                       <span>{cost}</span>
@@ -326,7 +468,7 @@ export const Store: React.FC<StoreProps> = ({ onClose }) => {
                   </div>
 
                   <div className="store-card-row-meta">
-                    {renderRow3Meta(item)}
+                    {renderRow3Meta(item, isOutOfStock)}
                   </div>
                 </div>
               );
@@ -349,27 +491,39 @@ export const Store: React.FC<StoreProps> = ({ onClose }) => {
             </div>
 
             {/* Quantity Stepper */}
-            <div className="store-stepper-wrap">
-              <span className="store-stepper-label">Amount:</span>
-              <div className="store-stepper-controls">
-                <button
-                  type="button"
-                  className="store-stepper-btn"
-                  onClick={() => setPurchaseAmount((prev) => Math.max(1, prev - 1))}
-                  disabled={purchaseAmount <= 1}
-                >
-                  -
-                </button>
-                <span className="store-stepper-value">{purchaseAmount}</span>
-                <button
-                  type="button"
-                  className="store-stepper-btn"
-                  onClick={() => setPurchaseAmount((prev) => prev + 1)}
-                >
-                  +
-                </button>
-              </div>
-            </div>
+            {(() => {
+              const availableStock = typeof selectedItem.stock === 'number'
+                ? selectedItem.stock
+                : (selectedItem.daily_stock ?? 1);
+
+              return (
+                <div className="store-stepper-wrap">
+                  <div style={{ display: 'flex', alignItems: 'center' }}>
+                    <span className="store-stepper-label">Amount:</span>
+                    <span className="store-modal-stock-hint">({availableStock} available)</span>
+                  </div>
+                  <div className="store-stepper-controls">
+                    <button
+                      type="button"
+                      className="store-stepper-btn"
+                      onClick={() => setPurchaseAmount((prev) => Math.max(1, prev - 1))}
+                      disabled={purchaseAmount <= 1}
+                    >
+                      -
+                    </button>
+                    <span className="store-stepper-value">{purchaseAmount}</span>
+                    <button
+                      type="button"
+                      className="store-stepper-btn"
+                      onClick={() => setPurchaseAmount((prev) => Math.min(availableStock, prev + 1))}
+                      disabled={purchaseAmount >= availableStock}
+                    >
+                      +
+                    </button>
+                  </div>
+                </div>
+              );
+            })()}
 
             {/* Total Cost Calculation */}
             <div className="store-modal-total-cost">
