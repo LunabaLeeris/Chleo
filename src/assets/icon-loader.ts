@@ -11,6 +11,8 @@ import LIGHTNING_ICON from './icons/lightning.png';
 import CARDBG_ICON from './icons/cardbg.png';
 import COIN_ICON from './icons/coin.png';
 import CHEST_ICON from './icons/chest.png';
+import CHOCOLATE_ICON from './icons/chocolate.png';
+import FRIDGE_ICON from './icons/fridge.png';
 
 /**
  * Registry of all known/drawn icons.
@@ -41,6 +43,8 @@ export const REGISTERED_ICONS: Record<string, string> = {
   store: COIN_ICON,
   cardbg: CARDBG_ICON,
   matching: CARDBG_ICON,
+  chocolate: CHOCOLATE_ICON,
+  fridge: FRIDGE_ICON
 };
 
 /**

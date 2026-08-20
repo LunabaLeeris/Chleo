@@ -1,6 +1,6 @@
 {
-  "items_last_reset": 1787241012542,
-  "food_last_reset": 1787241012542,
+  "items_last_reset": 1787243642565,
+  "food_last_reset": 1787243642565,
   "items": {
     "unblock_site": {
       "title": "Unblock",
@@ -8,7 +8,7 @@
       "status": "unblock",
       "details": "Unblocks a chosen site",
       "cost": 30,
-      "stock": 0,
+      "stock": 10,
       "daily_stock": 10
     },
     "avoid_30m": {

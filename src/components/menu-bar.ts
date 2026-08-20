@@ -11,6 +11,7 @@ export const DEFAULT_MENU_ITEMS: MenuItemConfig[] = [
   { id: 'status', label: 'Status', icon: REGISTERED_ICONS.status || 'status' },
   { id: 'puzzle', label: 'Puzzle', icon: REGISTERED_ICONS.puzzle || 'puzzle' },
   { id: 'storage', label: 'Storage', icon: REGISTERED_ICONS.storage || 'storage' },
+  { id: 'fridge', label: 'Fridge', icon: REGISTERED_ICONS.fridge },
   { id: 'store', label: 'Store', icon: REGISTERED_ICONS.store || 'store' },
   { id: 'monitoring', label: 'Monitoring', icon: REGISTERED_ICONS.monitoring || 'monitoring' },
   { id: 'debug', label: 'Debug', icon: REGISTERED_ICONS.debug || 'debug' },
@@ -18,7 +19,6 @@ export const DEFAULT_MENU_ITEMS: MenuItemConfig[] = [
   { id: 'config', label: 'Config', icon: '' },
   { id: 'marketplace', label: 'Marketplace', icon: '' },
   { id: 'calendar', label: 'Calendar', icon: '' },
-  { id: 'fridge', label: 'Fridge', icon: '' },
   { id: 'closet', label: 'Closet', icon: '' },
 ];
 
