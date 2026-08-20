@@ -1,9 +1,9 @@
-# CLEO Pixel Art Panel Background Assets
+# CHLEO Pixel Art Panel Background Assets
 
 Drop your custom pixel art PNG files into this directory to replace panel backgrounds:
 
 - `header-bg.png` - Header navigation bar background
-- `stage-bg.png` - CLEO main avatar stage canvas background
+- `stage-bg.png` - CHLEO main avatar stage canvas background
 - `actions-panel-bg.png` - Expressions & Actions panel background
 - `speech-panel-bg.png` - Speech & TTS simulator panel background
 - `activity-panel-bg.png` - Browser events simulator panel background

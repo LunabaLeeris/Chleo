@@ -67,7 +67,7 @@ export const DEFAULT_MODULATION_CONFIG: RoboticModulationConfig = {
   robotToneBlend: 0.25,
 };
 
-const STORAGE_KEY = 'cleo_robotic_voice_config';
+const STORAGE_KEY = 'chleo_robotic_voice_config';
 
 export type ConfigChangeListener = (config: RoboticModulationConfig) => void;
 

@@ -1,6 +1,6 @@
 # Monitoring Subsystem Listeners & `onTick` Architecture
 
-This document provides a detailed breakdown of the listener mechanisms in [`src/monitoring/activity-tracker.ts`](file:///c:/Users/ron/ReactProjects/Cleo/src/monitoring/activity-tracker.ts) and [`src/monitoring/rule-store.ts`](file:///c:/Users/ron/ReactProjects/Cleo/src/monitoring/rule-store.ts), focusing on the 1-second `onTick` lifecycle and how [`web/components/MonitoringSimulator.tsx`](file:///c:/Users/ron/ReactProjects/Cleo/web/components/MonitoringSimulator.tsx) consumes them.
+This document provides a detailed breakdown of the listener mechanisms in [`src/monitoring/activity-tracker.ts`](file:///c:/Users/ron/ReactProjects/Chleo/src/monitoring/activity-tracker.ts) and [`src/monitoring/rule-store.ts`](file:///c:/Users/ron/ReactProjects/Chleo/src/monitoring/rule-store.ts), focusing on the 1-second `onTick` lifecycle and how [`web/components/MonitoringSimulator.tsx`](file:///c:/Users/ron/ReactProjects/Chleo/web/components/MonitoringSimulator.tsx) consumes them.
 
 ---
 
@@ -41,7 +41,7 @@ sequenceDiagram
 ## 2. The Listener Interfaces
 
 ### A. `ActivityTrackerListeners`
-Located in [`src/monitoring/activity-tracker.ts`](file:///c:/Users/ron/ReactProjects/Cleo/src/monitoring/activity-tracker.ts):
+Located in [`src/monitoring/activity-tracker.ts`](file:///c:/Users/ron/ReactProjects/Chleo/src/monitoring/activity-tracker.ts):
 
 ```typescript
 export interface ActivityTrackerListeners {
@@ -61,7 +61,7 @@ export interface ActivityTrackerListeners {
 ---
 
 ### B. `RuleStoreListeners`
-Located in [`src/monitoring/rule-store.ts`](file:///c:/Users/ron/ReactProjects/Cleo/src/monitoring/rule-store.ts):
+Located in [`src/monitoring/rule-store.ts`](file:///c:/Users/ron/ReactProjects/Chleo/src/monitoring/rule-store.ts):
 
 ```typescript
 export interface RuleStoreListeners {
@@ -137,7 +137,7 @@ Here is what happens during a single 1-second interval:
 
 ## 4. How `MonitoringSimulator.tsx` Uses These Listeners
 
-In the Web Playground ([`web/components/MonitoringSimulator.tsx`](file:///c:/Users/ron/ReactProjects/Cleo/web/components/MonitoringSimulator.tsx)), all components run in the browser's single JavaScript thread. The component wires the listeners during `useEffect`:
+In the Web Playground ([`web/components/MonitoringSimulator.tsx`](file:///c:/Users/ron/ReactProjects/Chleo/web/components/MonitoringSimulator.tsx)), all components run in the browser's single JavaScript thread. The component wires the listeners during `useEffect`:
 
 ```typescript
 // web/components/MonitoringSimulator.tsx (Lines 53-90)
@@ -152,10 +152,10 @@ useEffect(() => {
   // 1. Initialize RuleStore with RuleStoreListeners
   const rs = new RuleStore(be, {
     onEventTriggered: (payload, speechText) => {
-      // Updates Cleo's emotion wheel & facial expression
+      // Updates Chleo's emotion wheel & facial expression
       onRefreshEmotionState();
       
-      // Makes Cleo speak dialogue through the speech bubble & TTS
+      // Makes Chleo speak dialogue through the speech bubble & TTS
       onSpeakText(speechText);
       
       // Adds the new event to the short-term memory stream in the UI
@@ -201,4 +201,4 @@ useEffect(() => {
 | **Execution Context** | Single renderer thread in browser | Main Process (Node.js) & Renderer (React UI) |
 | **Listener Connection** | Direct in-memory callback functions passed to constructors | Main process runs `ActivityTracker`, communicates to UI via IPC (`electronAPI`) |
 | **UI Updates** | Triggered directly via `onTick` and `onRuleChanged` callbacks | Renderer queries `getSiteRules()` or receives IPC push messages |
-| **Storage / Persistence** | In-memory cache + `localStorage` fallback on exit | In-memory cache + root [`user-data/`](file:///c:/Users/ron/ReactProjects/Cleo/user-data) JSON files on exit |
+| **Storage / Persistence** | In-memory cache + `localStorage` fallback on exit | In-memory cache + root [`user-data/`](file:///c:/Users/ron/ReactProjects/Chleo/user-data) JSON files on exit |

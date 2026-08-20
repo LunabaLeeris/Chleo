@@ -34,7 +34,7 @@ export type ChleoExpression =
   | 'question';
 
 /** Alias for backward compatibility during CHLEO rebranding. */
-export type CleoExpression = ChleoExpression;
+export type ChleoExpression = ChleoExpression;
 
 /**
  * Animation definition for an individual avatar part.

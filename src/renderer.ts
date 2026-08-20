@@ -18,7 +18,7 @@ import {
 import type { ChleoResponsePayload } from './types/ipc';
 
 // Expose logger on window for dev console access
-(window as any).__CLEO_LOGGER__ = logger;
+(window as any).__CHLEO_LOGGER__ = logger;
 
 const modalBackdrop = document.getElementById('modal-backdrop') as HTMLDivElement;
 const companionWrapper = document.getElementById('companion-wrapper') as HTMLDivElement;
@@ -579,7 +579,7 @@ const menuBar = new MenuBarComponent(menuBarContainer, {
 
 // Listen for companion speech broadcast from Main process
 (window as any).electronAPI?.onCompanionSpeak?.(async (data: ChleoResponsePayload) => {
-  logger.info('companion-speech', `Cleo dialogue: "${data.speechText}"`, {
+  logger.info('companion-speech', `Chleo dialogue: "${data.speechText}"`, {
     overallEmotion: data.overallEmotion,
     responseType: data.responseType,
   });

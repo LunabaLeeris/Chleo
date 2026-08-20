@@ -56,7 +56,7 @@ export class MenuBarComponent {
     this.container.innerHTML = `
       <div class="menu-bar-panel">
         <div class="menu-bar-header">
-          <span class="menu-bar-title">CLEO</span>
+          <span class="menu-bar-title">CHLEO</span>
           <div class="menu-bar-coins" id="menu-bar-coins" title="Coins: ${this.coins}">
             <span class="menu-bar-coin-icon">${renderIconHtml(REGISTERED_ICONS.coin || 'coin', 'coin-icon-img', 'Coins')}</span>
             <span class="menu-bar-coin-amount" id="menu-bar-coin-amount">${this.coins}</span>

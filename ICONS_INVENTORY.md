@@ -5,7 +5,7 @@ This document lists all existing icons, emoji placeholders, and missing icon slo
 ---
 
 ## ⚡ Icon Loader & Caching System (`src/assets/icon-loader.ts`)
-CHLEO uses an in-memory preloading and caching registry ([src/assets/icon-loader.ts](file:///c:/Users/ron/ReactProjects/Cleo/src/assets/icon-loader.ts)).
+CHLEO uses an in-memory preloading and caching registry ([src/assets/icon-loader.ts](file:///c:/Users/ron/ReactProjects/Chleo/src/assets/icon-loader.ts)).
 
 ### How to add new drawn icons:
 1. Save your `.png` drawing to `src/assets/icons/<name>.png` (and `assets/icons/<name>.png`).
@@ -133,7 +133,7 @@ These icons already exist as image files and are used across the companion deskt
 | `assets/eyes.png` | PNG | `web/pages/HomePage.tsx`, `BlogPage.tsx` | Monitoring feature icon |
 | `assets/mouth.png` | PNG | `web/pages/HomePage.tsx`, `BlogPage.tsx` | Speech feature icon |
 | `assets/heart.png` | PNG | `web/pages/HomePage.tsx`, `BlogPage.tsx` | Emotion feature icon |
-| `assets/logo.png` | PNG | App window, Favicon, Branding | CLEO companion logo |
+| `assets/logo.png` | PNG | App window, Favicon, Branding | CHLEO companion logo |
 
 ---
 

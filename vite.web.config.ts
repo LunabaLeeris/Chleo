@@ -2,7 +2,7 @@ import { defineConfig } from 'vite';
 import { resolve } from 'path';
 import react from '@vitejs/plugin-react';
 
-// Vite configuration for CLEO web application target.
+// Vite configuration for CHLEO web application target.
 // Bundles index.html (Playground), marketplace.html, and blog.html to dist output.
 export default defineConfig({
   plugins: [react()],

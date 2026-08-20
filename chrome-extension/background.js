@@ -5,13 +5,13 @@ function connectWebSocket() {
     socket = new WebSocket('ws://localhost:8080');
 
     socket.onopen = () => {
-        console.log('[Cleo Extension] Connected to Electron Avatar Backend');
+        console.log('[Chleo Extension] Connected to Electron Avatar Backend');
     };
 
     socket.onmessage = (event) => {
         try {
             const data = JSON.parse(event.data);
-            console.log('[Cleo Extension] Received command:', data);
+            console.log('[Chleo Extension] Received command:', data);
 
             if (data.action === 'close_tab') {
                 const targetDomain = (data.domain || '').toLowerCase().trim();
@@ -30,7 +30,7 @@ function connectWebSocket() {
                             );
                             if (matches) {
                                 chrome.tabs.remove(tab.id, () => {
-                                    console.log('[Cleo Extension] Closed matching domain tab:', tab.id, tabUrl);
+                                    console.log('[Chleo Extension] Closed matching domain tab:', tab.id, tabUrl);
                                 });
                                 closed = true;
                             }
@@ -40,7 +40,7 @@ function connectWebSocket() {
                     // 2. If no tab was closed by domain match, close the last active tab
                     if (!closed && lastActiveTabId) {
                         chrome.tabs.remove(lastActiveTabId, () => {
-                            console.log('[Cleo Extension] Closed lastActiveTabId:', lastActiveTabId);
+                            console.log('[Chleo Extension] Closed lastActiveTabId:', lastActiveTabId);
                         });
                         closed = true;
                     }
@@ -50,7 +50,7 @@ function connectWebSocket() {
                         chrome.tabs.query({ active: true }, (activeTabs) => {
                             if (activeTabs && activeTabs[0] && activeTabs[0].id) {
                                 chrome.tabs.remove(activeTabs[0].id, () => {
-                                    console.log('[Cleo Extension] Closed active tab fallback:', activeTabs[0].id);
+                                    console.log('[Chleo Extension] Closed active tab fallback:', activeTabs[0].id);
                                 });
                             }
                         });
@@ -69,17 +69,17 @@ function connectWebSocket() {
                 }
             }
         } catch (err) {
-            console.error('[Cleo Extension] Failed to parse message from WebSocket:', err);
+            console.error('[Chleo Extension] Failed to parse message from WebSocket:', err);
         }
     };
 
     socket.onclose = () => {
-        console.log('[Cleo Extension] Disconnected. Retrying in 3 seconds...');
+        console.log('[Chleo Extension] Disconnected. Retrying in 3 seconds...');
         setTimeout(connectWebSocket, 3000);
     };
 
     socket.onerror = (err) => {
-        console.error('[Cleo Extension] WebSocket Error:', err);
+        console.error('[Chleo Extension] WebSocket Error:', err);
     };
 }
 

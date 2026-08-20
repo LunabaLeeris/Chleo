@@ -49,17 +49,17 @@ export const Particle: React.FC<ParticleProps> = ({
 
   const content = (
     <div
-      className="cleo-particle-item"
+      className="chleo-particle-item"
       style={style}
       onAnimationEnd={handleAnimationEnd}
       aria-hidden="true"
     >
-      <div className="cleo-particle-glow" />
-      <div className="cleo-particle-badge">
+      <div className="chleo-particle-glow" />
+      <div className="chleo-particle-badge">
         {iconSrc ? (
-          <img src={iconSrc} alt={title || 'item'} className="cleo-particle-icon-img" />
+          <img src={iconSrc} alt={title || 'item'} className="chleo-particle-icon-img" />
         ) : (
-          <span className="cleo-particle-emoji">{emoji || icon || '📦'}</span>
+          <span className="chleo-particle-emoji">{emoji || icon || '📦'}</span>
         )}
       </div>
     </div>

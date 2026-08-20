@@ -9,7 +9,7 @@ export const CalendarPanel: React.FC<PanelProps> = ({ onClose }) => {
   return (
     <PanelContainer title="Calendar" icon="" onClose={onClose}>
       <p className="panel-card-desc">
-        Schedule, events, and daily reminder overview for CLEO.
+        Schedule, events, and daily reminder overview for CHLEO.
       </p>
       <div className="panel-placeholder-box">
         <span className="placeholder-tag">[Calendar Component Placeholder]</span>

@@ -50,7 +50,7 @@ export class DebugLogger {
     // Purge any legacy stored logs from previous sessions
     if (typeof window !== 'undefined' && window.localStorage) {
       try {
-        window.localStorage.removeItem('cleo_debug_logs');
+        window.localStorage.removeItem('chleo_debug_logs');
       } catch (_) {
         /* ignore */
       }

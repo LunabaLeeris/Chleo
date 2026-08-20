@@ -5,7 +5,7 @@ import type {
   AnimationDef,
   FrameArrayDef,
   LoopMode,
-  CleoExpression,
+  ChleoExpression,
 } from './sprite-types';
 import { PART_RENDER_ORDER } from './sprite-types';
 import { preloadAvatarSprites, ensureImagesLoaded } from './sprite-loader';
@@ -298,9 +298,9 @@ export class AvatarCompositor {
   }
 
   /**
-   * Trigger high-level CLEO expression preset across layers.
+   * Trigger high-level CHLEO expression preset across layers.
    */
-  setExpression(expression: CleoExpression, text?: string): void {
+  setExpression(expression: ChleoExpression, text?: string): void {
     switch (expression) {
       case 'idle':
         this.resetAll();

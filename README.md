@@ -14,7 +14,7 @@ Chleo is an interactive desktop and browser companion designed to keep you on tr
 *(Chleo features a dynamic composable pixel sprite system with independent body, eye, mouth, and eyebrow layers).*
 
 <div align="center">
-  <img src="./assets/cleo_idle.gif" alt="Chleo Idle Animation" width="400" />
+  <img src="./assets/chleo_idle.gif" alt="Chleo Idle Animation" width="400" />
 </div>
 
 ---

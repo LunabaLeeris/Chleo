@@ -8,7 +8,7 @@ import {
   defaultTTSModulator,
   defaultSpeechOrchestrator,
 } from '../../src/avatar';
-import type { CleoExpression } from '../../src/avatar';
+import type { ChleoExpression } from '../../src/avatar';
 
 // Icon imports from root assets folder
 import ICON_EYES from '../../assets/eyes.png';
@@ -20,7 +20,7 @@ import { MarketplaceSection } from '../components/MarketplaceSection';
 
 export interface HoverMessage {
   text: string;
-  expression?: CleoExpression;
+  expression?: ChleoExpression;
 }
 
 /**
@@ -36,7 +36,7 @@ interface FocusPanelConfig {
   /** Which side of the avatar this panel sits on */
   side: 'left' | 'right';
   /** Default avatar expression to play when user hovers this panel if message has no explicit expression */
-  expression?: CleoExpression;
+  expression?: ChleoExpression;
   /** List of speech bubble messages (string or object with custom expression) that CHLEO speaks when user hovers over this panel */
   hoverMessages: (string | HoverMessage)[];
   /** Blog anchor to navigate to on click */
@@ -110,7 +110,7 @@ const FOCUS_PANELS: FocusPanelConfig[] = [
 
 interface IdleMessage {
   text: string;
-  expression?: CleoExpression;
+  expression?: ChleoExpression;
 }
 
 const IDLE_MESSAGES: IdleMessage[] = [

@@ -54,7 +54,7 @@ export const TYPING_WORD_BANK: readonly string[] = [
  */
 export function getRandomWord(exclude?: string): string {
   const bank = TYPING_WORD_BANK;
-  if (bank.length <= 1) return bank[0] || 'cleo';
+  if (bank.length <= 1) return bank[0] || 'chleo';
 
   let candidate: string;
   let attempts = 0;

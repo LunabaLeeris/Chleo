@@ -24,7 +24,7 @@ export type {
   KeyframeOffsetMap,
   AvatarConfig,
   ChleoExpression,
-  CleoExpression,
+  ChleoExpression,
 } from './sprite-types';
 export { PART_RENDER_ORDER } from './sprite-types';
 export { RoboticTTSModulator, defaultTTSModulator, DEFAULT_MODULATION_CONFIG } from './tts/robotic-tts-modulator';

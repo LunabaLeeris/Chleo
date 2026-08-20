@@ -3709,7 +3709,7 @@ body {
    Store Purchase Particle Animation
    ========================================================================== */
 
-.cleo-particle-item {
+.chleo-particle-item {
   position: fixed;
   top: 0;
   left: 0;
@@ -3720,13 +3720,13 @@ body {
   justify-content: center;
   width: 52px;
   height: 52px;
-  animation-name: cleo-particle-flight;
+  animation-name: chleo-particle-flight;
   animation-timing-function: cubic-bezier(0.25, 1, 0.5, 1);
   animation-fill-mode: both;
   will-change: transform, opacity;
 }
 
-.cleo-particle-badge {
+.chleo-particle-badge {
   position: relative;
   z-index: 2;
   width: 48px;
@@ -3741,19 +3741,19 @@ body {
   box-sizing: border-box;
 }
 
-.cleo-particle-icon-img {
+.chleo-particle-icon-img {
   width: 32px;
   height: 32px;
   object-fit: contain;
   image-rendering: pixelated;
 }
 
-.cleo-particle-emoji {
+.chleo-particle-emoji {
   font-size: 1.6rem;
   line-height: 1;
 }
 
-.cleo-particle-glow {
+.chleo-particle-glow {
   position: absolute;
   top: -6px;
   left: -6px;
@@ -3765,7 +3765,7 @@ body {
   pointer-events: none;
 }
 
-@keyframes cleo-particle-flight {
+@keyframes chleo-particle-flight {
   0% {
     transform: translate3d(var(--particle-start-x), var(--particle-start-y), 0) translate(-50%, -50%) scale(0.2);
     opacity: 0;

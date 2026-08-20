@@ -1,6 +1,6 @@
 # Composable Pixel Sprites
 
-This directory holds sprite sheets for Cleo's composable avatar system.
+This directory holds sprite sheets for Chleo's composable avatar system.
 
 ## Directory Structure
 

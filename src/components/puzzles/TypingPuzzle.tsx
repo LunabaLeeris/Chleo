@@ -91,7 +91,7 @@ export const TypingPuzzle: React.FC<TypingPuzzleProps> = ({
 
   // Words State (Previous word, Current active word, and Array of Future preview words)
   const [prevWord, setPrevWord] = useState<string>('');
-  const [currentWord, setCurrentWord] = useState<string>('cleo');
+  const [currentWord, setCurrentWord] = useState<string>('chleo');
   const [futureWords, setFutureWords] = useState<string[]>([]);
 
   // Active typed input buffer
