@@ -1,7 +1,6 @@
 import { EmotionsOrchestrator } from '../avatar/emotions/emotions-orchestrator';
-import { ResponseGenerator } from './response-generator';
-import type { ResponseResult } from './response-generator';
-import type { PrimaryEmotion } from '../avatar/emotions/emotion-types';
+import { ResponseGenerator, ResponseResult } from './response-generator';
+import type { PrimaryEmotion, PlutchikEmotion } from '../avatar/emotions/emotion-types';
 import type { MonitoringEventPayload } from './monitoring-types';
 import type { StorageAdapter } from '../memory/memory-types';
 import type { ShortTermMemory } from '../memory/short-term-memory';
@@ -53,6 +52,7 @@ export interface BehavioralReactionResult {
   emotionDeltas: BehavioralRule['emotionDeltas'];
   rewards?: BehavioralRule['rewards'];
   actions?: BehavioralActions;
+  overallEmotion?: PlutchikEmotion;
 }
 
 /**
@@ -246,6 +246,7 @@ export class BehavioralEngine {
       emotionDeltas: matchingRule.emotionDeltas,
       rewards: matchingRule.rewards,
       actions: normalizedActions,
+      overallEmotion: this.emotionOrchestrator.getOverallEmotion(),
     };
   }
 

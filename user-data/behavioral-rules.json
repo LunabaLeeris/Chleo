@@ -231,6 +231,123 @@
         "Ooh... That's good"
       ],
       "llmDirective": "Chleo congratulates the user for beating the puzzle high score."
+    },
+    {
+      "id": "UNBLOCK_ITEM_USED",
+      "name": "Unblock item is used",
+      "conditions": {
+        "event": "UNBLOCK_ITEM_USED"
+      },
+      "emotionDeltas": {
+        "joy": 0,
+        "trust": 0,
+        "fear": 0,
+        "surprise": 0,
+        "sadness": 0,
+        "disgust": 0,
+        "anger": 0,
+        "anticipation": 0
+      },
+      "heuristicTemplates": [
+        "Hmm...",
+        "Fine...",
+        "Well. If that's what you want",
+        "Hey that is cheating!"
+      ],
+      "llmDirective": "Chleo accepts that a domain is unblocked without repercusions"
+    },
+    {
+      "id": "AVOID_ITEM_USED",
+      "name": "Avoid item is used",
+      "conditions": {
+        "event": "AVOID_ITEM_USED"
+      },
+      "emotionDeltas": {
+        "joy": 0,
+        "trust": 0,
+        "fear": 0,
+        "surprise": 0,
+        "sadness": 0,
+        "disgust": 0,
+        "anger": 0,
+        "anticipation": 0
+      },
+      "heuristicTemplates": [
+        "Ok, just a little bit more",
+        "Fine, I will be patient. ",
+        "Again?"
+      ],
+      "llmDirective": "Chleo accepts that a domain is extended without repercusions"
+    },
+    {
+      "id": "FOOD_USED",
+      "name": "A food item is given to chleo",
+      "conditions": {
+        "event": "FOOD_USED"
+      },
+      "emotionDeltas": {
+        "joy": 0,
+        "trust": 0,
+        "fear": 0,
+        "surprise": 0,
+        "sadness": 0,
+        "disgust": 0,
+        "anger": 0,
+        "anticipation": 0
+      },
+      "heuristicTemplates": [
+        "Wow thanks!",
+        "Yum",
+        "For me?",
+        "You're so generous"
+      ],
+      "llmDirective": "Chleo was given a treat and is thankful"
+    },
+    {
+      "id": "ITEM_BOUGHT",
+      "name": "An item was bought in the store",
+      "conditions": {
+        "event": "ITEM_BOUGHT"
+      },
+      "emotionDeltas": {
+        "joy": 0,
+        "trust": 0,
+        "fear": 0,
+        "surprise": 0,
+        "sadness": 0,
+        "disgust": 0,
+        "anger": 0,
+        "anticipation": 0
+      },
+      "heuristicTemplates": [
+        "Let's hope you'll not need that",
+        "Well well well...",
+        "What will that be for?"
+      ],
+      "llmDirective": "Chleo is curious what you bought"
+    },
+    {
+      "id": "FOOD_BOUGHT",
+      "name": "A food was bought in the store",
+      "conditions": {
+        "event": "FOOD_BOUGHT"
+      },
+      "emotionDeltas": {
+        "joy": 0,
+        "trust": 0,
+        "fear": 0,
+        "surprise": 0,
+        "sadness": 0,
+        "disgust": 0,
+        "anger": 0,
+        "anticipation": 0
+      },
+      "heuristicTemplates": [
+        "Wow, that looks delicious",
+        "Can I have some?",
+        "You deserve that!"
+      ],
+      "llmDirective": "Chleo is happy you bought some food."
     }
   ]
 }

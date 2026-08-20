@@ -4,15 +4,15 @@
       "domain": "facebook.com",
       "type": "neutral",
       "dailyLimitSeconds": 0,
-      "spentTodaySeconds": 4452,
+      "spentTodaySeconds": 0,
       "warningThresholdPercent": 50,
       "requiresPuzzleToUnblock": false
     },
     {
       "domain": "youtube.com",
-      "type": "neutral",
-      "dailyLimitSeconds": 0,
-      "spentTodaySeconds": 1618,
+      "type": "avoid",
+      "dailyLimitSeconds": 10800,
+      "spentTodaySeconds": 0,
       "warningThresholdPercent": 80,
       "requiresPuzzleToUnblock": false
     },
@@ -36,7 +36,7 @@
       "domain": "localhost",
       "type": "neutral",
       "dailyLimitSeconds": 0,
-      "spentTodaySeconds": 15455,
+      "spentTodaySeconds": 15931,
       "warningThresholdPercent": 80,
       "requiresPuzzleToUnblock": false
     },
@@ -68,7 +68,7 @@
       "domain": "app.diagrams.net",
       "type": "neutral",
       "dailyLimitSeconds": 0,
-      "spentTodaySeconds": 673,
+      "spentTodaySeconds": 841,
       "warningThresholdPercent": 80,
       "requiresPuzzleToUnblock": false
     },

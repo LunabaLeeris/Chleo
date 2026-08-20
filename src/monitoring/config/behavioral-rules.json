@@ -38,22 +38,20 @@
               "description": "Grant 1 minute access. Gives little penalty on emotions."
             }
           ],
-          "draggable": false,
+          "draggable": true,
           "closeAllTabs": true,
           "orientation": "center"
         },
         "openPuzzle": [
           "snake",
-          "typing",
-          "chess",
-          "sudoku"
+          "typing"
         ],
         "orientation": "center",
         "avatarPosition": "bottom-right",
         "interactable": false
       },
       "heuristicTemplates": [
-        "Hey! {domain} is completely blocked. You cannot visit it unless you complete my puzzle!",
+        "Hey! {domain} is completely blocked. Complete my puzzle to unblock it!",
         "Stop trying to open {domain}! Access is restricted until you pass my challenge."
       ],
       "llmDirective": "Chleo is angry that the user tried to open a blocked website."
@@ -71,7 +69,7 @@
         "trust": -0.13
       },
       "heuristicTemplates": [
-        "Warning! You have used {percent}% of your limit on {domain}. Only {remainingSeconds} seconds left!",
+        "Warning! You have used {percent}% of your limit on {domain}.",
         "Hey, you're almost out of time for {domain}! Wrap it up soon."
       ],
       "llmDirective": "Chleo warns the user sternly that their time limit on a website is almost up."
@@ -145,7 +143,7 @@
         "trust": 0.25
       },
       "rewards": {
-        "coins": 50,
+        "coins": 10,
         "itemDrop": "snack_apple"
       },
       "heuristicTemplates": [
@@ -228,9 +226,82 @@
         "anticipation": 0
       },
       "heuristicTemplates": [
-        "Congrats"
+        "Congrats. you beat your high score!",
+        "Not bad.",
+        "Ooh... That's good"
       ],
       "llmDirective": "Chleo congratulates the user for beating the puzzle high score."
+    },
+    {
+      "id": "UNBLOCK_ITEM_USED",
+      "name": "Unblock item is used",
+      "conditions": {
+        "event": "UNBLOCK_ITEM_USED"
+      },
+      "emotionDeltas": {
+        "joy": 0,
+        "trust": 0,
+        "fear": 0,
+        "surprise": 0,
+        "sadness": 0,
+        "disgust": 0,
+        "anger": 0,
+        "anticipation": 0
+      },
+      "heuristicTemplates": [
+        "Hmm...",
+        "Fine...",
+        "Well. If that's what you want",
+        "Hey that is cheating!"
+      ],
+      "llmDirective": "Chleo accepts that a domain is unblocked without repercusions"
+    },
+    {
+      "id": "AVOID_ITEM_USED",
+      "name": "Avoid item is used",
+      "conditions": {
+        "event": "AVOID_ITEM_USED"
+      },
+      "emotionDeltas": {
+        "joy": 0,
+        "trust": 0,
+        "fear": 0,
+        "surprise": 0,
+        "sadness": 0,
+        "disgust": 0,
+        "anger": 0,
+        "anticipation": 0
+      },
+      "heuristicTemplates": [
+        "Ok, just a little bit more",
+        "Fine, I will be patient. ",
+        "Again?"
+      ],
+      "llmDirective": "Chleo accepts that a domain is extended without repercusions"
+    },
+    {
+      "id": "FOOD_USED",
+      "name": "A food item is given to chleo",
+      "conditions": {
+        "event": "FOOD_USED"
+      },
+      "emotionDeltas": {
+        "joy": 0,
+        "trust": 0,
+        "fear": 0,
+        "surprise": 0,
+        "sadness": 0,
+        "disgust": 0,
+        "anger": 0,
+        "anticipation": 0
+      },
+      "heuristicTemplates": [
+        "Wow thanks!",
+        "Yum",
+        "For me?",
+        "You're so generous"
+      ],
+      "llmDirective": "Chleo was given a treat and is thankful"
     }
   ]
 }

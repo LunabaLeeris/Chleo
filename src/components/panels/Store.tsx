@@ -179,6 +179,31 @@ export const Store: React.FC<StoreProps> = ({ onClose }) => {
         }
       }
 
+      // Determine behavioral monitoring event (FOOD_BOUGHT vs ITEM_BOUGHT)
+      const isFood = activeTab === 'groceries' || target === 'fridge' || Boolean(config.food && config.food[itemToAnimate.id]);
+      const eventId = isFood ? 'FOOD_BOUGHT' : 'ITEM_BOUGHT';
+
+      if (typeof window !== 'undefined' && (window as any).electronAPI?.processMonitoringEvent) {
+        try {
+          const reaction = await (window as any).electronAPI.processMonitoringEvent({
+            eventId,
+            domain: 'store',
+            message: `Bought ${itemToAnimate.title} x${countToSpawn}`,
+            timestamp: Date.now(),
+          });
+
+          if (reaction?.speechText && typeof (window as any).playCompanionSpeech === 'function') {
+            (window as any).playCompanionSpeech(
+              reaction.speechText,
+              reaction.overallEmotion,
+              reaction.responseType
+            );
+          }
+        } catch (eventErr) {
+          console.warn('[Store] Failed to dispatch behavioral event:', eventErr);
+        }
+      }
+
       // Trigger particle animation effect matching quantity purchased
       spawnParticleEffect(itemToAnimate, target, countToSpawn);
 

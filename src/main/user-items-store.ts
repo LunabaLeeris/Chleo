@@ -114,6 +114,41 @@ export class UserItemsStore {
   }
 
   /**
+   * Remove an item from user inventory category (storage, fridge, closet).
+   * Decrements quantity and removes the entry if it reaches 0.
+   */
+  public removeItem(itemId: string, quantity = 1): boolean {
+    const data = this.cachedData || this.load();
+    let removed = false;
+    for (const target of ['storage', 'fridge', 'closet'] as InventoryTarget[]) {
+      const list = data[target] as any[];
+      if (!list) continue;
+
+      for (let i = 0; i < list.length; i++) {
+        const entry = list[i];
+        if (Array.isArray(entry) && entry[0] === itemId) {
+          entry[1] = Math.max(0, (typeof entry[1] === 'number' ? entry[1] : 0) - quantity);
+          if (entry[1] === 0) list.splice(i, 1);
+          removed = true;
+          break;
+        } else if (entry && typeof entry === 'object' && (entry.id === itemId || entry.itemId === itemId)) {
+          entry.quantity = Math.max(0, (typeof entry.quantity === 'number' ? entry.quantity : (entry.amount || 0)) - quantity);
+          if (entry.quantity === 0) list.splice(i, 1);
+          removed = true;
+          break;
+        }
+      }
+      if (removed) break;
+    }
+    
+    if (removed) {
+      this.cachedData = data;
+      return this.save();
+    }
+    return false;
+  }
+
+  /**
    * Purchase item: validates coin balance, deducts coins, and deposits item into target inventory.
    */
   public purchaseItem(

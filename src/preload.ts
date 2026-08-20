@@ -57,7 +57,7 @@ contextBridge.exposeInMainWorld('electronAPI', {
 
     // Actions & Puzzle APIs
     closeActiveTab: (domain?: string) => ipcRenderer.invoke('close-active-tab', domain),
-    modifyBlockSuccess: (domain: string, onSuccess?: any) => ipcRenderer.invoke('modify-block-success', domain, onSuccess),
+    applyItemEffect: (itemId: string, amount: number, domain?: string, deduct?: boolean) => ipcRenderer.invoke('apply-item-effect', itemId, amount, domain, deduct),
 
     // Main -> Renderer Logging Stream
     onMainLog: (callback: (payload: any) => void) => {

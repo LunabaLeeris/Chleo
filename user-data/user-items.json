@@ -1,22 +1,26 @@
 {
-  "coins": 7690,
+  "coins": 7310,
   "storage": [
     [
       "unblock_site",
-      35
+      29
     ],
     [
       "avoid_30m",
-      43
+      23
     ],
     [
       "avoid_1m",
-      22
+      10
     ]
   ],
   "fridge": [
     "chocolate",
-    3
+    3,
+    [
+      "chocolate",
+      4
+    ]
   ],
   "closet": []
 }

@@ -264,7 +264,7 @@ export class RuleStore {
     return rule;
   }
 
-  setSiteLimit(domain: string, dailyLimitSeconds: number, useThisRule?: SiteRule): SiteRule {
+  setSiteLimit(domain: string, dailyLimitSeconds: number, useThisRule?: SiteRule, _options?: { skipEvent?: boolean }): SiteRule {
     let rule = useThisRule ? useThisRule : this.findRuleForDomain(domain);
     if (!rule) {
       rule = {

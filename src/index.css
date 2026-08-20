@@ -3188,6 +3188,154 @@ body {
 }
 
 /* ==========================================================================
+   STORAGE USE ITEM MODAL
+   ========================================================================== */
+
+.storage-use-overlay {
+  position: absolute;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.55);
+  backdrop-filter: blur(2px);
+  z-index: 20;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 12px;
+  box-sizing: border-box;
+  border-radius: 12px;
+  animation: storeFadeIn 0.15s ease;
+}
+
+.storage-use-modal {
+  background: var(--bg-card, #fef6ec);
+  border: 3px solid var(--border-pixel, #2e1005);
+  box-shadow: 4px 4px 0px var(--border-pixel, #2e1005);
+  border-radius: 8px;
+  padding: 12px;
+  width: 100%;
+  max-width: 270px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  box-sizing: border-box;
+  animation: storePopIn 0.18s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+.storage-use-header {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.storage-use-icon-box {
+  width: 36px;
+  height: 36px;
+  background: #55231c;
+  border: 2px solid #8f463a;
+  box-shadow: inset 1px 1px 0px #35130d, inset -1px -1px 0px #b06253;
+  border-radius: 6px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.storage-use-icon-img {
+  width: 24px;
+  height: 24px;
+  object-fit: contain;
+  image-rendering: pixelated;
+}
+
+.storage-use-icon-emoji {
+  font-size: 1.3rem;
+  line-height: 1;
+}
+
+.storage-use-title-wrap {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  overflow: hidden;
+}
+
+.storage-use-title {
+  font-family: var(--font-pixel);
+  font-size: 0.76rem;
+  font-weight: 700;
+  color: var(--text-dark, #2e1005);
+  margin: 0;
+  line-height: 1.2;
+}
+
+.storage-use-desc {
+  font-size: 0.58rem;
+  color: var(--text-muted, #6b7280);
+  margin: 0;
+  line-height: 1.25;
+}
+
+.storage-use-effects {
+  background: #fff;
+  border: 1.5px solid var(--border-pixel, #2e1005);
+  border-radius: 6px;
+  padding: 6px 8px;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.storage-effects-label {
+  font-family: var(--font-pixel);
+  font-size: 0.58rem;
+  font-weight: 700;
+  color: var(--text-dark, #2e1005);
+}
+
+.storage-effects-badges {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px;
+}
+
+.storage-domain-select-wrap {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+}
+
+.storage-domain-label {
+  font-family: var(--font-pixel);
+  font-size: 0.6rem;
+  font-weight: 700;
+  color: var(--text-dark, #2e1005);
+}
+
+.storage-domain-select {
+  font-family: var(--font-pixel);
+  font-size: 0.62rem;
+  padding: 4px 6px;
+  background: #fff;
+  border: 1.5px solid var(--border-pixel, #2e1005);
+  border-radius: 4px;
+  color: var(--text-dark, #2e1005);
+  outline: none;
+  cursor: pointer;
+  width: 100%;
+  box-sizing: border-box;
+}
+
+.storage-domain-select:focus {
+  border-color: #3b82f6;
+}
+
+.storage-domain-empty {
+  font-size: 0.55rem;
+  color: #dc2626;
+  font-family: var(--font-pixel);
+}
+
+/* ==========================================================================
    STORE PANEL STYLES
    ========================================================================== */
 

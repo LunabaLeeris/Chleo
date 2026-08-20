@@ -1,13 +1,13 @@
 {
   "daysKnown": 10,
   "firstSeenTimestamp": 1723370000000,
-  "lastSeenTimestamp": 1787226901496,
+  "lastSeenTimestamp": 1787237731184,
   "totalViolationsCount": 0,
   "totalRewardsEarned": 0,
   "totalPuzzlesCompleted": 0,
   "lastEmotionState": {
-    "joy": 1,
-    "trust": 1,
+    "joy": 0.75,
+    "trust": 0.6799999999999999,
     "fear": 0,
     "surprise": 0,
     "sadness": 1,

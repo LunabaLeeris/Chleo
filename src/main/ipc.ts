@@ -7,8 +7,9 @@ import type { EmotionsOrchestrator } from '../avatar/emotions/emotions-orchestra
 import type { BehavioralEngine } from '../monitoring/behavioral-engine';
 import type { RuleStore } from '../monitoring/rule-store';
 import type { ActivityTracker } from '../monitoring/activity-tracker';
-import { InteractiveRects, IgnoreMouseEventsOptions } from '../types/ipc';
+import { InteractiveRects, IgnoreMouseEventsOptions, PurchaseItemPayload, InventoryTarget } from '../types/ipc';
 import { MonitoringEventPayload } from 'src/monitoring';
+import { getItemDefinition } from '../items/items-registry';
 
 import type { BrowserWebSocketServer } from '../monitoring/browser-websocket-server';
 
@@ -144,7 +145,11 @@ export function registerIpcHandlers(ctx: IpcHandlerContext): void {
   });
 
   ipcMain.handle('process-monitoring-event', async (_event, payload: MonitoringEventPayload) => {
-    return await ctx.behavioralEngine.processEvent(payload);
+    const reaction = await ctx.behavioralEngine.processEvent(payload);
+    if (reaction && !reaction.overallEmotion) {
+      reaction.overallEmotion = ctx.emotionsOrchestrator.getOverallEmotion();
+    }
+    return reaction;
   });
 
   ipcMain.handle('set-active-domain', (_event, url: string) => {
@@ -192,14 +197,40 @@ export function registerIpcHandlers(ctx: IpcHandlerContext): void {
     return true;
   });
 
-  ipcMain.handle('modify-block-success', async (_event, domain: string, onSuccess?: { status: 'unblock' | 'avoid'; duration?: number }) => {
-    if (!domain) return false;
-    ctx.sendMainLog('info', 'behavior', `Modifying block/limit via puzzle success: ${domain}`, { onSuccess });
-    if (onSuccess?.status === 'avoid') {
-      ctx.ruleStore.setSiteLimit(domain, onSuccess.duration || 30);
-    } else {
-      await ctx.ruleStore.setUnblockSite(domain);
+  ipcMain.handle('apply-item-effect', async (_event, itemId: string, amount: number, domain?: string, deduct?: boolean) => {
+    ctx.sendMainLog('info', 'behavior', `Applying item effect for: ${itemId} (amount: ${amount})`);
+    
+    let itemDef = getItemDefinition(itemId);
+    if (!itemDef) {
+       const parts = itemId.split('_');
+       if (parts[0] === 'avoid') {
+          itemDef = { status: 'avoid', duration: parseInt(parts[1]) || 30, title: 'Avoid' };
+       } else if (parts[0] === 'unblock') {
+          itemDef = { status: 'unblock', title: 'Unblock' };
+       }
     }
+
+    if (itemDef) {
+      if (itemDef.deltas) {
+        const adjustedDeltas: Record<string, number> = {};
+        for (const [key, val] of Object.entries(itemDef.deltas)) {
+          adjustedDeltas[key] = (val as number) * amount;
+        }
+        ctx.emotionsOrchestrator.applyBehavioralData(adjustedDeltas);
+        ctx.shortTermMemory.updateLastEmotion(ctx.emotionsOrchestrator.getState());
+      }
+
+      if (domain && itemDef.status === 'avoid') {
+        ctx.ruleStore.setSiteLimit(domain, (itemDef.duration || 30) * amount, undefined, { skipEvent: true });
+      } else if (domain && itemDef.status === 'unblock') {
+        await ctx.ruleStore.setUnblockSite(domain, undefined, { skipEvent: true });
+      }
+    }
+
+    if (deduct && (ctx.userItemsStore as any).removeItem) {
+       (ctx.userItemsStore as any).removeItem(itemId, amount);
+    }
+
     return true;
   });
 }

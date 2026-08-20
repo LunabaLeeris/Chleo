@@ -8,6 +8,7 @@ import { PanelHost } from './components/panels/PanelHost';
 import { ActionPrompt } from './components/action-prompt/ActionPrompt';
 import { PuzzleHost } from './components/puzzles/PuzzleHost';
 import { RewardPanel } from './components/panels/RewardPanel';
+import { processItemUsage } from './items/item-processor';
 import { logger } from './logger';
 import {
   adjustBubblePosition,
@@ -270,6 +271,8 @@ async function playCompanionSpeech(
   }
 }
 
+(window as any).playCompanionSpeech = playCompanionSpeech;
+
 function showActionPrompt(promptState: ActivePromptState) {
   activePrompt = promptState;
   if (!actionPromptContainer || !actionPromptRoot) return;
@@ -403,7 +406,7 @@ function showPuzzlePanel(puzzleState: ActivePuzzleState) {
             });
 
             if (reaction?.speechText) {
-              playCompanionSpeech(reaction.speechText, 'happy', reaction.responseType);
+              playCompanionSpeech(reaction.speechText, reaction.overallEmotion, reaction.responseType);
             }
           } catch (err: any) {
             logger.error('puzzle', `Failed to process HIGH_SCORE_BEATEN event: ${err?.message || err}`);
@@ -434,10 +437,12 @@ function showPuzzlePanel(puzzleState: ActivePuzzleState) {
                 logger.info('reward-panel', `User chosen reward:`, selectedReward);
                 closePuzzlePanel();
                 if (puzzleState.domain && !puzzleState.isSandboxTest) {
-                  await (window as any).electronAPI?.modifyBlockSuccess?.(
-                    puzzleState.domain,
-                    selectedReward
-                  );
+                  await processItemUsage({
+                    itemId: selectedReward.id || `${selectedReward.status}_${selectedReward.duration || 0}`,
+                    amount: 1,
+                    domain: puzzleState.domain,
+                    deduct: false
+                  });
                 }
                 if (puzzleState.isSandboxTest) {
                   activeOptionId = 'puzzle';

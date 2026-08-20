@@ -1,6 +1,236 @@
 {
   "events": [
     {
+      "type": "avoid_item_used",
+      "domain": "youtube.com",
+      "details": "Fine, I will be patient. ",
+      "emotionDelta": {
+        "joy": 0,
+        "trust": 0,
+        "fear": 0,
+        "surprise": 0,
+        "sadness": 0,
+        "disgust": 0,
+        "anger": 0,
+        "anticipation": 0
+      },
+      "id": "stm_1787237731186_jixrs",
+      "timestamp": 1787237731186,
+      "formattedText": "default"
+    },
+    {
+      "type": "unblock_item_used",
+      "domain": "facebook.com",
+      "details": "Well. If that's what you want",
+      "emotionDelta": {
+        "joy": 0,
+        "trust": 0,
+        "fear": 0,
+        "surprise": 0,
+        "sadness": 0,
+        "disgust": 0,
+        "anger": 0,
+        "anticipation": 0
+      },
+      "id": "stm_1787237724713_jt1j0",
+      "timestamp": 1787237724713,
+      "formattedText": "default"
+    },
+    {
+      "type": "avoid_item_used",
+      "domain": "youtube.com",
+      "details": "Again?",
+      "emotionDelta": {
+        "joy": 0,
+        "trust": 0,
+        "fear": 0,
+        "surprise": 0,
+        "sadness": 0,
+        "disgust": 0,
+        "anger": 0,
+        "anticipation": 0
+      },
+      "id": "stm_1787237719138_k85os",
+      "timestamp": 1787237719138,
+      "formattedText": "default"
+    },
+    {
+      "type": "food_bought",
+      "domain": "store",
+      "details": "Wow, that looks delicious",
+      "emotionDelta": {
+        "joy": 0,
+        "trust": 0,
+        "fear": 0,
+        "surprise": 0,
+        "sadness": 0,
+        "disgust": 0,
+        "anger": 0,
+        "anticipation": 0
+      },
+      "id": "stm_1787237709206_6707j",
+      "timestamp": 1787237709206,
+      "formattedText": "default"
+    },
+    {
+      "type": "item_bought",
+      "domain": "store",
+      "details": "What will that be for?",
+      "emotionDelta": {
+        "joy": 0,
+        "trust": 0,
+        "fear": 0,
+        "surprise": 0,
+        "sadness": 0,
+        "disgust": 0,
+        "anger": 0,
+        "anticipation": 0
+      },
+      "id": "stm_1787237702679_mk8uj",
+      "timestamp": 1787237702679,
+      "formattedText": "default"
+    },
+    {
+      "type": "unblock_item_used",
+      "domain": "youtube.com",
+      "details": "Fine...",
+      "emotionDelta": {
+        "joy": 0,
+        "trust": 0,
+        "fear": 0,
+        "surprise": 0,
+        "sadness": 0,
+        "disgust": 0,
+        "anger": 0,
+        "anticipation": 0
+      },
+      "id": "stm_1787237207898_bo8xh",
+      "timestamp": 1787237207898,
+      "formattedText": "default"
+    },
+    {
+      "type": "unblock_item_used",
+      "domain": "facebook.com",
+      "details": "Fine...",
+      "emotionDelta": {
+        "joy": 0,
+        "trust": 0,
+        "fear": 0,
+        "surprise": 0,
+        "sadness": 0,
+        "disgust": 0,
+        "anger": 0,
+        "anticipation": 0
+      },
+      "id": "stm_1787237196900_y8lxr",
+      "timestamp": 1787237196900,
+      "formattedText": "default"
+    },
+    {
+      "type": "avoid_item_used",
+      "domain": "facebook.com",
+      "details": "Ok, just a little bit more",
+      "emotionDelta": {
+        "joy": 0,
+        "trust": 0,
+        "fear": 0,
+        "surprise": 0,
+        "sadness": 0,
+        "disgust": 0,
+        "anger": 0,
+        "anticipation": 0
+      },
+      "id": "stm_1787237189018_tqudz",
+      "timestamp": 1787237189018,
+      "formattedText": "default"
+    },
+    {
+      "type": "avoid_item_used",
+      "domain": "facebook.com",
+      "details": "Ok, just a little bit more",
+      "emotionDelta": {
+        "joy": 0,
+        "trust": 0,
+        "fear": 0,
+        "surprise": 0,
+        "sadness": 0,
+        "disgust": 0,
+        "anger": 0,
+        "anticipation": 0
+      },
+      "id": "stm_1787235964565_8a6z7",
+      "timestamp": 1787235964565,
+      "formattedText": "default"
+    },
+    {
+      "type": "avoid_item_used",
+      "domain": "facebook.com",
+      "details": "Fine, I will be patient. ",
+      "emotionDelta": {
+        "joy": 0,
+        "trust": 0,
+        "fear": 0,
+        "surprise": 0,
+        "sadness": 0,
+        "disgust": 0,
+        "anger": 0,
+        "anticipation": 0
+      },
+      "id": "stm_1787235690001_uz8sz",
+      "timestamp": 1787235690001,
+      "formattedText": "default"
+    },
+    {
+      "type": "avoid_item_used",
+      "domain": "facebook.com",
+      "details": "Fine, I will be patient. ",
+      "emotionDelta": {
+        "joy": 0,
+        "trust": 0,
+        "fear": 0,
+        "surprise": 0,
+        "sadness": 0,
+        "disgust": 0,
+        "anger": 0,
+        "anticipation": 0
+      },
+      "id": "stm_1787235679350_lh6jt",
+      "timestamp": 1787235679350,
+      "formattedText": "default"
+    },
+    {
+      "type": "puzzle_unblock_penalty",
+      "domain": "facebook.com",
+      "details": "You completed the puzzle so I unlocked facebook... but I'm still mad you visited it!",
+      "emotionDelta": {
+        "anger": 0.3,
+        "sadness": 0.2,
+        "joy": -0.25,
+        "trust": -0.32
+      },
+      "id": "stm_1787235621234_pqqz0",
+      "timestamp": 1787235621234,
+      "formattedText": "default"
+    },
+    {
+      "type": "unblock_item_used",
+      "domain": "facebook.com",
+      "details": "Well. If that's what you want",
+      "emotionDelta": {
+        "joy": 0,
+        "trust": 0,
+        "fear": 0,
+        "surprise": 0,
+        "sadness": 0,
+        "disgust": 0,
+        "anger": 0,
+        "anticipation": 0
+      },
+      "id": "stm_1787235621189_ka6hj",
+      "timestamp": 1787235621189,
+      "formattedText": "default"
+    },
+    {
       "type": "productive_milestone",
       "domain": "github.com",
       "details": "You're locked in! Keep up the good work on github. I gave you a reward!",
@@ -529,197 +759,19 @@
       "id": "stm_1786957048695_nau8t",
       "timestamp": 1786957048695,
       "formattedText": "default"
-    },
-    {
-      "type": "limit_exceeded",
-      "domain": "youtube.com",
-      "details": "Time's up! You exceeded your daily limit on youtube. It is now blocked!",
-      "emotionDelta": {
-        "anger": 0.4,
-        "sadness": 0.3,
-        "joy": -0.1,
-        "trust": -0.1
-      },
-      "id": "stm_1786936319575_vz5a0",
-      "timestamp": 1786936319575,
-      "formattedText": "default"
-    },
-    {
-      "type": "limit_warning",
-      "domain": "youtube.com",
-      "details": "Hey, you're almost out of time for youtube! Wrap it up soon.",
-      "emotionDelta": {
-        "anger": 0.15,
-        "sadness": 0.1,
-        "joy": -0.15,
-        "trust": -0.13
-      },
-      "id": "stm_1786936317548_ql00a",
-      "timestamp": 1786936317548,
-      "formattedText": "default"
-    },
-    {
-      "type": "puzzle_unblock_penalty",
-      "domain": "youtube.com",
-      "details": "Fine, youtube is unlocked now that you passed the puzzle, but don't stay here long!",
-      "emotionDelta": {
-        "anger": 0.3,
-        "sadness": 0.2,
-        "joy": -0.25,
-        "trust": -0.32
-      },
-      "id": "stm_1786887134885_k2x86",
-      "timestamp": 1786887134885,
-      "formattedText": "default"
-    },
-    {
-      "type": "site_blocked_visit",
-      "domain": "youtube.com",
-      "details": "Stop trying to open youtube! Access is restricted until you pass my challenge.",
-      "emotionDelta": {
-        "anger": 0.35,
-        "sadness": 0.25,
-        "joy": -0.25,
-        "trust": -0.23
-      },
-      "id": "stm_1786887116693_iu15p",
-      "timestamp": 1786887116693,
-      "formattedText": "default"
-    },
-    {
-      "type": "puzzle_unblock_penalty",
-      "domain": "facebook.com",
-      "details": "You completed the puzzle so I unlocked facebook... but I'm still mad you visited it!",
-      "emotionDelta": {
-        "anger": 0.3,
-        "sadness": 0.2,
-        "joy": -0.25,
-        "trust": -0.32
-      },
-      "id": "stm_1786887076208_brdb9",
-      "timestamp": 1786887076208,
-      "formattedText": "default"
-    },
-    {
-      "type": "site_blocked_visit",
-      "domain": "facebook.com",
-      "details": "Stop trying to open facebook! Access is restricted until you pass my challenge.",
-      "emotionDelta": {
-        "anger": 0.35,
-        "sadness": 0.25,
-        "joy": -0.25,
-        "trust": -0.23
-      },
-      "id": "stm_1786887058316_ppqvm",
-      "timestamp": 1786887058316,
-      "formattedText": "default"
-    },
-    {
-      "type": "productive_milestone",
-      "domain": "github.com",
-      "details": "You're locked in! Keep up the good work on github. I gave you a reward!",
-      "emotionDelta": {
-        "joy": 0.35,
-        "trust": 0.25
-      },
-      "id": "stm_1786887047189_l37gf",
-      "timestamp": 1786887047189,
-      "formattedText": "default"
-    },
-    {
-      "type": "site_blocked_visit",
-      "domain": "youtube.com",
-      "details": "Stop trying to open youtube! Access is restricted until you pass my challenge.",
-      "emotionDelta": {
-        "anger": 0.35,
-        "sadness": 0.25,
-        "joy": -0.25,
-        "trust": -0.23
-      },
-      "id": "stm_1786887038174_ct90v",
-      "timestamp": 1786887038174,
-      "formattedText": "default"
-    },
-    {
-      "type": "site_blocked_visit",
-      "domain": "facebook.com",
-      "details": "Stop trying to open facebook! Access is restricted until you pass my challenge.",
-      "emotionDelta": {
-        "anger": 0.35,
-        "sadness": 0.25,
-        "joy": -0.25,
-        "trust": -0.23
-      },
-      "id": "stm_1786887037943_qf9xl",
-      "timestamp": 1786887037943,
-      "formattedText": "default"
-    },
-    {
-      "type": "site_blocked_visit",
-      "domain": "facebook.com",
-      "details": "Hey! facebook is completely blocked. Complete my puzzle to unblock it!",
-      "emotionDelta": {
-        "anger": 0.35,
-        "sadness": 0.25,
-        "joy": -0.25,
-        "trust": -0.23
-      },
-      "id": "stm_1786886983501_up0u5",
-      "timestamp": 1786886983501,
-      "formattedText": "default"
-    },
-    {
-      "type": "productive_milestone",
-      "domain": "github.com",
-      "details": "Great job! You've been productive on github for 3m! Here are 50 coins!",
-      "emotionDelta": {
-        "joy": 0.35,
-        "trust": 0.25
-      },
-      "id": "stm_1786878789724_gjpqg",
-      "timestamp": 1786878789724,
-      "formattedText": "default"
-    },
-    {
-      "type": "site_blocked_visit",
-      "domain": "facebook.com",
-      "details": "Hey! facebook is completely blocked. Complete my puzzle to unblock it!",
-      "emotionDelta": {
-        "anger": 0.35,
-        "sadness": 0.25,
-        "joy": -0.25,
-        "trust": -0.23
-      },
-      "id": "stm_1786878775193_67yxk",
-      "timestamp": 1786878775193,
-      "formattedText": "default"
-    },
-    {
-      "type": "site_blocked_visit",
-      "domain": "facebook.com",
-      "details": "Stop trying to open facebook! Access is restricted until you pass my challenge.",
-      "emotionDelta": {
-        "anger": 0.35,
-        "sadness": 0.25,
-        "joy": -0.25,
-        "trust": -0.23
-      },
-      "id": "stm_1786878753973_sjnnj",
-      "timestamp": 1786878753973,
-      "formattedText": "default"
     }
   ],
   "recentSpeechPhrases": [
-    "You're locked in! Keep up the good work on github. I gave you a reward!",
-    "You're locked in! Keep up the good work on github. I gave you a reward!",
-    "You're locked in! Keep up the good work on github. I gave you a reward!",
-    "Great job! You've been productive on github for 4m! Here are 50 coins!",
-    "You're locked in! Keep up the good work on github. I gave you a reward!",
-    "Great job! You've been productive on github for 4m! Here are 50 coins!",
-    "You're locked in! Keep up the good work on github. I gave you a reward!",
-    "Great job! You've been productive on github for 3m! Here are 50 coins!",
-    "Great job! You've been productive on github for 3m! Here are 50 coins!",
-    "You're locked in! Keep up the good work on github. I gave you a reward!"
+    "Fine, I will be patient. ",
+    "Well. If that's what you want",
+    "Again?",
+    "Wow, that looks delicious",
+    "What will that be for?",
+    "Fine...",
+    "Fine...",
+    "Ok, just a little bit more",
+    "Ok, just a little bit more",
+    "Fine, I will be patient. "
   ],
   "activeWarnings": [],
   "currentActiveDomain": "github.com",
