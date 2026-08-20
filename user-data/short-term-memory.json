@@ -3,6 +3,24 @@
     {
       "type": "food_used",
       "domain": "fridge",
+      "details": "You're so generous",
+      "emotionDelta": {
+        "joy": 0,
+        "trust": 0,
+        "fear": 0,
+        "surprise": 0,
+        "sadness": 0,
+        "disgust": 0,
+        "anger": 0,
+        "anticipation": 0
+      },
+      "id": "stm_1787244722796_1wcrn",
+      "timestamp": 1787244722796,
+      "formattedText": "default"
+    },
+    {
+      "type": "food_used",
+      "domain": "fridge",
       "details": "For me?",
       "emotionDelta": {
         "joy": 0,
@@ -38,6 +56,7 @@
     }
   ],
   "recentSpeechPhrases": [
+    "You're so generous",
     "For me?",
     "You're so generous",
     "Let's hope you'll not need that",
@@ -46,8 +65,7 @@
     "Well. If that's what you want",
     "Again?",
     "Wow, that looks delicious",
-    "What will that be for?",
-    "Fine..."
+    "What will that be for?"
   ],
   "activeWarnings": [],
   "currentActiveDomain": "github.com",

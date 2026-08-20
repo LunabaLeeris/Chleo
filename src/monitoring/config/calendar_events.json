@@ -1,0 +1,132 @@
+{
+  "event_types": {
+    "reminder": {
+      "label": "Reminder",
+      "color": "#f59e0b",
+      "bg_color": "#fef3c7",
+      "icon": "hourglass",
+      "details": "Tasks, alarms & daily reminders"
+    },
+    "birthday": {
+      "label": "Birthday",
+      "color": "#ff5d8f",
+      "bg_color": "#ffe4ee",
+      "icon": "star",
+      "details": "Celebrations & birthdays"
+    },
+    "date": {
+      "label": "Date",
+      "color": "#f43f5e",
+      "bg_color": "#ffe4e6",
+      "icon": "chocolate",
+      "details": "Outings, social dates & treats"
+    },
+    "milestone": {
+      "label": "Milestone",
+      "color": "#8b5cf6",
+      "bg_color": "#ede9fe",
+      "icon": "lightning",
+      "details": "Important goals & milestone releases"
+    },
+    "routine": {
+      "label": "Routine",
+      "color": "#10b981",
+      "bg_color": "#d1fae5",
+      "icon": "status",
+      "details": "Habits, health & daily self-care"
+    },
+    "game": {
+      "label": "Game & Arcade",
+      "color": "#06b6d4",
+      "bg_color": "#cffafe",
+      "icon": "puzzle",
+      "details": "Puzzles, gaming & tournaments"
+    }
+  },
+  "events": {
+    "2026-08-08": {
+      "title": "Inventory Restock Day",
+      "details": "Organized the storage chest and restocked fridge with fresh chocolates.",
+      "on_complete": "restock_reward",
+      "on_miss": "restock_miss",
+      "type": "routine",
+      "icon": "storage"
+    },
+    "2026-08-14": {
+      "title": "Retro Arcade Tournament",
+      "details": "Snake and typing puzzle speedrun competition with high score rewards.",
+      "on_complete": "arcade_reward",
+      "on_miss": "arcade_miss",
+      "type": "game",
+      "icon": "puzzle"
+    },
+    "2026-08-21": [
+      {
+        "title": "Chleo System Launch & Sync",
+        "details": "Launch the new pixel calendar interface and review daily objectives with Chleo.",
+        "on_complete": "sync_reward",
+        "on_miss": "sync_miss",
+        "type": "milestone",
+        "icon": "lightning"
+      },
+      {
+        "title": "Sweet Treat & Daily Reflection",
+        "details": "Check in on Chleo's emotional status and feed chocolate reward.",
+        "on_complete": "tea_reward",
+        "on_miss": "tea_miss",
+        "type": "date",
+        "icon": "chocolate"
+      }
+    ],
+    "2026-08-22": {
+      "title": "Weekend Arcade & Hangout",
+      "details": "Hang out at the retro game center and compete on puzzle leaderboards.",
+      "on_complete": "boba_reward",
+      "on_miss": "boba_miss",
+      "type": "game",
+      "icon": "snake"
+    },
+    "2026-08-25": [
+      {
+        "title": "Cleo's Virtual Birthday Party",
+        "details": "Celebrate with extra chocolate treats and unlock special celebratory dialogue!",
+        "on_complete": "bday_reward",
+        "on_miss": "bday_miss",
+        "type": "birthday",
+        "icon": "star"
+      },
+      {
+        "title": "Special Birthday Gift Quest",
+        "details": "Solve special birthday puzzle to earn surprise coin bonus.",
+        "on_complete": "gift_reward",
+        "on_miss": "gift_miss",
+        "type": "reminder",
+        "icon": "coin"
+      }
+    ],
+    "2026-08-28": {
+      "title": "Submit Milestone Report",
+      "details": "Wrap up week's progress notes and review study analytics in monitoring panel.",
+      "on_complete": "report_reward",
+      "on_miss": "report_miss",
+      "type": "reminder",
+      "icon": "hourglass"
+    },
+    "2026-09-01": {
+      "title": "Autumn Festival Kickoff",
+      "details": "Beginning of seasonal events and autumn-themed room customization.",
+      "on_complete": "autumn_reward",
+      "on_miss": "autumn_miss",
+      "type": "milestone",
+      "icon": "star"
+    },
+    "2026-09-15": {
+      "title": "Mid-Autumn Night Quest",
+      "details": "Special evening stargazing event with bonus puzzle challenges.",
+      "on_complete": "moon_reward",
+      "on_miss": "moon_miss",
+      "type": "game",
+      "icon": "keyboard"
+    }
+  }
+}
