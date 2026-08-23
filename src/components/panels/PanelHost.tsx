@@ -32,7 +32,6 @@ export const PanelHost: React.FC<PanelHostProps> = ({
         <RewardPanel
           rewards={[]}
           targetDomain="sample-domain.com"
-          onClose={onClose}
           onSelectReward={(reward) => {
             console.log('[RewardPanel Preview] Picked reward:', reward);
             onClose();

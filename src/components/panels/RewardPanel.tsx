@@ -10,7 +10,6 @@ export interface RewardPanelProps {
   urgePercent?: number;
   onSelectReward: (reward: PuzzleRewardItem) => void;
   onUrge?: () => void;
-  onClose?: () => void;
 }
 
 const DEFAULT_FALLBACK_REWARDS: Partial<PuzzleRewardItem>[] = [
@@ -35,7 +34,6 @@ export const RewardPanel: React.FC<RewardPanelProps> = ({
   urgePercent = 50,
   onSelectReward,
   onUrge,
-  onClose,
 }) => {
   const [timeLeft, setTimeLeft] = useState<number>(timeoutSeconds);
   const [selectedRewardId, setSelectedRewardId] = useState<string | null>(null);
@@ -142,17 +140,6 @@ export const RewardPanel: React.FC<RewardPanelProps> = ({
             )}
             <span className="timer-digits">{timeLeft}s</span>
           </div>
-
-          {onClose && (
-            <button
-              className="reward-panel-close-btn"
-              type="button"
-              onClick={onClose}
-              title="Close"
-            >
-              ✕
-            </button>
-          )}
         </div>
       </div>
 

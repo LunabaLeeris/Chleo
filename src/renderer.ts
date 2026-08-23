@@ -436,16 +436,6 @@ function showPuzzlePanel(puzzleState: ActivePuzzleState) {
                   renderFeaturePanel();
                 }
               },
-              onClose: () => {
-                logger.info('reward-panel', 'Reward selection closed by user');
-                closePuzzlePanel();
-                if (puzzleState.isSandboxTest) {
-                  activeOptionId = 'puzzle';
-                  menuBar.open();
-                  menuBar.setActiveOption('puzzle');
-                  renderFeaturePanel();
-                }
-              },
             })
           );
           updateInteractiveRects();
