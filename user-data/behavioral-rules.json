@@ -43,8 +43,7 @@
           "orientation": "center"
         },
         "openPuzzle": [
-          "snake",
-          "typing"
+          "snake"
         ],
         "orientation": "center",
         "avatarPosition": "bottom-right",

@@ -1,10 +1,5 @@
 import type { EmotionalState } from '../../avatar/emotions/emotion-types';
 
-/**
- * Weights assigned to each primary emotion for calculating puzzle target scores.
- * - Positive emotions reduce the difficulty (lower target score).
- * - Negative emotions increase the difficulty (higher target score).
- */
 export interface EmotionScoreWeights {
   joy: number;
   trust: number;
@@ -16,47 +11,125 @@ export interface EmotionScoreWeights {
   fear: number;
 }
 
-export const DEFAULT_EMOTION_SCORE_WEIGHTS: EmotionScoreWeights = {
-  // Positive emotions (make target score more lenient)
-  joy: -1.2,
-  trust: -1.0,
-  anticipation: -0.6,
-  surprise: 0.0, // Neutral
-
-  // Negative emotions (make target score more demanding / punitive)
-  anger: 1.5,
-  disgust: 1.2,
-  sadness: 1.0,
-  fear: 0.8,
-};
-
-/**
- * Target score boundaries (minimum, neutral baseline, and maximum cap) for each puzzle.
- * All boundaries are multiples of 10.
- */
 export interface PuzzleTargetBounds {
   minScore: number;
   baseScore: number;
   maxScore: number;
+  roundStep?: number;
+  weights?: Partial<EmotionScoreWeights>;
+  stressDivisor?: number;
 }
 
-export const PUZZLE_TARGET_BOUNDS: Record<string, PuzzleTargetBounds> = {
-  snake: {
-    minScore: 30,  // 3 apples
-    baseScore: 50, // 5 apples
-    maxScore: 100, // 10 apples
+export interface PuzzleTargetConfig {
+  weights: EmotionScoreWeights;
+  stressDivisor: number;
+  bounds: Record<string, PuzzleTargetBounds>;
+}
+
+export const DEFAULT_PUZZLE_TARGET_CONFIG: PuzzleTargetConfig = {
+  weights: {
+    joy: -1.2,
+    trust: -1.0,
+    anticipation: -0.6,
+    surprise: 0.0,
+    anger: 1.5,
+    disgust: 1.2,
+    sadness: 1.0,
+    fear: 0.8,
   },
-  typing: {
-    minScore: 30,  // 3 words (30 pts)
-    baseScore: 50, // 5 words (50 pts)
-    maxScore: 100, // 10 words (100 pts)
-  },
-  matching: {
-    minScore: 40,  // 4 pairs (40 pts)
-    baseScore: 60, // 6 pairs (60 pts)
-    maxScore: 100, // 10 pairs (100 pts)
+  stressDivisor: 2.0,
+  bounds: {
+    snake: {
+      minScore: 30,
+      baseScore: 50,
+      maxScore: 100,
+      roundStep: 10,
+    },
+    typing: {
+      minScore: 30,
+      baseScore: 50,
+      maxScore: 100,
+      roundStep: 10,
+    },
+    matching: {
+      minScore: 40,
+      baseScore: 60,
+      maxScore: 100,
+      roundStep: 10,
+    },
   },
 };
+
+// Cached in-memory active config (populated on load)
+let activeConfig: PuzzleTargetConfig = {
+  weights: { ...DEFAULT_PUZZLE_TARGET_CONFIG.weights },
+  stressDivisor: DEFAULT_PUZZLE_TARGET_CONFIG.stressDivisor,
+  bounds: JSON.parse(JSON.stringify(DEFAULT_PUZZLE_TARGET_CONFIG.bounds)),
+};
+
+/**
+ * Returns the currently active target score configuration.
+ */
+export function getPuzzleTargetConfig(): PuzzleTargetConfig {
+  return activeConfig;
+}
+
+/**
+ * Sets or updates the active target score configuration in memory.
+ */
+export function setPuzzleTargetConfig(newConfig: Partial<PuzzleTargetConfig>): void {
+  activeConfig = {
+    weights: { ...activeConfig.weights, ...(newConfig.weights || {}) },
+    stressDivisor: newConfig.stressDivisor ?? activeConfig.stressDivisor,
+    bounds: { ...activeConfig.bounds, ...(newConfig.bounds || {}) },
+  };
+}
+
+/**
+ * Loads puzzle-target-config.json asynchronously via electronAPI if available.
+ */
+export async function loadPuzzleTargetConfig(): Promise<PuzzleTargetConfig> {
+  try {
+    if (typeof window !== 'undefined' && (window as any).electronAPI?.readMemoryFile) {
+      const raw = await (window as any).electronAPI.readMemoryFile('puzzle-target-config.json');
+      if (raw) {
+        const parsed = JSON.parse(raw);
+        if (parsed && typeof parsed === 'object') {
+          activeConfig = {
+            weights: { ...DEFAULT_PUZZLE_TARGET_CONFIG.weights, ...(parsed.weights || {}) },
+            stressDivisor: typeof parsed.stressDivisor === 'number' ? parsed.stressDivisor : DEFAULT_PUZZLE_TARGET_CONFIG.stressDivisor,
+            bounds: { ...DEFAULT_PUZZLE_TARGET_CONFIG.bounds, ...(parsed.bounds || {}) },
+          };
+          return activeConfig;
+        }
+      }
+    }
+  } catch (e) {
+    console.warn('[puzzle-target-score] Failed to load puzzle-target-config.json, using defaults:', e);
+  }
+  return activeConfig;
+}
+
+/**
+ * Saves current configuration to puzzle-target-config.json via electronAPI.
+ */
+export async function savePuzzleTargetConfig(config: PuzzleTargetConfig): Promise<boolean> {
+  try {
+    if (typeof window !== 'undefined' && (window as any).electronAPI?.saveMemoryFile) {
+      const success = await (window as any).electronAPI.saveMemoryFile(
+        'puzzle-target-config.json',
+        JSON.stringify(config, null, 2)
+      );
+      if (success) {
+        activeConfig = { ...config };
+      }
+      return Boolean(success);
+    }
+  } catch (e) {
+    console.warn('[puzzle-target-score] Failed to save puzzle-target-config.json:', e);
+  }
+  return false;
+}
 
 /**
  * Computes an emotional distress / difficulty factor in the range [-1.0, 1.0].
@@ -66,7 +139,8 @@ export const PUZZLE_TARGET_BOUNDS: Record<string, PuzzleTargetBounds> = {
  */
 export function computeEmotionalDifficultyFactor(
   emotions?: Partial<EmotionalState> | null,
-  weights: EmotionScoreWeights = DEFAULT_EMOTION_SCORE_WEIGHTS
+  weights: EmotionScoreWeights = activeConfig.weights,
+  stressDivisor: number = activeConfig.stressDivisor
 ): number {
   if (!emotions) return 0;
 
@@ -90,60 +164,60 @@ export function computeEmotionalDifficultyFactor(
     trust * weights.trust +
     anticipation * weights.anticipation;
 
-  // Normalize factor into [-1.0, 1.0] (clamped)
-  const normalized = netStress / 2.0;
+  const divisor = stressDivisor > 0 ? stressDivisor : 2.0;
+  const normalized = netStress / divisor;
   return Math.max(-1.0, Math.min(1.0, normalized));
 }
 
 /**
- * Calculates a dynamic puzzle target score based on avatar emotions.
- * The output is guaranteed to be a multiple of 10 within [minScore, maxScore].
+ * Calculates a dynamic puzzle target score based on avatar emotions and config.
+ * The output is guaranteed to be a multiple of roundStep (default 10) within [minScore, maxScore].
  */
 export function calculatePuzzleTargetScore(
   puzzleId: string,
-  emotions?: Partial<EmotionalState> | null
+  emotions?: Partial<EmotionalState> | null,
+  config: PuzzleTargetConfig = activeConfig
 ): number {
   const normId = puzzleId.toLowerCase().trim();
-  const bounds = PUZZLE_TARGET_BOUNDS[normId] || PUZZLE_TARGET_BOUNDS.snake;
+  const bounds = config.bounds[normId] || config.bounds.snake || DEFAULT_PUZZLE_TARGET_CONFIG.bounds.snake;
 
-  const factor = computeEmotionalDifficultyFactor(emotions);
+  const effectiveWeights = bounds.weights
+    ? { ...config.weights, ...bounds.weights }
+    : config.weights;
+  const effectiveDivisor = bounds.stressDivisor ?? config.stressDivisor;
+
+  const factor = computeEmotionalDifficultyFactor(emotions, effectiveWeights, effectiveDivisor);
 
   let rawScore: number;
   if (factor >= 0) {
-    // Bad emotions dominate -> scale up from baseScore towards maxScore
     rawScore = bounds.baseScore + factor * (bounds.maxScore - bounds.baseScore);
   } else {
-    // Good emotions dominate -> scale down from baseScore towards minScore
     rawScore = bounds.baseScore + factor * (bounds.baseScore - bounds.minScore);
   }
 
-  // Round to the nearest multiple of 10
-  const roundedTo10 = Math.round(rawScore / 10) * 10;
+  const step = bounds.roundStep && bounds.roundStep > 0 ? bounds.roundStep : 10;
+  const rounded = Math.round(rawScore / step) * step;
 
-  // Clamp within puzzle bounds
-  return Math.max(bounds.minScore, Math.min(bounds.maxScore, roundedTo10));
+  return Math.max(bounds.minScore, Math.min(bounds.maxScore, rounded));
 }
 
-/**
- * Calculates target score for Retro Snake puzzle based on avatar emotional values.
- * Result is always a multiple of 10 (e.g. 30, 40, 50, 60, ..., 100).
- */
-export function calculateSnakeTargetScore(emotions?: Partial<EmotionalState> | null): number {
-  return calculatePuzzleTargetScore('snake', emotions);
+export function calculateSnakeTargetScore(
+  emotions?: Partial<EmotionalState> | null,
+  config?: PuzzleTargetConfig
+): number {
+  return calculatePuzzleTargetScore('snake', emotions, config);
 }
 
-/**
- * Calculates target score for Speed Typer puzzle based on avatar emotional values.
- * Result is always a multiple of 10 (e.g. 30, 40, 50, 60, ..., 100).
- */
-export function calculateTypingTargetScore(emotions?: Partial<EmotionalState> | null): number {
-  return calculatePuzzleTargetScore('typing', emotions);
+export function calculateTypingTargetScore(
+  emotions?: Partial<EmotionalState> | null,
+  config?: PuzzleTargetConfig
+): number {
+  return calculatePuzzleTargetScore('typing', emotions, config);
 }
 
-/**
- * Calculates target score for Memory Match puzzle based on avatar emotional values.
- * Result is always a multiple of 10 (e.g. 40, 50, 60, 70, ..., 100).
- */
-export function calculateMatchingTargetScore(emotions?: Partial<EmotionalState> | null): number {
-  return calculatePuzzleTargetScore('matching', emotions);
+export function calculateMatchingTargetScore(
+  emotions?: Partial<EmotionalState> | null,
+  config?: PuzzleTargetConfig
+): number {
+  return calculatePuzzleTargetScore('matching', emotions, config);
 }

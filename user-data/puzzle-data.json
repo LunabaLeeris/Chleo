@@ -1,11 +1,11 @@
 {
   "snake": {
-    "highScore": 80,
-    "totalTimeSeconds": 18
+    "highScore": 100,
+    "totalTimeSeconds": 53
   },
   "typing": {
     "highScore": 290,
-    "totalTimeSeconds": 0
+    "totalTimeSeconds": 17
   },
   "matching": {
     "highScore": 100,

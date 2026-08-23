@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { PuzzleContainer } from './PuzzleContainer';
 import type { PuzzleComponentProps, PuzzleConfig } from './puzzle-types';
-import { calculateSnakeTargetScore } from './puzzle-target-score';
+import { calculateSnakeTargetScore, loadPuzzleTargetConfig } from './puzzle-target-score';
 
 export const SNAKE_THEME = {
   boardBackground: '#0c0c0cff',
@@ -85,11 +85,12 @@ export const SnakePuzzle: React.FC<SnakePuzzleProps> = ({
         setTargetScore(propTargetScore);
         return;
       }
-      if (emotionalState) {
-        setTargetScore(calculateSnakeTargetScore(emotionalState));
-        return;
-      }
       try {
+        await loadPuzzleTargetConfig();
+        if (emotionalState) {
+          if (isMounted) setTargetScore(calculateSnakeTargetScore(emotionalState));
+          return;
+        }
         if (typeof window !== 'undefined' && (window as any).electronAPI?.getEmotionState) {
           const emotions = await (window as any).electronAPI.getEmotionState();
           if (emotions && isMounted) {

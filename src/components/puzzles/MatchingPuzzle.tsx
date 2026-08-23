@@ -3,7 +3,7 @@ import { PuzzleContainer } from './PuzzleContainer';
 import type { PuzzleComponentProps, PuzzleConfig } from './puzzle-types';
 import { getIconSrc } from '../../assets/icon-loader';
 import CARDBG_IMG from '../../assets/icons/cardbg.png';
-import { calculateMatchingTargetScore } from './puzzle-target-score';
+import { calculateMatchingTargetScore, loadPuzzleTargetConfig } from './puzzle-target-score';
 
 /**
  * Visual Color Theme for Matching Puzzle.
@@ -150,11 +150,12 @@ export const MatchingPuzzle: React.FC<MatchingPuzzleProps> = ({
         setTargetScore(propTargetScore);
         return;
       }
-      if (emotionalState) {
-        setTargetScore(calculateMatchingTargetScore(emotionalState));
-        return;
-      }
       try {
+        await loadPuzzleTargetConfig();
+        if (emotionalState) {
+          if (isMounted) setTargetScore(calculateMatchingTargetScore(emotionalState));
+          return;
+        }
         if (typeof window !== 'undefined' && (window as any).electronAPI?.getEmotionState) {
           const emotions = await (window as any).electronAPI.getEmotionState();
           if (emotions && isMounted) {

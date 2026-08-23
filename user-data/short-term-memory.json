@@ -2,6 +2,104 @@
   "events": [
     {
       "type": "high_score_beaten",
+      "domain": "youtube.com",
+      "details": "Congrats. you beat your high score!",
+      "emotionDelta": {
+        "joy": 0,
+        "trust": 0,
+        "fear": 0,
+        "surprise": 0,
+        "sadness": 0,
+        "disgust": 0,
+        "anger": 0,
+        "anticipation": 0
+      },
+      "id": "stm_1787492923312_kq4o6",
+      "timestamp": 1787492923312,
+      "formattedText": "default"
+    },
+    {
+      "type": "site_blocked_visit",
+      "domain": "youtube.com",
+      "details": "Stop trying to open youtube! Access is restricted until you pass my challenge.",
+      "emotionDelta": {
+        "anger": 0.35,
+        "sadness": 0.25,
+        "joy": -0.25,
+        "trust": -0.23
+      },
+      "id": "stm_1787492903668_5tzmu",
+      "timestamp": 1787492903668,
+      "formattedText": "default"
+    },
+    {
+      "type": "productive_milestone",
+      "domain": "github.com",
+      "details": "You're locked in! Keep up the good work on github. I gave you a reward!",
+      "emotionDelta": {
+        "joy": 0.35,
+        "trust": 0.25
+      },
+      "id": "stm_1787492819065_mfjvb",
+      "timestamp": 1787492819065,
+      "formattedText": "default"
+    },
+    {
+      "type": "productive_milestone",
+      "domain": "github.com",
+      "details": "You're locked in! Keep up the good work on github. I gave you a reward!",
+      "emotionDelta": {
+        "joy": 0.35,
+        "trust": 0.25
+      },
+      "id": "stm_1787492808964_f2w2e",
+      "timestamp": 1787492808964,
+      "formattedText": "default"
+    },
+    {
+      "type": "site_blocked_visit",
+      "domain": "youtube.com",
+      "details": "Hey! youtube is completely blocked. Complete my puzzle to unblock it!",
+      "emotionDelta": {
+        "anger": 0.35,
+        "sadness": 0.25,
+        "joy": -0.25,
+        "trust": -0.23
+      },
+      "id": "stm_1787492800079_k5ax6",
+      "timestamp": 1787492800079,
+      "formattedText": "default"
+    },
+    {
+      "type": "site_blocked_visit",
+      "domain": "youtube.com",
+      "details": "Hey! youtube is completely blocked. Complete my puzzle to unblock it!",
+      "emotionDelta": {
+        "anger": 0.35,
+        "sadness": 0.25,
+        "joy": -0.25,
+        "trust": -0.23
+      },
+      "id": "stm_1787492784169_df87n",
+      "timestamp": 1787492784169,
+      "formattedText": "default"
+    },
+    {
+      "type": "site_blocked_visit",
+      "domain": "youtube.com",
+      "details": "Stop trying to open youtube! Access is restricted until you pass my challenge.",
+      "emotionDelta": {
+        "anger": 0.35,
+        "sadness": 0.25,
+        "joy": -0.25,
+        "trust": -0.23
+      },
+      "id": "stm_1787492755380_69mok",
+      "timestamp": 1787492755380,
+      "formattedText": "default"
+    },
+    {
+      "type": "high_score_beaten",
       "domain": "retro-snake",
       "details": "Congrats. you beat your high score!",
       "emotionDelta": {
@@ -75,18 +173,18 @@
   ],
   "recentSpeechPhrases": [
     "Congrats. you beat your high score!",
+    "Stop trying to open youtube! Access is restricted until you pass my challenge.",
+    "You're locked in! Keep up the good work on github. I gave you a reward!",
+    "You're locked in! Keep up the good work on github. I gave you a reward!",
+    "Hey! youtube is completely blocked. Complete my puzzle to unblock it!",
+    "Hey! youtube is completely blocked. Complete my puzzle to unblock it!",
+    "Stop trying to open youtube! Access is restricted until you pass my challenge.",
+    "Congrats. you beat your high score!",
     "You're so generous",
-    "For me?",
-    "You're so generous",
-    "Let's hope you'll not need that",
-    "Well well well...",
-    "Fine, I will be patient. ",
-    "Well. If that's what you want",
-    "Again?",
-    "Wow, that looks delicious"
+    "For me?"
   ],
   "activeWarnings": [],
-  "currentActiveDomain": "github.com",
+  "currentActiveDomain": "chrome://newtab/",
   "eventTemplate": "default",
   "memorableEventTypes": [
     "long_idle_duration",

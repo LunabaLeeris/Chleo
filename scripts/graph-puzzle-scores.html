@@ -1,0 +1,1101 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Puzzle Progression Test</title>
+  <style>
+    :root {
+      --bg-page: #f8fafc;
+      --bg-card: #ffffff;
+      --bg-muted: #f1f5f9;
+      --border-color: #e2e8f0;
+      --border-focus: #3b82f6;
+      --text-main: #0f172a;
+      --text-muted: #64748b;
+      --text-subtle: #94a3b8;
+
+      --color-snake: #16a34a;
+      --color-typing: #0284c7;
+      --color-matching: #7c3aed;
+
+      --font-mono: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+      --font-ui: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      background-color: var(--bg-page);
+      color: var(--text-main);
+      font-family: var(--font-ui);
+      padding: 24px;
+      min-height: 100vh;
+    }
+
+    header {
+      margin-bottom: 20px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 16px;
+      border-bottom: 1px solid var(--border-color);
+      padding-bottom: 16px;
+    }
+
+    h1 {
+      font-size: 1.35rem;
+      font-weight: 700;
+      color: var(--text-main);
+      letter-spacing: -0.01em;
+    }
+
+    .header-actions {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+    }
+
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      padding: 6px 12px;
+      border-radius: 6px;
+      font-size: 0.8rem;
+      font-weight: 500;
+      cursor: pointer;
+      border: 1px solid var(--border-color);
+      background: #ffffff;
+      color: var(--text-main);
+      transition: all 0.15s ease;
+    }
+
+    .btn:hover {
+      background: var(--bg-muted);
+      border-color: #cbd5e1;
+    }
+
+    .btn-primary {
+      background: #0f172a;
+      color: #ffffff;
+      border-color: #0f172a;
+    }
+
+    .btn-primary:hover {
+      background: #334155;
+      border-color: #334155;
+    }
+
+    .main-grid {
+      display: grid;
+      grid-template-columns: 1fr 340px;
+      gap: 20px;
+    }
+
+    @media (max-width: 1050px) {
+      .main-grid {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    .card {
+      background: var(--bg-card);
+      border: 1px solid var(--border-color);
+      border-radius: 8px;
+      overflow: hidden;
+      margin-bottom: 20px;
+    }
+
+    .card:last-child {
+      margin-bottom: 0;
+    }
+
+    .card-header {
+      background: var(--bg-muted);
+      padding: 10px 16px;
+      font-size: 0.82rem;
+      font-weight: 600;
+      color: var(--text-main);
+      border-bottom: 1px solid var(--border-color);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .card-body {
+      padding: 16px;
+    }
+
+    /* Tabs */
+    .tabs-nav {
+      display: flex;
+      border-bottom: 1px solid var(--border-color);
+      background: var(--bg-muted);
+    }
+
+    .tab-btn {
+      padding: 9px 16px;
+      font-size: 0.8rem;
+      font-weight: 500;
+      background: transparent;
+      color: var(--text-muted);
+      border: none;
+      border-bottom: 2px solid transparent;
+      cursor: pointer;
+      transition: all 0.15s ease;
+    }
+
+    .tab-btn.active {
+      color: var(--text-main);
+      font-weight: 600;
+      border-bottom-color: #0f172a;
+      background: #ffffff;
+    }
+
+    .tab-pane {
+      display: none;
+    }
+
+    .tab-pane.active {
+      display: block;
+    }
+
+    /* Canvas */
+    .canvas-container {
+      position: relative;
+      width: 100%;
+      height: 440px;
+    }
+
+    canvas {
+      width: 100%;
+      height: 100%;
+      display: block;
+      cursor: crosshair;
+    }
+
+    /* Bounds Grid */
+    .bounds-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 12px;
+    }
+
+    @media (max-width: 768px) {
+      .bounds-grid {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    .game-bound-card {
+      background: #f8fafc;
+      border: 1px solid var(--border-color);
+      border-radius: 6px;
+      padding: 12px;
+    }
+
+    .game-bound-title {
+      font-size: 0.82rem;
+      font-weight: 600;
+      margin-bottom: 8px;
+    }
+
+    .input-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding-left: 10px;
+      padding-right: 10px;
+      font-size: 0.76rem;
+      margin: 5px;
+    }
+
+    .input-row label {
+      color: var(--text-muted);
+    }
+
+    .input-row input {
+      width: 60px;
+      padding: 3px 6px;
+      background: #ffffff;
+      border: 1px solid var(--border-color);
+      border-radius: 4px;
+      color: var(--text-main);
+      font-family: var(--font-mono);
+      font-size: 0.78rem;
+      text-align: right;
+    }
+
+    .input-row input:focus {
+      outline: none;
+      border-color: var(--border-focus);
+    }
+
+    /* Preset Buttons */
+    .preset-buttons {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 6px;
+      margin-bottom: 14px;
+    }
+
+    .btn-preset {
+      background: var(--bg-muted);
+      border: 1px solid var(--border-color);
+      color: var(--text-main);
+      padding: 6px 8px;
+      border-radius: 4px;
+      font-size: 0.75rem;
+      cursor: pointer;
+      transition: all 0.15s ease;
+      text-align: center;
+      font-weight: 500;
+    }
+
+    .btn-preset:hover {
+      background: #e2e8f0;
+    }
+
+    /* Sliders */
+    .slider-item {
+      display: flex;
+      flex-direction: column;
+      gap: 3px;
+      margin-bottom: 10px;
+    }
+
+    .slider-header {
+      display: flex;
+      justify-content: space-between;
+      font-size: 0.76rem;
+    }
+
+    .slider-header .val {
+      font-family: var(--font-mono);
+      color: var(--text-muted);
+    }
+
+    input[type="range"] {
+      width: 100%;
+      height: 4px;
+      background: #cbd5e1;
+      border-radius: 2px;
+      outline: none;
+      -webkit-appearance: none;
+    }
+
+    input[type="range"]::-webkit-slider-thumb {
+      -webkit-appearance: none;
+      width: 12px;
+      height: 12px;
+      border-radius: 50%;
+      background: #0f172a;
+      cursor: pointer;
+    }
+
+    /* Live Output Box */
+    .live-status-box {
+      background: #f8fafc;
+      border: 1px solid var(--border-color);
+      border-radius: 6px;
+      padding: 12px;
+      margin-top: 14px;
+      font-family: var(--font-mono);
+      font-size: 0.78rem;
+    }
+
+    .live-status-row {
+      display: flex;
+      justify-content: space-between;
+      margin-bottom: 4px;
+    }
+
+    .live-status-row:last-child {
+      margin-bottom: 0;
+    }
+
+    .status-badge {
+      font-weight: 600;
+      padding: 1px 6px;
+      border-radius: 4px;
+    }
+
+    .badge-snake {
+      background: #dcfce7;
+      color: var(--color-snake);
+    }
+
+    .badge-typing {
+      background: #e0f2fe;
+      color: var(--color-typing);
+    }
+
+    .badge-matching {
+      background: #f3e8ff;
+      color: var(--color-matching);
+    }
+
+    .toast {
+      position: fixed;
+      bottom: 20px;
+      right: 20px;
+      background: #0f172a;
+      color: #ffffff;
+      padding: 8px 14px;
+      border-radius: 6px;
+      font-weight: 500;
+      font-size: 0.8rem;
+      box-shadow: 0 4px 10px rgba(0, 0, 0, 0.15);
+      opacity: 0;
+      transform: translateY(8px);
+      transition: all 0.2s ease;
+      pointer-events: none;
+      z-index: 9999;
+    }
+
+    .toast.show {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  </style>
+</head>
+
+<body>
+
+  <header>
+    <h1>Puzzle Progression Test</h1>
+
+    <div class="header-actions">
+      <button class="btn btn-primary" onclick="saveDirectlyToFile()">Save to File</button>
+      <button class="btn" onclick="downloadConfigJSON()">Download JSON</button>
+      <button class="btn" onclick="copyConfigJSON()">Copy JSON</button>
+      <button class="btn" onclick="document.getElementById('importFileInput').click()">Load JSON</button>
+      <input type="file" id="importFileInput" style="display: none;" accept=".json" onchange="importConfigFile(event)">
+      <button class="btn" onclick="resetAllDefaults()">Reset</button>
+    </div>
+  </header>
+
+  <div class="main-grid">
+    <!-- Left Column: Graph & Boundaries -->
+    <div>
+      <div class="card">
+        <div class="card-header">
+          <div style="display: flex; gap: 12px; align-items: center;">
+            <span>Target Score Curves</span>
+            <label
+              style="font-size: 0.75rem; color: var(--text-muted); display: flex; align-items: center; gap: 4px; cursor: pointer; font-weight: normal;">
+              <input type="checkbox" id="showSmoothCurve" onchange="drawGraph()"> Show Smooth Line
+            </label>
+          </div>
+          <span id="hoverInfo"
+            style="font-family: var(--font-mono); font-size: 0.76rem; color: var(--text-muted);">Hover to inspect</span>
+        </div>
+        <div class="card-body">
+          <div class="canvas-container">
+            <canvas id="scoreCanvas"></canvas>
+          </div>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-header">
+          <span>Game Boundaries</span>
+        </div>
+        <div class="card-body">
+          <div class="bounds-grid">
+            <!-- Snake Bounds -->
+            <div class="game-bound-card" style="border-top: 3px solid var(--color-snake);">
+              <div class="game-bound-title" style="color: var(--color-snake);">Snake</div>
+              <div class="input-row">
+                <label>Min Score:</label>
+                <input type="number" id="bound_snake_min" step="5" value="10"
+                  onchange="updateBound('snake', 'minScore', this.value)">
+              </div>
+              <div class="input-row">
+                <label>Base Score:</label>
+                <input type="number" id="bound_snake_base" step="5" value="20"
+                  onchange="updateBound('snake', 'baseScore', this.value)">
+              </div>
+              <div class="input-row">
+                <label>Max Score:</label>
+                <input type="number" id="bound_snake_max" step="5" value="100"
+                  onchange="updateBound('snake', 'maxScore', this.value)">
+              </div>
+              <div class="input-row">
+                <label>Step:</label>
+                <input type="number" id="bound_snake_step" step="1" value="5"
+                  onchange="updateBound('snake', 'roundStep', this.value)">
+              </div>
+            </div>
+
+            <!-- Typing Bounds -->
+            <div class="game-bound-card" style="border-top: 3px solid var(--color-typing);">
+              <div class="game-bound-title" style="color: var(--color-typing);">Typing</div>
+              <div class="input-row">
+                <label>Min Score:</label>
+                <input type="number" id="bound_typing_min" step="5" value="250"
+                  onchange="updateBound('typing', 'minScore', this.value)">
+              </div>
+              <div class="input-row">
+                <label>Base Score:</label>
+                <input type="number" id="bound_typing_base" step="5" value="300"
+                  onchange="updateBound('typing', 'baseScore', this.value)">
+              </div>
+              <div class="input-row">
+                <label>Max Score:</label>
+                <input type="number" id="bound_typing_max" step="5" value="500"
+                  onchange="updateBound('typing', 'maxScore', this.value)">
+              </div>
+              <div class="input-row">
+                <label>Step:</label>
+                <input type="number" id="bound_typing_step" step="1" value="10"
+                  onchange="updateBound('typing', 'roundStep', this.value)">
+              </div>
+            </div>
+
+            <!-- Matching Bounds -->
+            <div class="game-bound-card" style="border-top: 3px solid var(--color-matching);">
+              <div class="game-bound-title" style="color: var(--color-matching);">Matching</div>
+              <div class="input-row">
+                <label>Min Score:</label>
+                <input type="number" id="bound_matching_min" step="5" value="50"
+                  onchange="updateBound('matching', 'minScore', this.value)">
+              </div>
+              <div class="input-row">
+                <label>Base Score:</label>
+                <input type="number" id="bound_matching_base" step="5" value="60"
+                  onchange="updateBound('matching', 'baseScore', this.value)">
+              </div>
+              <div class="input-row">
+                <label>Max Score:</label>
+                <input type="number" id="bound_matching_max" step="5" value="100"
+                  onchange="updateBound('matching', 'maxScore', this.value)">
+              </div>
+              <div class="input-row">
+                <label>Step:</label>
+                <input type="number" id="bound_matching_step" step="1" value="10"
+                  onchange="updateBound('matching', 'roundStep', this.value)">
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Right Column: Controls -->
+    <div>
+      <div class="card">
+        <div class="tabs-nav">
+          <button class="tab-btn active" onclick="switchTab('tabEmotions', this)">Emotions</button>
+          <button class="tab-btn" onclick="switchTab('tabWeights', this)">Weights</button>
+        </div>
+
+        <div class="card-body">
+          <div class="slider-item">
+            <div class="slider-header">
+              <span>Joy</span>
+              <span class="val" id="val_joy">0.00</span>
+            </div>
+            <input type="range" id="slider_joy" min="0" max="1" step="0.05" value="0"
+              oninput="onEmotionChange('joy', this.value)">
+          </div>
+
+          <div class="slider-item">
+            <div class="slider-header">
+              <span>Trust</span>
+              <span class="val" id="val_trust">0.00</span>
+            </div>
+            <input type="range" id="slider_trust" min="0" max="1" step="0.05" value="0"
+              oninput="onEmotionChange('trust', this.value)">
+          </div>
+
+          <div class="slider-item">
+            <div class="slider-header">
+              <span>Anticipation</span>
+              <span class="val" id="val_anticipation">0.00</span>
+            </div>
+            <input type="range" id="slider_anticipation" min="0" max="1" step="0.05" value="0"
+              oninput="onEmotionChange('anticipation', this.value)">
+          </div>
+
+          <div class="slider-item">
+            <div class="slider-header">
+              <span>Anger</span>
+              <span class="val" id="val_anger">0.00</span>
+            </div>
+            <input type="range" id="slider_anger" min="0" max="1" step="0.05" value="0"
+              oninput="onEmotionChange('anger', this.value)">
+          </div>
+
+          <div class="slider-item">
+            <div class="slider-header">
+              <span>Sadness</span>
+              <span class="val" id="val_sadness">0.00</span>
+            </div>
+            <input type="range" id="slider_sadness" min="0" max="1" step="0.05" value="0"
+              oninput="onEmotionChange('sadness', this.value)">
+          </div>
+
+          <div class="slider-item">
+            <div class="slider-header">
+              <span>Disgust</span>
+              <span class="val" id="val_disgust">0.00</span>
+            </div>
+            <input type="range" id="slider_disgust" min="0" max="1" step="0.05" value="0"
+              oninput="onEmotionChange('disgust', this.value)">
+          </div>
+
+          <div class="slider-item">
+            <div class="slider-header">
+              <span>Fear</span>
+              <span class="val" id="val_fear">0.00</span>
+            </div>
+            <input type="range" id="slider_fear" min="0" max="1" step="0.05" value="0"
+              oninput="onEmotionChange('fear', this.value)">
+          </div>
+        </div>
+
+        <!-- Weights -->
+        <div id="tabWeights" class="tab-pane">
+          <div class="input-row" style="margin-bottom: 12px;">
+            <label>Stress Divisor:</label>
+            <input type="number" id="weight_divisor" step="0.1" value="2" onchange="updateDivisor(this.value)">
+          </div>
+
+          <div class="input-row">
+            <label>Joy Weight:</label>
+            <input type="number" id="weight_joy" step="0.1" value="-1.2" onchange="updateWeight('joy', this.value)">
+          </div>
+
+          <div class="input-row">
+            <label>Trust Weight:</label>
+            <input type="number" id="weight_trust" step="0.1" value="-1" onchange="updateWeight('trust', this.value)">
+          </div>
+
+          <div class="input-row">
+            <label>Anticipation Weight:</label>
+            <input type="number" id="weight_anticipation" step="0.1" value="-0.6"
+              onchange="updateWeight('anticipation', this.value)">
+          </div>
+
+          <div class="input-row">
+            <label>Anger Weight:</label>
+            <input type="number" id="weight_anger" step="0.1" value="1.5" onchange="updateWeight('anger', this.value)">
+          </div>
+
+          <div class="input-row">
+            <label>Disgust Weight:</label>
+            <input type="number" id="weight_disgust" step="0.1" value="1.2"
+              onchange="updateWeight('disgust', this.value)">
+          </div>
+
+          <div class="input-row">
+            <label>Sadness Weight:</label>
+            <input type="number" id="weight_sadness" step="0.1" value="1"
+              onchange="updateWeight('sadness', this.value)">
+          </div>
+
+          <div class="input-row">
+            <label>Fear Weight:</label>
+            <input type="number" id="weight_fear" step="0.1" value="0.8" onchange="updateWeight('fear', this.value)">
+          </div>
+        </div>
+
+        <!-- Live Status Output -->
+        <div class="live-status-box">
+          <div class="live-status-row">
+            <span style="color: var(--text-muted);">Net Stress:</span>
+            <span id="liveNetStress" style="font-weight: 600;">0.00</span>
+          </div>
+          <div class="live-status-row">
+            <span style="color: var(--text-muted);">Factor:</span>
+            <span id="liveFactor" style="font-weight: 600;">0.00</span>
+          </div>
+          <hr style="border: none; border-top: 1px solid var(--border-color); margin: 6px 0;">
+          <div class="live-status-row">
+            <span style="color: var(--color-snake);">Snake Target:</span>
+            <span class="status-badge badge-snake" id="liveSnakeScore">20</span>
+          </div>
+          <div class="live-status-row">
+            <span style="color: var(--color-typing);">Typing Target:</span>
+            <span class="status-badge badge-typing" id="liveTypingScore">300</span>
+          </div>
+          <div class="live-status-row">
+            <span style="color: var(--color-matching);">Matching Target:</span>
+            <span class="status-badge badge-matching" id="liveMatchingScore">60</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  </div>
+
+  <div id="toast" class="toast">Saved configuration</div>
+
+  <script>
+    let config = {
+      weights: {
+        joy: -1.2,
+        trust: -1,
+        anticipation: -0.6,
+        surprise: 0,
+        anger: 1.5,
+        disgust: 1.2,
+        sadness: 1,
+        fear: 0.8,
+      },
+      stressDivisor: 2,
+      bounds: {
+        snake: { minScore: 10, baseScore: 20, maxScore: 100, roundStep: 5 },
+        typing: { minScore: 250, baseScore: 300, maxScore: 500, roundStep: 10 },
+        matching: { minScore: 50, baseScore: 60, maxScore: 100, roundStep: 10 },
+      }
+    };
+
+    const currentEmotions = {
+      joy: 0,
+      trust: 0,
+      anticipation: 0,
+      surprise: 0,
+      anger: 0,
+      sadness: 0,
+      disgust: 0,
+      fear: 0
+    };
+
+    function computeNetStress(emotions) {
+      const w = config.weights;
+      return (
+        (emotions.anger || 0) * w.anger +
+        (emotions.disgust || 0) * w.disgust +
+        (emotions.sadness || 0) * w.sadness +
+        (emotions.fear || 0) * w.fear +
+        (emotions.surprise || 0) * (w.surprise || 0) +
+        (emotions.joy || 0) * w.joy +
+        (emotions.trust || 0) * w.trust +
+        (emotions.anticipation || 0) * w.anticipation
+      );
+    }
+
+    function computeFactor(emotions) {
+      const net = computeNetStress(emotions);
+      const div = config.stressDivisor > 0 ? config.stressDivisor : 2.0;
+      const normalized = net / div;
+      return Math.max(-1.0, Math.min(1.0, normalized));
+    }
+
+    function calculateScore(puzzleId, factor, raw = false) {
+      const bounds = config.bounds[puzzleId] || config.bounds.snake;
+      let score;
+      if (factor >= 0) {
+        score = bounds.baseScore + factor * (bounds.maxScore - bounds.baseScore);
+      } else {
+        score = bounds.baseScore + factor * (bounds.baseScore - bounds.minScore);
+      }
+
+      if (raw) {
+        return Math.max(bounds.minScore, Math.min(bounds.maxScore, score));
+      }
+
+      const step = bounds.roundStep && bounds.roundStep > 0 ? bounds.roundStep : 10;
+      const rounded = Math.round(score / step) * step;
+      return Math.max(bounds.minScore, Math.min(bounds.maxScore, rounded));
+    }
+
+    // Chart Canvas Rendering
+    const canvas = document.getElementById('scoreCanvas');
+    const ctx = canvas.getContext('2d');
+    let hoveredFactor = null;
+
+    function resizeCanvas() {
+      const rect = canvas.getBoundingClientRect();
+      canvas.width = rect.width * window.devicePixelRatio;
+      canvas.height = rect.height * window.devicePixelRatio;
+      drawGraph();
+    }
+    window.addEventListener('resize', resizeCanvas);
+
+    function drawGraph() {
+      const w = canvas.width;
+      const h = canvas.height;
+      const dpr = window.devicePixelRatio || 1;
+      const showSmooth = document.getElementById('showSmoothCurve').checked;
+
+      ctx.clearRect(0, 0, w, h);
+
+      // Auto-scale Y axis
+      let allMin = 10000;
+      let allMax = 0;
+      for (const b of Object.values(config.bounds)) {
+        if (b.minScore < allMin) allMin = b.minScore;
+        if (b.maxScore > allMax) allMax = b.maxScore;
+      }
+      const yAxisMin = Math.max(0, Math.floor((allMin - 10) / 50) * 50);
+      const yAxisMax = Math.ceil((allMax + 20) / 50) * 50;
+
+      const padding = { top: 25 * dpr, bottom: 35 * dpr, left: 45 * dpr, right: 25 * dpr };
+      const plotWidth = w - padding.left - padding.right;
+      const plotHeight = h - padding.top - padding.bottom;
+
+      function toScreenX(factor) {
+        const norm = (factor - (-1.0)) / 2.0;
+        return padding.left + norm * plotWidth;
+      }
+      function toScreenY(score) {
+        const norm = (score - yAxisMin) / (yAxisMax - yAxisMin || 1);
+        return padding.top + (1 - norm) * plotHeight;
+      }
+
+      // Grid background
+      ctx.fillStyle = '#ffffff';
+      ctx.fillRect(padding.left, padding.top, plotWidth, plotHeight);
+
+      // Y-Axis grid lines
+      ctx.lineWidth = 1 * dpr;
+      ctx.textAlign = 'right';
+      ctx.textBaseline = 'middle';
+      ctx.font = `${10 * dpr}px monospace`;
+
+      const yRange = yAxisMax - yAxisMin;
+      const yStep = yRange > 300 ? 50 : yRange > 150 ? 25 : 10;
+
+      for (let s = yAxisMin; s <= yAxisMax; s += yStep) {
+        const y = toScreenY(s);
+        ctx.strokeStyle = '#e2e8f0';
+        ctx.beginPath();
+        ctx.moveTo(padding.left, y);
+        ctx.lineTo(w - padding.right, y);
+        ctx.stroke();
+
+        ctx.fillStyle = '#94a3b8';
+        ctx.fillText(`${s}`, padding.left - 6 * dpr, y);
+      }
+
+      // X-Axis grid lines
+      ctx.textAlign = 'center';
+      ctx.textBaseline = 'top';
+      for (let f = -1.0; f <= 1.01; f += 0.2) {
+        const x = toScreenX(f);
+        ctx.strokeStyle = Math.abs(f) < 0.01 ? '#cbd5e1' : '#f1f5f9';
+        ctx.beginPath();
+        ctx.moveTo(x, padding.top);
+        ctx.lineTo(x, h - padding.bottom);
+        ctx.stroke();
+
+        ctx.fillStyle = Math.abs(f) < 0.01 ? '#475569' : '#94a3b8';
+        ctx.fillText(f.toFixed(1), x, h - padding.bottom + 6 * dpr);
+      }
+
+      // Axis labels
+      ctx.fillStyle = '#64748b';
+      ctx.font = `${10 * dpr}px -apple-system, BlinkMacSystemFont, sans-serif`;
+      ctx.fillText('Net Stress Factor (-1.0 to +1.0)', padding.left + plotWidth / 2, h - 14 * dpr);
+
+      // Plot curves
+      function plotCurve(puzzleId, color) {
+        if (showSmooth) {
+          ctx.strokeStyle = color;
+          ctx.lineWidth = 1 * dpr;
+          ctx.setLineDash([3 * dpr, 3 * dpr]);
+          ctx.beginPath();
+          for (let i = 0; i <= 200; i++) {
+            const factor = -1.0 + (i / 200) * 2.0;
+            const score = calculateScore(puzzleId, factor, true);
+            const x = toScreenX(factor);
+            const y = toScreenY(score);
+            if (i === 0) ctx.moveTo(x, y);
+            else ctx.lineTo(x, y);
+          }
+          ctx.stroke();
+          ctx.setLineDash([]);
+        }
+
+        ctx.strokeStyle = color;
+        ctx.lineWidth = 2 * dpr;
+        ctx.beginPath();
+
+        const steps = 300;
+        for (let i = 0; i <= steps; i++) {
+          const factor = -1.0 + (i / steps) * 2.0;
+          const score = calculateScore(puzzleId, factor, false);
+          const x = toScreenX(factor);
+          const y = toScreenY(score);
+          if (i === 0) ctx.moveTo(x, y);
+          else ctx.lineTo(x, y);
+        }
+        ctx.stroke();
+      }
+
+      plotCurve('typing', '#0284c7');
+      plotCurve('matching', '#7c3aed');
+      plotCurve('snake', '#16a34a');
+
+      // Live Avatar Position Line Marker
+      const currentFactor = computeFactor(currentEmotions);
+      const markerX = toScreenX(currentFactor);
+
+      ctx.strokeStyle = '#f59e0b';
+      ctx.lineWidth = 1.5 * dpr;
+      ctx.setLineDash([3 * dpr, 3 * dpr]);
+      ctx.beginPath();
+      ctx.moveTo(markerX, padding.top);
+      ctx.lineTo(markerX, h - padding.bottom);
+      ctx.stroke();
+      ctx.setLineDash([]);
+
+      function drawPoint(score, color) {
+        const y = toScreenY(score);
+        ctx.fillStyle = color;
+        ctx.beginPath();
+        ctx.arc(markerX, y, 4 * dpr, 0, Math.PI * 2);
+        ctx.fill();
+        ctx.strokeStyle = '#ffffff';
+        ctx.lineWidth = 1 * dpr;
+        ctx.stroke();
+      }
+
+      drawPoint(calculateScore('typing', currentFactor), '#0284c7');
+      drawPoint(calculateScore('matching', currentFactor), '#7c3aed');
+      drawPoint(calculateScore('snake', currentFactor), '#16a34a');
+
+      // Hover Crosshair
+      if (hoveredFactor !== null) {
+        const hoverX = toScreenX(hoveredFactor);
+        ctx.strokeStyle = 'rgba(15, 23, 42, 0.2)';
+        ctx.lineWidth = 1 * dpr;
+        ctx.beginPath();
+        ctx.moveTo(hoverX, padding.top);
+        ctx.lineTo(hoverX, h - padding.bottom);
+        ctx.stroke();
+      }
+    }
+
+    // Hover Handler
+    canvas.addEventListener('mousemove', (e) => {
+      const rect = canvas.getBoundingClientRect();
+      const clientX = e.clientX - rect.left;
+      const dpr = window.devicePixelRatio || 1;
+      const w = canvas.width;
+      const padding = { left: 45 * dpr, right: 25 * dpr };
+      const plotWidth = w - padding.left - padding.right;
+
+      const normX = (clientX * dpr - padding.left) / plotWidth;
+      if (normX >= 0 && normX <= 1) {
+        hoveredFactor = -1.0 + normX * 2.0;
+        const snk = calculateScore('snake', hoveredFactor);
+        const typ = calculateScore('typing', hoveredFactor);
+        const mat = calculateScore('matching', hoveredFactor);
+        document.getElementById('hoverInfo').innerText =
+          `Factor: ${hoveredFactor.toFixed(2)} | Snake: ${snk} | Typing: ${typ} | Matching: ${mat}`;
+      } else {
+        hoveredFactor = null;
+        document.getElementById('hoverInfo').innerText = 'Hover to inspect';
+      }
+      drawGraph();
+    });
+
+    canvas.addEventListener('mouseleave', () => {
+      hoveredFactor = null;
+      document.getElementById('hoverInfo').innerText = 'Hover to inspect';
+      drawGraph();
+    });
+
+    // Tab switcher
+    window.switchTab = function (tabId, btn) {
+      document.querySelectorAll('.tab-pane').forEach(el => el.classList.remove('active'));
+      document.querySelectorAll('.tab-btn').forEach(el => el.classList.remove('active'));
+      document.getElementById(tabId).classList.add('active');
+      btn.classList.add('active');
+    };
+
+    // Presets
+    const PRESETS = {
+      neutral: { joy: 0, trust: 0, anticipation: 0, anger: 0, sadness: 0, disgust: 0, fear: 0 },
+      happy: { joy: 0.9, trust: 0.8, anticipation: 0.5, anger: 0, sadness: 0, disgust: 0, fear: 0 },
+      calm: { joy: 0.5, trust: 0.6, anticipation: 0.4, anger: 0, sadness: 0, disgust: 0, fear: 0 },
+      blocked: { joy: 0, trust: 0, anticipation: 0.1, anger: 0.8, sadness: 0.6, disgust: 0.7, fear: 0.3 },
+      limit: { joy: 0.1, trust: 0.2, anticipation: 0.1, anger: 0.6, sadness: 0.5, disgust: 0.4, fear: 0.2 },
+      angry: { joy: 0, trust: 0, anticipation: 0, anger: 1.0, sadness: 0.8, disgust: 1.0, fear: 0.5 },
+    };
+
+    window.setPreset = function (presetName) {
+      const p = PRESETS[presetName] || PRESETS.neutral;
+      for (const [k, v] of Object.entries(p)) {
+        currentEmotions[k] = v;
+        const slider = document.getElementById(`slider_${k}`);
+        if (slider) slider.value = v;
+        const valEl = document.getElementById(`val_${k}`);
+        if (valEl) valEl.innerText = v.toFixed(2);
+      }
+      updateLiveValues();
+    };
+
+    window.onEmotionChange = function (emotion, val) {
+      const num = parseFloat(val);
+      currentEmotions[emotion] = num;
+      document.getElementById(`val_${emotion}`).innerText = num.toFixed(2);
+      updateLiveValues();
+    };
+
+    window.updateBound = function (game, key, val) {
+      config.bounds[game][key] = parseInt(val, 10) || 0;
+      updateLiveValues();
+    };
+
+    window.updateWeight = function (emotion, val) {
+      config.weights[emotion] = parseFloat(val) || 0;
+      updateLiveValues();
+    };
+
+    window.updateDivisor = function (val) {
+      config.stressDivisor = parseFloat(val) || 2;
+      updateLiveValues();
+    };
+
+    function updateLiveValues() {
+      const net = computeNetStress(currentEmotions);
+      const fac = computeFactor(currentEmotions);
+      const snake = calculateScore('snake', fac);
+      const typing = calculateScore('typing', fac);
+      const matching = calculateScore('matching', fac);
+
+      document.getElementById('liveNetStress').innerText = `${net >= 0 ? '+' : ''}${net.toFixed(2)}`;
+      document.getElementById('liveFactor').innerText = `${fac >= 0 ? '+' : ''}${fac.toFixed(2)}`;
+      document.getElementById('liveSnakeScore').innerText = `${snake}`;
+      document.getElementById('liveTypingScore').innerText = `${typing}`;
+      document.getElementById('liveMatchingScore').innerText = `${matching}`;
+
+      drawGraph();
+    }
+
+    function syncUIFromConfig() {
+      for (const [game, b] of Object.entries(config.bounds)) {
+        if (document.getElementById(`bound_${game}_min`)) document.getElementById(`bound_${game}_min`).value = b.minScore;
+        if (document.getElementById(`bound_${game}_base`)) document.getElementById(`bound_${game}_base`).value = b.baseScore;
+        if (document.getElementById(`bound_${game}_max`)) document.getElementById(`bound_${game}_max`).value = b.maxScore;
+        if (document.getElementById(`bound_${game}_step`)) document.getElementById(`bound_${game}_step`).value = b.roundStep || 10;
+      }
+      for (const [em, w] of Object.entries(config.weights)) {
+        if (document.getElementById(`weight_${em}`)) document.getElementById(`weight_${em}`).value = w;
+      }
+      if (document.getElementById('weight_divisor')) document.getElementById('weight_divisor').value = config.stressDivisor;
+
+      updateLiveValues();
+    }
+
+    function showToast(msg) {
+      const t = document.getElementById('toast');
+      t.innerText = msg;
+      t.classList.add('show');
+      setTimeout(() => t.classList.remove('show'), 2200);
+    }
+
+    window.saveDirectlyToFile = async function () {
+      try {
+        if ('showSaveFilePicker' in window) {
+          const handle = await window.showSaveFilePicker({
+            suggestedName: 'puzzle-target-config.json',
+            types: [{
+              description: 'JSON Files',
+              accept: { 'application/json': ['.json'] },
+            }],
+          });
+          const writable = await handle.createWritable();
+          await writable.write(JSON.stringify(config, null, 2));
+          await writable.close();
+          showToast("Saved to " + (handle.name || 'puzzle-target-config.json'));
+        } else {
+          downloadConfigJSON();
+        }
+      } catch (err) {
+        if (err.name !== 'AbortError') {
+          downloadConfigJSON();
+        }
+      }
+    };
+
+    window.downloadConfigJSON = function () {
+      const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(config, null, 2));
+      const downloadAnchor = document.createElement('a');
+      downloadAnchor.setAttribute("href", dataStr);
+      downloadAnchor.setAttribute("download", "puzzle-target-config.json");
+      document.body.appendChild(downloadAnchor);
+      downloadAnchor.click();
+      downloadAnchor.remove();
+      showToast("Downloaded puzzle-target-config.json");
+    };
+
+    window.copyConfigJSON = function () {
+      navigator.clipboard.writeText(JSON.stringify(config, null, 2)).then(() => {
+        showToast("Copied to clipboard");
+      });
+    };
+
+    window.importConfigFile = function (event) {
+      const file = event.target.files[0];
+      if (!file) return;
+      const reader = new FileReader();
+      reader.onload = function (e) {
+        try {
+          const parsed = JSON.parse(e.target.result);
+          if (parsed && typeof parsed === 'object') {
+            if (parsed.weights) config.weights = { ...config.weights, ...parsed.weights };
+            if (parsed.stressDivisor !== undefined) config.stressDivisor = parsed.stressDivisor;
+            if (parsed.bounds) config.bounds = { ...config.bounds, ...parsed.bounds };
+            syncUIFromConfig();
+            showToast("Loaded " + file.name);
+          }
+        } catch (err) {
+          alert("Invalid JSON file: " + err.message);
+        }
+      };
+      reader.readAsText(file);
+    };
+
+    window.resetAllDefaults = function () {
+      config = {
+        weights: { joy: -1.2, trust: -1, anticipation: -0.6, surprise: 0, anger: 1.5, disgust: 1.2, sadness: 1, fear: 0.8 },
+        stressDivisor: 2,
+        bounds: {
+          snake: { minScore: 10, baseScore: 20, maxScore: 100, roundStep: 5 },
+          typing: { minScore: 250, baseScore: 300, maxScore: 500, roundStep: 10 },
+          matching: { minScore: 50, baseScore: 60, maxScore: 100, roundStep: 10 },
+        }
+      };
+      setPreset('neutral');
+      syncUIFromConfig();
+      showToast("Reset defaults");
+    };
+
+    async function tryAutoLoadConfig() {
+      const paths = ['../user-data/puzzle-target-config.json', '../src/monitoring/config/puzzle-target-config.json'];
+      for (const p of paths) {
+        try {
+          const res = await fetch(p);
+          if (res.ok) {
+            const data = await res.json();
+            if (data && typeof data === 'object') {
+              if (data.weights) config.weights = { ...config.weights, ...data.weights };
+              if (data.stressDivisor !== undefined) config.stressDivisor = data.stressDivisor;
+              if (data.bounds) config.bounds = { ...config.bounds, ...data.bounds };
+              syncUIFromConfig();
+              break;
+            }
+          }
+        } catch (_) { }
+      }
+    }
+
+    syncUIFromConfig();
+    tryAutoLoadConfig();
+    setTimeout(resizeCanvas, 50);
+  </script>
+</body>
+
+</html>

@@ -2,7 +2,7 @@ import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { PuzzleContainer } from './PuzzleContainer';
 import type { PuzzleComponentProps, PuzzleConfig } from './puzzle-types';
 import { getRandomWord } from './typing-words';
-import { calculateTypingTargetScore } from './puzzle-target-score';
+import { calculateTypingTargetScore, loadPuzzleTargetConfig } from './puzzle-target-score';
 
 /**
  * Visual Color Theme for Typing Puzzle.
@@ -97,11 +97,12 @@ export const TypingPuzzle: React.FC<TypingPuzzleProps> = ({
         setTargetScore(propTargetScore);
         return;
       }
-      if (emotionalState) {
-        setTargetScore(calculateTypingTargetScore(emotionalState));
-        return;
-      }
       try {
+        await loadPuzzleTargetConfig();
+        if (emotionalState) {
+          if (isMounted) setTargetScore(calculateTypingTargetScore(emotionalState));
+          return;
+        }
         if (typeof window !== 'undefined' && (window as any).electronAPI?.getEmotionState) {
           const emotions = await (window as any).electronAPI.getEmotionState();
           if (emotions && isMounted) {
