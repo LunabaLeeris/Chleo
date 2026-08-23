@@ -140,14 +140,14 @@ export const MatchingPuzzle: React.FC<MatchingPuzzleProps> = ({
   const [isBusy, setIsBusy] = useState<boolean>(false);
   const [score, setScore] = useState<number>(0);
   const [matchesFound, setMatchesFound] = useState<number>(0);
-  const [highScore, setHighScore] = useState<number>(initialHighScore ?? 60);
+  const [highScore, setHighScore] = useState<number | null>(initialHighScore ?? null);
   const [previewTimeLeft, setPreviewTimeLeft] = useState<number>(initialRevealSeconds);
   const [timeLeft, setTimeLeft] = useState<number>(timeLimitSeconds);
 
   // Refs for timer and handler access
   const scoreRef = useRef<number>(0);
   const matchesFoundRef = useRef<number>(0);
-  const highScoreRef = useRef<number>(initialHighScore ?? 60);
+  const highScoreRef = useRef<number | null>(initialHighScore ?? null);
 
   // Load high score from puzzle-data.json on mount
   useEffect(() => {
@@ -277,7 +277,11 @@ export const MatchingPuzzle: React.FC<MatchingPuzzleProps> = ({
           setMatchesFound(newMatches);
 
           // Beaten High Score Check
-          if (newScore > highScoreRef.current) {
+          if (highScoreRef.current !== null && newScore > highScoreRef.current) {
+            highScoreRef.current = newScore;
+            setHighScore(newScore);
+            onHighScoreBeaten?.('matching', newScore);
+          } else if (highScoreRef.current === null && newScore > 0) {
             highScoreRef.current = newScore;
             setHighScore(newScore);
             onHighScoreBeaten?.('matching', newScore);
@@ -356,7 +360,7 @@ export const MatchingPuzzle: React.FC<MatchingPuzzleProps> = ({
             </div>
 
             <div className="matching-hud-chip">
-              <span>Best: <span className="hud-val">{highScore}</span></span>
+              <span>Best: <span className="hud-val">{highScore !== null && highScore !== undefined ? highScore : 'n/a'}</span></span>
             </div>
           </div>
 

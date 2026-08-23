@@ -4,14 +4,12 @@ import { getIconSrc } from '../../assets/icon-loader';
 import { loadPuzzleData, formatPuzzleTime, PuzzleDataMap } from '../puzzles/puzzle-data-service';
 
 export interface PuzzleItem {
-  id: 'typing' | 'snake' | 'chess' | 'sudoku' | 'matching';
+  id: 'typing' | 'snake' | 'matching';
   name: string;
   icon: string;
   badge: string;
   description: string;
   targetScore: number;
-  highScore: number;
-  timePlayed?: string;
 }
 
 export const AVAILABLE_PUZZLES: PuzzleItem[] = [
@@ -22,7 +20,6 @@ export const AVAILABLE_PUZZLES: PuzzleItem[] = [
     badge: 'Memory',
     description: 'Match pairs of pixel icons before time runs out!',
     targetScore: 60,
-    highScore: 60,
   },
   {
     id: 'typing',
@@ -31,7 +28,6 @@ export const AVAILABLE_PUZZLES: PuzzleItem[] = [
     badge: 'Speed',
     description: 'Type words accurately and beat the high score within 30s!',
     targetScore: 50,
-    highScore: 40,
   },
   {
     id: 'snake',
@@ -40,31 +36,12 @@ export const AVAILABLE_PUZZLES: PuzzleItem[] = [
     badge: 'Arcade',
     description: 'Slither, collect apples, and dodge walls to score points!',
     targetScore: 50,
-    highScore: 40,
-  },
-  {
-    id: 'chess',
-    name: 'Pixel Chess',
-    icon: '♟️',
-    badge: 'Tactics',
-    description: 'Solve the Mate-in-1 Tactical challenge.',
-    targetScore: 100,
-    highScore: 100,
-  },
-  {
-    id: 'sudoku',
-    name: 'Mini Sudoku',
-    icon: '🔢',
-    badge: 'Logic',
-    description: 'Fill the 4x4 quick logic grid without row/col repeats.',
-    targetScore: 80,
-    highScore: 80,
   },
 ];
 
 export interface PuzzlesPanelProps {
   onClose: () => void;
-  onSelectPuzzle?: (puzzleId: 'typing' | 'snake' | 'chess' | 'sudoku' | 'matching') => void;
+  onSelectPuzzle?: (puzzleId: 'typing' | 'snake' | 'matching') => void;
 }
 
 export const PuzzlesPanel: React.FC<PuzzlesPanelProps> = ({ onClose, onSelectPuzzle }) => {
@@ -88,9 +65,16 @@ export const PuzzlesPanel: React.FC<PuzzlesPanelProps> = ({ onClose, onSelectPuz
     };
   }, []);
 
-  const totalTimePlayedAll = AVAILABLE_PUZZLES.reduce((acc, puzzle) => {
-    return acc + (puzzleStats[puzzle.id]?.totalTimeSeconds ?? 0);
-  }, 0);
+  const loadedPuzzlesWithTime = AVAILABLE_PUZZLES.filter(
+    (p) => puzzleStats[p.id]?.totalTimeSeconds !== undefined
+  );
+  const totalTimePlayedAll =
+    loadedPuzzlesWithTime.length > 0
+      ? loadedPuzzlesWithTime.reduce(
+          (acc, puzzle) => acc + (puzzleStats[puzzle.id]?.totalTimeSeconds || 0),
+          0
+        )
+      : undefined;
 
   return (
     <PanelContainer title="Puzzles & Games" icon="puzzles" className="puzzles-panel-card" onClose={onClose}>
@@ -111,9 +95,9 @@ export const PuzzlesPanel: React.FC<PuzzlesPanelProps> = ({ onClose, onSelectPuz
       {/* Puzzles list */}
       <div className="puzzles-list">
         {AVAILABLE_PUZZLES.map((puzzle) => {
-          const currentBest = puzzleStats[puzzle.id]?.highScore ?? puzzle.highScore;
-          const timePlayedSeconds = puzzleStats[puzzle.id]?.totalTimeSeconds ?? 0;
-          const formattedTimePlayed = formatPuzzleTime(timePlayedSeconds);
+          const stats = puzzleStats[puzzle.id];
+          const bestDisplay = stats?.highScore !== undefined ? stats.highScore : 'n/a';
+          const formattedTimePlayed = formatPuzzleTime(stats?.totalTimeSeconds);
 
           return (
             <div
@@ -154,7 +138,7 @@ export const PuzzlesPanel: React.FC<PuzzlesPanelProps> = ({ onClose, onSelectPuz
 
                 <div className="puzzle-item-meta-row">
                   <span className="puzzle-meta-chip">
-                    Best: <span className="meta-val">{currentBest}</span>
+                    Best: <span className="meta-val">{bestDisplay}</span>
                   </span>
                   <span className="puzzle-meta-chip">
                     Played: <span className="meta-val">{formattedTimePlayed}</span>

@@ -15,7 +15,7 @@ import { Store } from './Store';
 export interface PanelHostProps {
   activeOptionId: string | null;
   onClose: () => void;
-  onSelectPuzzle?: (puzzleId: 'typing' | 'snake' | 'chess' | 'sudoku' | 'matching') => void;
+  onSelectPuzzle?: (puzzleId: 'typing' | 'snake' | 'matching') => void;
 }
 
 export const PanelHost: React.FC<PanelHostProps> = ({

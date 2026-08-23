@@ -1,7 +1,5 @@
 import React, { useEffect } from 'react';
 import { SnakePuzzle } from './SnakePuzzle';
-import { ChessPuzzle } from './ChessPuzzle';
-import { SudokuPuzzle } from './SudokuPuzzle';
 import { TypingPuzzle } from './TypingPuzzle';
 import { MatchingPuzzle } from './MatchingPuzzle';
 import { addPuzzleTimeSpent } from './puzzle-data-service';
@@ -62,28 +60,6 @@ export const PuzzleHost: React.FC<PuzzleHostProps> = ({
     case 'typing':
       return (
         <TypingPuzzle
-          targetDomain={targetDomain}
-          onSuccess={onSuccess}
-          onCancel={onCancel}
-          onSuccessConfig={onSuccessConfig}
-          onHighScoreBeaten={onHighScoreBeaten}
-          initialHighScore={initialHighScore}
-        />
-      );
-    case 'chess':
-      return (
-        <ChessPuzzle
-          targetDomain={targetDomain}
-          onSuccess={onSuccess}
-          onCancel={onCancel}
-          onSuccessConfig={onSuccessConfig}
-          onHighScoreBeaten={onHighScoreBeaten}
-          initialHighScore={initialHighScore}
-        />
-      );
-    case 'sudoku':
-      return (
-        <SudokuPuzzle
           targetDomain={targetDomain}
           onSuccess={onSuccess}
           onCancel={onCancel}

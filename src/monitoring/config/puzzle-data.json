@@ -10,13 +10,5 @@
   "snake": {
     "highScore": 40,
     "totalTimeSeconds": 0
-  },
-  "chess": {
-    "highScore": 100,
-    "totalTimeSeconds": 0
-  },
-  "sudoku": {
-    "highScore": 80,
-    "totalTimeSeconds": 0
   }
 }

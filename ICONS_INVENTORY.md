@@ -83,8 +83,6 @@ Puzzles displayed in `PuzzlesPanel` cards and inside `PuzzleContainer` headers.
 | `matching` | Memory Match | ✅ `puzzles` (`puzzles.png`) | `src/components/puzzles/MatchingPuzzle.tsx` | Pixel cards / memory puzzle pieces |
 | `typing` | Speed Typer | ✅ `keyboard` (`keyboard.png`) | `src/components/puzzles/TypingPuzzle.tsx` | Pixel mechanical keyboard / typing icon |
 | `snake` | Retro Snake | ✅ `snake` (`snake.png`) | `src/components/puzzles/SnakePuzzle.tsx` | Pixel retro snake icon |
-| `chess` | Pixel Chess | `♟️` (Emoji) | `src/components/puzzles/ChessPuzzle.tsx` | Pixel chess knight or pawn piece |
-| `sudoku` | Mini Sudoku | `🔢` (Emoji) | `src/components/puzzles/SudokuPuzzle.tsx` | 4x4 numbered grid or dice |
 
 ---
 

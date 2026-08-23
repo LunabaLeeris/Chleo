@@ -2,7 +2,7 @@ import { resolveRewardItem } from '../items/items-registry';
 
 export type PanelOrientation = 'center' | 'left' | 'remain';
 export type AvatarPosition = 'bottom-right' | 'top-right' | 'center-right';
-export type Puzzles = 'snake' | 'chess' | 'sudoku' | 'typing' | 'matching';
+export type Puzzles = 'snake' | 'typing' | 'matching';
 
 export interface PuzzleRewardItem {
   id?: string;
@@ -112,7 +112,7 @@ export function normalizeBehavioralActions(
     promptPuzzle: normalizePromptPuzzleConfig(actions.promptPuzzle),
     openPuzzle: actions.openPuzzle && actions.openPuzzle.length > 0
       ? actions.openPuzzle
-      : ['snake', 'chess', 'sudoku'],
+      : ['snake', 'typing', 'matching'],
     orientation: actions.orientation || 'center',
     avatarPosition: actions.avatarPosition || 'bottom-right',
     interactable: actions.interactable ?? true,

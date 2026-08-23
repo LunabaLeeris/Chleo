@@ -119,8 +119,7 @@
         "openPuzzle": [
           "snake",
           "typing",
-          "chess",
-          "sudoku"
+          "matching"
         ],
         "orientation": "center",
         "avatarPosition": "bottom-right",

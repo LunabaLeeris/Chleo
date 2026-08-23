@@ -85,7 +85,7 @@ export const TypingPuzzle: React.FC<TypingPuzzleProps> = ({
   // Game states
   const [gameState, setGameState] = useState<GameState>('idle');
   const [score, setScore] = useState<number>(0);
-  const [highScore, setHighScore] = useState<number>(initialHighScore ?? 40);
+  const [highScore, setHighScore] = useState<number | null>(initialHighScore ?? null);
   const [timeLeft, setTimeLeft] = useState<number>(timeLimitSeconds);
   const [capsLockActive, setCapsLockActive] = useState<boolean>(false);
 
@@ -98,8 +98,8 @@ export const TypingPuzzle: React.FC<TypingPuzzleProps> = ({
   const [typedInput, setTypedInput] = useState<string>('');
 
   // Refs for state tracking inside timer and handlers
-  const highScoreRef = useRef<number>(initialHighScore ?? 40);
-  const sessionStartHighScoreRef = useRef<number>(initialHighScore ?? 40);
+  const highScoreRef = useRef<number | null>(initialHighScore ?? null);
+  const sessionStartHighScoreRef = useRef<number | null>(initialHighScore ?? null);
   const scoreRef = useRef<number>(0);
   const timerRef = useRef<number | null>(null);
   const containerRef = useRef<HTMLDivElement | null>(null);
@@ -259,7 +259,11 @@ export const TypingPuzzle: React.FC<TypingPuzzleProps> = ({
           setScore(newScore);
 
           // Check High Score
-          if (newScore > highScoreRef.current) {
+          if (highScoreRef.current !== null && newScore > highScoreRef.current) {
+            highScoreRef.current = newScore;
+            setHighScore(newScore);
+            onHighScoreBeaten?.('typing', newScore);
+          } else if (highScoreRef.current === null && newScore > 0) {
             highScoreRef.current = newScore;
             setHighScore(newScore);
             onHighScoreBeaten?.('typing', newScore);
@@ -392,7 +396,7 @@ export const TypingPuzzle: React.FC<TypingPuzzleProps> = ({
             </span>
 
             <span className="typing-hud-chip best-chip">
-              BEST: <span className="hud-val">{highScore}</span>
+              BEST: <span className="hud-val">{highScore !== null && highScore !== undefined ? highScore : 'n/a'}</span>
             </span>
           </div>
 
@@ -468,7 +472,7 @@ export const TypingPuzzle: React.FC<TypingPuzzleProps> = ({
                 TIME UP!
               </span>
               <span className="typing-prompt-hint">
-                Score: {score} pts {score <= sessionStartHighScoreRef.current ? `(Best: ${highScore})` : ''}
+                Score: {score} pts {sessionStartHighScoreRef.current !== null && score <= sessionStartHighScoreRef.current ? `(Best: ${highScore})` : ''}
               </span>
               <button type="button" className="typing-restart-btn" onClick={resetGame}>
                 Play Again

@@ -1,6 +1,6 @@
 export interface PuzzleRecord {
-  highScore: number;
-  totalTimeSeconds: number;
+  highScore?: number;
+  totalTimeSeconds?: number;
   [key: string]: any;
 }
 
@@ -12,16 +12,9 @@ export const normalizePuzzleId = (id: string): string => {
   return clean;
 };
 
-export const DEFAULT_PUZZLE_DATA: PuzzleDataMap = {
-  matching: { highScore: 60, totalTimeSeconds: 0 },
-  typing: { highScore: 40, totalTimeSeconds: 0 },
-  snake: { highScore: 40, totalTimeSeconds: 0 },
-  chess: { highScore: 100, totalTimeSeconds: 0 },
-  sudoku: { highScore: 80, totalTimeSeconds: 0 },
-};
-
 /**
  * Loads puzzle-data.json via electronAPI if available.
+ * Returns empty record map if no data is found rather than fabricated default values.
  */
 export async function loadPuzzleData(): Promise<PuzzleDataMap> {
   try {
@@ -34,20 +27,20 @@ export async function loadPuzzleData(): Promise<PuzzleDataMap> {
           for (const [key, val] of Object.entries(parsed)) {
             if (val && typeof val === 'object') {
               const record = val as Record<string, any>;
-              const highScore = typeof record.highScore === 'number' ? record.highScore : 0;
+              const highScore = typeof record.highScore === 'number' ? record.highScore : undefined;
               const totalTimeSeconds =
                 typeof record.totalTimeSeconds === 'number'
                   ? record.totalTimeSeconds
                   : typeof record.timeSpentSeconds === 'number'
-                  ? record.timeSpentSeconds
-                  : typeof record.timePlayedSeconds === 'number'
-                  ? record.timePlayedSeconds
-                  : 0;
+                    ? record.timeSpentSeconds
+                    : typeof record.timePlayedSeconds === 'number'
+                      ? record.timePlayedSeconds
+                      : undefined;
 
               result[normalizePuzzleId(key)] = {
                 ...record,
-                highScore,
-                totalTimeSeconds,
+                ...(highScore !== undefined ? { highScore } : {}),
+                ...(totalTimeSeconds !== undefined ? { totalTimeSeconds } : {}),
               };
             }
           }
@@ -58,7 +51,7 @@ export async function loadPuzzleData(): Promise<PuzzleDataMap> {
   } catch (e) {
     console.warn('[puzzle-data-service] Failed to load puzzle data:', e);
   }
-  return { ...DEFAULT_PUZZLE_DATA };
+  return {};
 }
 
 /**
@@ -104,54 +97,70 @@ export function enqueuePuzzleUpdate(
 
 /**
  * Increment total time spent playing a puzzle.
+ * If record is missing (n/a), fails safely with a debug error without crashing.
  */
 export async function addPuzzleTimeSpent(puzzleId: string, secondsToAdd: number): Promise<boolean> {
   if (secondsToAdd <= 0) return true;
   const normId = normalizePuzzleId(puzzleId);
 
   return enqueuePuzzleUpdate((data) => {
-    const existing = data[normId] || {
-      highScore: DEFAULT_PUZZLE_DATA[normId]?.highScore ?? 0,
-      totalTimeSeconds: 0,
-    };
+    const existing = data[normId];
+    if (!existing) {
+      console.error(
+        `[puzzle-data-service] Write error: Cannot add time spent for puzzle "${puzzleId}" because record is missing / n/a.`
+      );
+      return;
+    }
+    const currentSeconds = existing.totalTimeSeconds;
+    if (currentSeconds === undefined || currentSeconds === null) {
+      console.error(
+        `[puzzle-data-service] Write error: Cannot add time spent for puzzle "${puzzleId}" because totalTimeSeconds is n/a.`
+      );
+      return;
+    }
     data[normId] = {
       ...existing,
-      totalTimeSeconds: (existing.totalTimeSeconds || 0) + secondsToAdd,
+      totalTimeSeconds: currentSeconds + secondsToAdd,
     };
   });
 }
 
 /**
  * Update high score for a puzzle.
+ * If record is missing (n/a), fails safely with a debug error without crashing.
  */
 export async function updatePuzzleHighScore(puzzleId: string, newHighScore: number): Promise<boolean> {
   const normId = normalizePuzzleId(puzzleId);
 
   return enqueuePuzzleUpdate((data) => {
-    const existing = data[normId] || {
-      highScore: 0,
-      totalTimeSeconds: 0,
-    };
+    const existing = data[normId];
+    if (!existing) {
+      console.error(
+        `[puzzle-data-service] Write error: Cannot update high score for puzzle "${puzzleId}" because record is missing / n/a.`
+      );
+      return;
+    }
+    const currentHighScore = existing.highScore;
+    if (currentHighScore === undefined || currentHighScore === null) {
+      console.error(
+        `[puzzle-data-service] Write error: Cannot update high score for puzzle "${puzzleId}" because highScore is n/a.`
+      );
+      return;
+    }
     data[normId] = {
       ...existing,
-      highScore: Math.max(existing.highScore || 0, newHighScore),
+      highScore: Math.max(currentHighScore, newHighScore),
     };
   });
 }
 
 /**
  * Formats a duration in seconds into a clean human-readable string.
- * Examples:
- * - 0 -> '0m'
- * - 45 -> '45s'
- * - 60 -> '1m'
- * - 75 -> '1m 15s'
- * - 3600 -> '1h'
- * - 3665 -> '1h 1m'
+ * Returns 'n/a' when totalSeconds is undefined, null, negative, or not loaded.
  */
-export function formatPuzzleTime(totalSeconds: number): string {
-  if (!totalSeconds || totalSeconds <= 0) {
-    return '0m';
+export function formatPuzzleTime(totalSeconds: number | undefined | null): string {
+  if (totalSeconds === undefined || totalSeconds === null || isNaN(totalSeconds) || totalSeconds < 0) {
+    return 'n/a';
   }
   if (totalSeconds < 60) {
     return `${Math.floor(totalSeconds)}s`;

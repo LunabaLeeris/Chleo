@@ -71,8 +71,8 @@ export const SnakePuzzle: React.FC<SnakePuzzleProps> = ({
   // Game logic states
   const [gameState, setGameState] = useState<GameState>('idle');
   const [score, setScore] = useState<number>(0);
-  const [highScore, setHighScore] = useState<number>(initialHighScore ?? 120);
-  const highScoreRef = useRef<number>(initialHighScore ?? 120);
+  const [highScore, setHighScore] = useState<number | null>(initialHighScore ?? null);
+  const highScoreRef = useRef<number | null>(initialHighScore ?? null);
   const chompsRef = useRef<number>(0);
 
   // Load high score from puzzle-data.json on mount
@@ -341,7 +341,11 @@ export const SnakePuzzle: React.FC<SnakePuzzleProps> = ({
 
         const newScore = score + SNAKE_SETTINGS.scorePerFood;
         setScore(newScore);
-        if (newScore > highScoreRef.current) {
+        if (highScoreRef.current !== null && newScore > highScoreRef.current) {
+          highScoreRef.current = newScore;
+          setHighScore(newScore);
+          onHighScoreBeaten?.('snake', newScore);
+        } else if (highScoreRef.current === null && newScore > 0) {
           highScoreRef.current = newScore;
           setHighScore(newScore);
           onHighScoreBeaten?.('snake', newScore);
@@ -413,7 +417,7 @@ export const SnakePuzzle: React.FC<SnakePuzzleProps> = ({
               SCORE: <span className="hud-val">{isChallenge && targetScore ? `${score}/${targetScore}` : score}</span>
             </span>
             <span className="snake-hud-chip best-chip">
-              BEST: <span className="hud-val">{highScore}</span>
+              BEST: <span className="hud-val">{highScore !== null && highScore !== undefined ? highScore : 'n/a'}</span>
             </span>
           </div>
 
