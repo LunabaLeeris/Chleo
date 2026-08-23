@@ -4,6 +4,7 @@ import { TypingPuzzle } from './TypingPuzzle';
 import { MatchingPuzzle } from './MatchingPuzzle';
 import { addPuzzleTimeSpent } from './puzzle-data-service';
 import type { PuzzleSuccessConfig } from '../../monitoring/behavioral-engine';
+import type { EmotionalState } from '../../avatar/emotions/emotion-types';
 
 export interface PuzzleHostProps {
   puzzleId: string;
@@ -13,6 +14,8 @@ export interface PuzzleHostProps {
   onSuccessConfig?: PuzzleSuccessConfig;
   onHighScoreBeaten?: (puzzleId: string, newHighScore: number) => void;
   initialHighScore?: number;
+  emotionalState?: Partial<EmotionalState>;
+  targetScore?: number;
 }
 
 export const PuzzleHost: React.FC<PuzzleHostProps> = ({
@@ -23,6 +26,8 @@ export const PuzzleHost: React.FC<PuzzleHostProps> = ({
   onSuccessConfig,
   onHighScoreBeaten,
   initialHighScore,
+  emotionalState,
+  targetScore,
 }) => {
   useEffect(() => {
     let lastFlushedTime = Date.now();
@@ -55,6 +60,8 @@ export const PuzzleHost: React.FC<PuzzleHostProps> = ({
           onSuccessConfig={onSuccessConfig}
           onHighScoreBeaten={onHighScoreBeaten}
           initialHighScore={initialHighScore}
+          emotionalState={emotionalState}
+          targetScore={targetScore}
         />
       );
     case 'typing':
@@ -66,6 +73,8 @@ export const PuzzleHost: React.FC<PuzzleHostProps> = ({
           onSuccessConfig={onSuccessConfig}
           onHighScoreBeaten={onHighScoreBeaten}
           initialHighScore={initialHighScore}
+          emotionalState={emotionalState}
+          targetScore={targetScore}
         />
       );
     case 'snake':
@@ -78,6 +87,8 @@ export const PuzzleHost: React.FC<PuzzleHostProps> = ({
           onSuccessConfig={onSuccessConfig}
           onHighScoreBeaten={onHighScoreBeaten}
           initialHighScore={initialHighScore}
+          emotionalState={emotionalState}
+          targetScore={targetScore}
         />
       );
   }

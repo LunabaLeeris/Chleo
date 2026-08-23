@@ -2,6 +2,7 @@ import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { PuzzleContainer } from './PuzzleContainer';
 import type { PuzzleComponentProps, PuzzleConfig } from './puzzle-types';
 import { getRandomWord } from './typing-words';
+import { calculateTypingTargetScore } from './puzzle-target-score';
 
 /**
  * Visual Color Theme for Typing Puzzle.
@@ -37,8 +38,6 @@ export const TYPING_SETTINGS = {
 
   // Amount of upcoming texts/words we can see in the future
   futureWordsCount: 2,            // How many upcoming words to preview below the current word
-
-  // Font size settings (easily customized)
   currentWordFontSize: '2.35rem', // Font size for active middle word
   prevWordFontSize: '1.25rem',    // Font size for previously typed word
   futureWordFontSize: '1.25rem',  // Font size for upcoming future words
@@ -73,15 +72,52 @@ export const TypingPuzzle: React.FC<TypingPuzzleProps> = ({
   onCancel,
   onHighScoreBeaten,
   initialHighScore,
+  emotionalState,
   timeLimitSeconds = TYPING_SETTINGS.timeLimitSeconds,
   scorePerWord = TYPING_SETTINGS.scorePerWord,
-  targetScore = TYPING_SETTINGS.targetScore,
+  targetScore: propTargetScore,
   futureWordsCount = TYPING_SETTINGS.futureWordsCount,
   currentWordFontSize = TYPING_SETTINGS.currentWordFontSize,
   prevWordFontSize = TYPING_SETTINGS.prevWordFontSize,
   futureWordFontSize = TYPING_SETTINGS.futureWordFontSize,
   rowGap = TYPING_SETTINGS.rowGap,
 }) => {
+  // Dynamic emotion-based target score
+  const [targetScore, setTargetScore] = useState<number>(() =>
+    propTargetScore !== undefined
+      ? propTargetScore
+      : calculateTypingTargetScore(emotionalState)
+  );
+
+  // Sync / fetch dynamic emotion target score on mount
+  useEffect(() => {
+    let isMounted = true;
+    const initTargetScore = async () => {
+      if (propTargetScore !== undefined) {
+        setTargetScore(propTargetScore);
+        return;
+      }
+      if (emotionalState) {
+        setTargetScore(calculateTypingTargetScore(emotionalState));
+        return;
+      }
+      try {
+        if (typeof window !== 'undefined' && (window as any).electronAPI?.getEmotionState) {
+          const emotions = await (window as any).electronAPI.getEmotionState();
+          if (emotions && isMounted) {
+            setTargetScore(calculateTypingTargetScore(emotions));
+          }
+        }
+      } catch (e) {
+        console.warn('[TypingPuzzle] Failed to fetch emotion state for target score:', e);
+      }
+    };
+    initTargetScore();
+    return () => {
+      isMounted = false;
+    };
+  }, [propTargetScore, emotionalState]);
+
   // Game states
   const [gameState, setGameState] = useState<GameState>('idle');
   const [score, setScore] = useState<number>(0);

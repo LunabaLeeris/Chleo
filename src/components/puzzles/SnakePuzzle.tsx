@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { PuzzleContainer } from './PuzzleContainer';
 import type { PuzzleComponentProps, PuzzleConfig } from './puzzle-types';
+import { calculateSnakeTargetScore } from './puzzle-target-score';
 
 export const SNAKE_THEME = {
   boardBackground: '#0c0c0cff',
@@ -59,14 +60,51 @@ export const SnakePuzzle: React.FC<SnakePuzzleProps> = ({
   onCancel,
   onHighScoreBeaten,
   initialHighScore,
+  emotionalState,
   gridSize = SNAKE_SETTINGS.gridSize,
   cellSize = SNAKE_SETTINGS.cellSize,
   initialSpeedMs = SNAKE_SETTINGS.initialSpeedMs,
   minSpeedMs = SNAKE_SETTINGS.minSpeedMs,
   speedStepMs = SNAKE_SETTINGS.speedStepMs,
-  targetScore = SNAKE_SETTINGS.targetScore,
+  targetScore: propTargetScore,
 }) => {
   const canvasRef = useRef<HTMLCanvasElement | null>(null);
+
+  // Dynamic emotion-based target score
+  const [targetScore, setTargetScore] = useState<number>(() =>
+    propTargetScore !== undefined
+      ? propTargetScore
+      : calculateSnakeTargetScore(emotionalState)
+  );
+
+  // Sync / fetch dynamic emotion target score on mount
+  useEffect(() => {
+    let isMounted = true;
+    const initTargetScore = async () => {
+      if (propTargetScore !== undefined) {
+        setTargetScore(propTargetScore);
+        return;
+      }
+      if (emotionalState) {
+        setTargetScore(calculateSnakeTargetScore(emotionalState));
+        return;
+      }
+      try {
+        if (typeof window !== 'undefined' && (window as any).electronAPI?.getEmotionState) {
+          const emotions = await (window as any).electronAPI.getEmotionState();
+          if (emotions && isMounted) {
+            setTargetScore(calculateSnakeTargetScore(emotions));
+          }
+        }
+      } catch (e) {
+        console.warn('[SnakePuzzle] Failed to fetch emotion state for target score:', e);
+      }
+    };
+    initTargetScore();
+    return () => {
+      isMounted = false;
+    };
+  }, [propTargetScore, emotionalState]);
 
   // Game logic states
   const [gameState, setGameState] = useState<GameState>('idle');

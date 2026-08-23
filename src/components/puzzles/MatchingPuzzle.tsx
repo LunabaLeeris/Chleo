@@ -3,6 +3,7 @@ import { PuzzleContainer } from './PuzzleContainer';
 import type { PuzzleComponentProps, PuzzleConfig } from './puzzle-types';
 import { getIconSrc } from '../../assets/icon-loader';
 import CARDBG_IMG from '../../assets/icons/cardbg.png';
+import { calculateMatchingTargetScore } from './puzzle-target-score';
 
 /**
  * Visual Color Theme for Matching Puzzle.
@@ -123,16 +124,53 @@ export const MatchingPuzzle: React.FC<MatchingPuzzleProps> = ({
   onCancel,
   onHighScoreBeaten,
   initialHighScore,
+  emotionalState,
   pairCount = MATCHING_SETTINGS.pairCount,
   columns = MATCHING_SETTINGS.columns,
   iconSize = MATCHING_SETTINGS.iconSize,
   initialRevealSeconds = MATCHING_SETTINGS.initialRevealSeconds,
   timeLimitSeconds = MATCHING_SETTINGS.timeLimitSeconds,
   scorePerMatch = MATCHING_SETTINGS.scorePerMatch,
-  targetScore = MATCHING_SETTINGS.targetScore,
+  targetScore: propTargetScore,
   mismatchDelayMs = MATCHING_SETTINGS.mismatchDelayMs,
   cardBackImage = MATCHING_SETTINGS.cardBackImage,
 }) => {
+  // Dynamic emotion-based target score
+  const [targetScore, setTargetScore] = useState<number>(() =>
+    propTargetScore !== undefined
+      ? propTargetScore
+      : calculateMatchingTargetScore(emotionalState)
+  );
+
+  // Sync / fetch dynamic emotion target score on mount
+  useEffect(() => {
+    let isMounted = true;
+    const initTargetScore = async () => {
+      if (propTargetScore !== undefined) {
+        setTargetScore(propTargetScore);
+        return;
+      }
+      if (emotionalState) {
+        setTargetScore(calculateMatchingTargetScore(emotionalState));
+        return;
+      }
+      try {
+        if (typeof window !== 'undefined' && (window as any).electronAPI?.getEmotionState) {
+          const emotions = await (window as any).electronAPI.getEmotionState();
+          if (emotions && isMounted) {
+            setTargetScore(calculateMatchingTargetScore(emotions));
+          }
+        }
+      } catch (e) {
+        console.warn('[MatchingPuzzle] Failed to fetch emotion state for target score:', e);
+      }
+    };
+    initTargetScore();
+    return () => {
+      isMounted = false;
+    };
+  }, [propTargetScore, emotionalState]);
+
   // Game states
   const [gameState, setGameState] = useState<MatchingGameState>('preview');
   const [cards, setCards] = useState<CardItem[]>(() => createShuffledDeck(pairCount));
@@ -287,10 +325,10 @@ export const MatchingPuzzle: React.FC<MatchingPuzzleProps> = ({
             onHighScoreBeaten?.('matching', newScore);
           }
 
-          // Check if all pairs are matched (Win Condition)
-          if (newMatches >= pairCount) {
+          // Check if all pairs are matched or challenge target score reached
+          const isChallenge = Boolean(targetDomain);
+          if (newMatches >= pairCount || (isChallenge && targetScore && newScore >= targetScore)) {
             setGameState('won');
-            const isChallenge = Boolean(targetDomain);
             if (isChallenge) {
               // Trigger challenge success
               onSuccess(newScore);
@@ -356,7 +394,7 @@ export const MatchingPuzzle: React.FC<MatchingPuzzleProps> = ({
 
             {/* Score & Best */}
             <div className="matching-hud-chip">
-              <span>Score: <span className="hud-val">{score}</span></span>
+              <span>Score: <span className="hud-val">{isChallenge && targetScore ? `${score}/${targetScore}` : score}</span></span>
             </div>
 
             <div className="matching-hud-chip">
