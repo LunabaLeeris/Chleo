@@ -7,6 +7,7 @@ import { MenuBarComponent } from './components/menu-bar';
 import { PanelHost } from './components/panels/PanelHost';
 import { ActionPrompt } from './components/action-prompt/ActionPrompt';
 import { PuzzleHost } from './components/puzzles/PuzzleHost';
+import { updatePuzzleHighScore } from './components/puzzles/puzzle-data-service';
 import { RewardPanel } from './components/panels/RewardPanel';
 import { processItemUsage } from './items/item-processor';
 import { logger } from './logger';
@@ -373,23 +374,7 @@ function showPuzzlePanel(puzzleState: ActivePuzzleState) {
 
         // Rewrite the high score in backend for that puzzle
         try {
-          let puzzleData: Record<string, any> = {};
-          const raw = await (window as any).electronAPI?.readMemoryFile?.('puzzle-data.json');
-          if (raw) {
-            try {
-              puzzleData = JSON.parse(raw);
-            } catch {
-              puzzleData = {};
-            }
-          }
-          puzzleData[puzzleId] = {
-            ...(puzzleData[puzzleId] || {}),
-            highScore: newHighScore,
-          };
-          await (window as any).electronAPI?.saveMemoryFile?.(
-            'puzzle-data.json',
-            JSON.stringify(puzzleData, null, 2)
-          );
+          await updatePuzzleHighScore(puzzleId, newHighScore);
         } catch (err: any) {
           logger.error('puzzle', `Failed to save new high score for ${puzzleId}: ${err?.message || err}`);
         }

@@ -1,11 +1,22 @@
 {
   "snake": {
-    "highScore": 70
+    "highScore": 80,
+    "totalTimeSeconds": 18
   },
   "typing": {
-    "highScore": 290
+    "highScore": 290,
+    "totalTimeSeconds": 0
   },
   "matching": {
-    "highScore": 100
+    "highScore": 100,
+    "totalTimeSeconds": 0
+  },
+  "chess": {
+    "highScore": 100,
+    "totalTimeSeconds": 0
+  },
+  "sudoku": {
+    "highScore": 80,
+    "totalTimeSeconds": 0
   }
 }

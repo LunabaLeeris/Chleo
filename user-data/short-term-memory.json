@@ -1,6 +1,24 @@
 {
   "events": [
     {
+      "type": "high_score_beaten",
+      "domain": "retro-snake",
+      "details": "Congrats. you beat your high score!",
+      "emotionDelta": {
+        "joy": 0,
+        "trust": 0,
+        "fear": 0,
+        "surprise": 0,
+        "sadness": 0,
+        "disgust": 0,
+        "anger": 0,
+        "anticipation": 0
+      },
+      "id": "stm_1787312019232_5mfx4",
+      "timestamp": 1787312019232,
+      "formattedText": "default"
+    },
+    {
       "type": "food_used",
       "domain": "fridge",
       "details": "You're so generous",
@@ -56,6 +74,7 @@
     }
   ],
   "recentSpeechPhrases": [
+    "Congrats. you beat your high score!",
     "You're so generous",
     "For me?",
     "You're so generous",
@@ -64,8 +83,7 @@
     "Fine, I will be patient. ",
     "Well. If that's what you want",
     "Again?",
-    "Wow, that looks delicious",
-    "What will that be for?"
+    "Wow, that looks delicious"
   ],
   "activeWarnings": [],
   "currentActiveDomain": "github.com",

@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { PanelContainer } from './PanelContainer';
 import { getIconSrc } from '../../assets/icon-loader';
+import { loadPuzzleData, formatPuzzleTime, PuzzleDataMap } from '../puzzles/puzzle-data-service';
 
 export interface PuzzleItem {
   id: 'typing' | 'snake' | 'chess' | 'sudoku' | 'matching';
@@ -10,7 +11,7 @@ export interface PuzzleItem {
   description: string;
   targetScore: number;
   highScore: number;
-  timePlayed: string;
+  timePlayed?: string;
 }
 
 export const AVAILABLE_PUZZLES: PuzzleItem[] = [
@@ -22,7 +23,6 @@ export const AVAILABLE_PUZZLES: PuzzleItem[] = [
     description: 'Match pairs of pixel icons before time runs out!',
     targetScore: 60,
     highScore: 60,
-    timePlayed: '12m',
   },
   {
     id: 'typing',
@@ -32,7 +32,6 @@ export const AVAILABLE_PUZZLES: PuzzleItem[] = [
     description: 'Type words accurately and beat the high score within 30s!',
     targetScore: 50,
     highScore: 40,
-    timePlayed: '10m',
   },
   {
     id: 'snake',
@@ -42,7 +41,6 @@ export const AVAILABLE_PUZZLES: PuzzleItem[] = [
     description: 'Slither, collect apples, and dodge walls to score points!',
     targetScore: 50,
     highScore: 40,
-    timePlayed: '18m',
   },
   {
     id: 'chess',
@@ -52,7 +50,6 @@ export const AVAILABLE_PUZZLES: PuzzleItem[] = [
     description: 'Solve the Mate-in-1 Tactical challenge.',
     targetScore: 100,
     highScore: 100,
-    timePlayed: '12m',
   },
   {
     id: 'sudoku',
@@ -62,7 +59,6 @@ export const AVAILABLE_PUZZLES: PuzzleItem[] = [
     description: 'Fill the 4x4 quick logic grid without row/col repeats.',
     targetScore: 80,
     highScore: 80,
-    timePlayed: '15m',
   },
 ];
 
@@ -72,36 +68,29 @@ export interface PuzzlesPanelProps {
 }
 
 export const PuzzlesPanel: React.FC<PuzzlesPanelProps> = ({ onClose, onSelectPuzzle }) => {
-  const [puzzleHighScores, setPuzzleHighScores] = useState<Record<string, number>>({});
+  const [puzzleStats, setPuzzleStats] = useState<PuzzleDataMap>({});
 
   useEffect(() => {
     let isMounted = true;
-    const loadPuzzleData = async () => {
+    const fetchPuzzleData = async () => {
       try {
-        if (typeof window !== 'undefined' && (window as any).electronAPI?.readMemoryFile) {
-          const raw = await (window as any).electronAPI.readMemoryFile('puzzle-data.json');
-          if (raw && isMounted) {
-            const parsed = JSON.parse(raw);
-            const scoreMap: Record<string, number> = {};
-            if (parsed && typeof parsed === 'object') {
-              for (const [key, val] of Object.entries(parsed)) {
-                if (val && typeof (val as any).highScore === 'number') {
-                  scoreMap[key] = (val as any).highScore;
-                }
-              }
-            }
-            setPuzzleHighScores(scoreMap);
-          }
+        const data = await loadPuzzleData();
+        if (isMounted) {
+          setPuzzleStats(data);
         }
       } catch (e) {
-        console.warn('[PuzzlesPanel] Failed to load high scores from puzzle-data.json:', e);
+        console.warn('[PuzzlesPanel] Failed to load puzzle data:', e);
       }
     };
-    loadPuzzleData();
+    fetchPuzzleData();
     return () => {
       isMounted = false;
     };
   }, []);
+
+  const totalTimePlayedAll = AVAILABLE_PUZZLES.reduce((acc, puzzle) => {
+    return acc + (puzzleStats[puzzle.id]?.totalTimeSeconds ?? 0);
+  }, 0);
 
   return (
     <PanelContainer title="Puzzles & Games" icon="puzzles" className="puzzles-panel-card" onClose={onClose}>
@@ -113,14 +102,19 @@ export const PuzzlesPanel: React.FC<PuzzlesPanelProps> = ({ onClose, onSelectPuz
         </div>
         <div className="puzzles-stat-pill">
           <span className="stat-label">Time Played</span>
-          <span className="stat-value" style={{ color: '#16a34a' }}>55m</span>
+          <span className="stat-value" style={{ color: '#16a34a' }}>
+            {formatPuzzleTime(totalTimePlayedAll)}
+          </span>
         </div>
       </div>
 
       {/* Puzzles list */}
       <div className="puzzles-list">
         {AVAILABLE_PUZZLES.map((puzzle) => {
-          const currentBest = puzzleHighScores[puzzle.id] ?? puzzle.highScore;
+          const currentBest = puzzleStats[puzzle.id]?.highScore ?? puzzle.highScore;
+          const timePlayedSeconds = puzzleStats[puzzle.id]?.totalTimeSeconds ?? 0;
+          const formattedTimePlayed = formatPuzzleTime(timePlayedSeconds);
+
           return (
             <div
               key={puzzle.id}
@@ -163,7 +157,7 @@ export const PuzzlesPanel: React.FC<PuzzlesPanelProps> = ({ onClose, onSelectPuz
                     Best: <span className="meta-val">{currentBest}</span>
                   </span>
                   <span className="puzzle-meta-chip">
-                    Played: <span className="meta-val">{puzzle.timePlayed}</span>
+                    Played: <span className="meta-val">{formattedTimePlayed}</span>
                   </span>
                 </div>
               </div>
@@ -174,4 +168,3 @@ export const PuzzlesPanel: React.FC<PuzzlesPanelProps> = ({ onClose, onSelectPuz
     </PanelContainer>
   );
 };
-
